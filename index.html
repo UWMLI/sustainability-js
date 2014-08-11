@@ -9,7 +9,14 @@
 <title>Game</title>
 
 <link href="style.css" rel="stylesheet" type="text/css"></link>
-<script type="text/javascript" src="model.js"></script>
+<script type='text/javascript' src='src/utils/webgl-utils.js'></script>
+<script type="text/javascript" src="src/utils/canv.js"></script>
+<script type="text/javascript" src="src/stage.js"></script>
+<script type="text/javascript" src="src/game.js"></script>
+<script type="text/javascript" src="src/model.js"></script>
+<script type="text/javascript" src="src/scenes/nullScene.js"></script>
+<script type="text/javascript" src="src/scenes/loading/loadingScene.js"></script>
+<script type="text/javascript" src="src/scenes/gameplay/gameplayScene.js"></script>
 <script type="text/javascript">
     window.onerror = function(msg, url, linenumber) { alert('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber); return true; };
 
@@ -20,19 +27,16 @@
     ARIS.ready = function() { partReady(); };
     window.addEventListener('load', partReady, false);
     //Sync with ARIS for data
-    function jsLoaded() { m.fetchSync(begin); }
+    function jsLoaded() { m.fetchSync(g.begin); }
 
     var m = new Model();
-
-    function begin()
-    {
-
-    }
+    var g = new Game();
 </script>
 </head>
 
 <body class='full_screen'>
-    <div id='loading' class='full_screen'>&nbsp;<img height='12px' src='assets/spinner.gif'></img> Loading...</div>
+  <div id="stage_container" style="display:block; margin:50px auto 20px auto; width:640px;"></div>
 </body>
 
 </html>
+
