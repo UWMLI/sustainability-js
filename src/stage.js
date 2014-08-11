@@ -1,7 +1,7 @@
 var Stage = function()
 {
-  var width = 640;
-  var height = 320;
+  var width = document.getElementById("stage_container").offsetWidth;
+  var height = document.getElementById("stage_container").offsetHeight;
 
   this.drawCanv = new Canv(width,height);
   this.drawCanv.context.fillStyle = "#000000";
@@ -21,6 +21,6 @@ var Stage = function()
     this.dispCanv.clear();
   };
 
-  document.getElementById("stage_container").insertBefore(this.dispCanv.canvas, document.getElementById("shadow"));
+  document.getElementById("stage_container").appendChild(this.dispCanv.canvas);
 };
 

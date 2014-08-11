@@ -20,6 +20,9 @@
 <script type="text/javascript">
     window.onerror = function(msg, url, linenumber) { alert('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber); return true; };
 
+    var m;//model
+    var g;//game
+
     //Prepare and load HTML+JS
     var ARIS = {};
     var readyCount = 2;
@@ -27,15 +30,19 @@
     ARIS.ready = function() { partReady(); };
     window.addEventListener('load', partReady, false);
     //Sync with ARIS for data
-    function jsLoaded() { m.fetchSync(g.begin); }
+    function jsLoaded() { m = new Model(); g = new Game(); m.fetchSync(g.begin); }
 
-    var m = new Model();
-    var g = new Game();
+    //Uncomment to test on PC
+    ///*
+    ARIS.parseURLParams = function(url){ return {"gameId":0,"playerId":0,"webPageId":0}; };
+    ARIS.getItemCount = function(itemId){ ARIS.didUpdateItemQty(itemId, 1); };
+    ARIS.ready();
+    //*/
 </script>
 </head>
 
 <body class='full_screen'>
-  <div id="stage_container" style="display:block; margin:50px auto 20px auto; width:640px;"></div>
+  <div id="stage_container" style="width:640px; height:12px;"></div>
 </body>
 
 </html>
