@@ -1,0 +1,36 @@
+@font-face
+{
+    font-family:archer_font;
+    src:url('fonts/Archer/Archer-Medium-Pro.otf');
+}
+
+@font-face
+{
+    font-family:gotham_font;
+    src:url('fonts/Gotham/Gotham-Black.otf');
+}
+
+div,span,html,body
+{
+    padding:0px;
+    margin:0px;
+}
+
+body
+{
+    user-select:none;
+    -webkit-user-select:none;
+    font-family:"HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+}
+
+.full_screen
+{
+    width:320px;
+    height:504px;
+    position:absolute;
+    top:0px;
+    left:0px;
+    overflow:hidden;
+    background-size:320px 504px;
+}
+
