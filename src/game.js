@@ -1,4 +1,4 @@
-var Game = function()
+var Game = function(GamePlayScene)
 {
   var self = this;
 
