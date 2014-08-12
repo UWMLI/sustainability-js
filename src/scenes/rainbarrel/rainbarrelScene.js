@@ -5,6 +5,7 @@ var RainBarrelScene = function(game, canv)
   self.ticker;
   self.clicker;
   self.drawer;
+  self.assetter;
 
   self.player;
   self.buttons;
@@ -21,6 +22,7 @@ var RainBarrelScene = function(game, canv)
     self.ticker = new Ticker();
     self.clicker = new Clicker();
     self.drawer = new Drawer(canv);
+    self.assetter = new Assetter();
 
     self.player = new RB_Player(self);
     self.buttons = [];
@@ -63,6 +65,29 @@ var RainBarrelScene = function(game, canv)
   };
 };
 
+var RB_Player = function(game)
+{
+  var self = this;
+  self.floor = 0;
+  self.img = game.assetter.asset("assets/man.png");
+
+  self.setFloor = function(floor)
+  {
+    if(floor == self.floor) game.sweaterFactory.produce();
+    self.floor = floor;
+  }
+
+  self.tick = function()
+  {
+
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.drawImage(self.img,10,(game.numFloors-self.floor)*100);
+  }
+}
+
 var RB_EnemyFactory = function(game)
 {
   var self = this;
@@ -90,9 +115,7 @@ var RB_Enemy = function(game, floor)
   self.width = 50;
   self.height = 50;
 
-  //switch asset, and don't actually load new image for every entity
-  var man = new Image();
-  man.src = "assets/man.png";
+  self.img = game.assetter.asset("assets/man.png");
 
   self.tick = function()
   {
@@ -102,7 +125,7 @@ var RB_Enemy = function(game, floor)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(man,self.x,self.y,self.width,self.height);
+    canv.context.drawImage(self.img,self.x,self.y,self.width,self.height);
   }
 
   self.kill = function()
@@ -137,9 +160,7 @@ var RB_Sweater = function(game, floor)
   self.width = 50;
   self.height = 50;
 
-  //switch asset, and don't actually load new image for every entity
-  var man = new Image();
-  man.src = "assets/man.png";
+  self.img = game.assetter.asset("assets/man.png");
 
   self.tick = function()
   {
@@ -160,7 +181,7 @@ var RB_Sweater = function(game, floor)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(man,self.x,self.y,self.width,self.height);
+    canv.context.drawImage(self.img,self.x,self.y,self.width,self.height);
   }
 
   self.kill = function()
