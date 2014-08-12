@@ -1,25 +1,26 @@
 var GamePlayScene = function(game, canv)
 {
   var self = this;
-  var tickables;
-  var drawables;
+  var ticker;
+  var clicker;
+  var drawer;
 
   self.ready = function()
   {
-    tickables = [];
-    drawables = [];
+    ticker = new Ticker();
+    clicker = new Clicker();
+    drawer = new Drawer(canv);
   };
 
   self.tick = function()
   {
-    for(var i = 0; i < tickables.length; i++)
-      tickables[i].tick(ih);
+    clicker.flush();
+    ticker.flush();
   };
 
   self.draw = function()
   {
-    for(var i = 0; i < drawables.length; i++)
-      drawables[i].draw(canv);
+    drawer.flush();
   };
 
   self.cleanup = function()
