@@ -28,12 +28,13 @@ var RainBarrelScene = function(game, canv)
     self.sweaters = [];
 
     self.enemyFactory = new RB_EnemyFactory(self);
+    self.sweaterFactory = new RB_SweaterFactory(self);
 
-    self.buttons.push(new Clickable({"x":0,"y":100,"w":100,"h":100,"callback":function(){self.player.floor = 4;}}));
-    self.buttons.push(new Clickable({"x":0,"y":200,"w":100,"h":100,"callback":function(){self.player.floor = 3;}}));
-    self.buttons.push(new Clickable({"x":0,"y":300,"w":100,"h":100,"callback":function(){self.player.floor = 2;}}));
-    self.buttons.push(new Clickable({"x":0,"y":400,"w":100,"h":100,"callback":function(){self.player.floor = 1;}}));
-    self.buttons.push(new Clickable({"x":0,"y":500,"w":100,"h":100,"callback":function(){self.player.floor = 0;}}));
+    self.buttons.push(new Clickable({"x":0,"y":100,"w":100,"h":100,"callback":function(){self.player.setFloor(4);}}));
+    self.buttons.push(new Clickable({"x":0,"y":200,"w":100,"h":100,"callback":function(){self.player.setFloor(3);}}));
+    self.buttons.push(new Clickable({"x":0,"y":300,"w":100,"h":100,"callback":function(){self.player.setFloor(2);}}));
+    self.buttons.push(new Clickable({"x":0,"y":400,"w":100,"h":100,"callback":function(){self.player.setFloor(1);}}));
+    self.buttons.push(new Clickable({"x":0,"y":500,"w":100,"h":100,"callback":function(){self.player.setFloor(0);}}));
     for(var i = 0; i < self.buttons.length; i++)
     {
       self.clicker.register(self.buttons[i]);
@@ -71,10 +72,10 @@ var RB_EnemyFactory = function(game)
     if(Math.random() < 0.01)
     {
       
-      var E = new RB_Enemy(game,Math.floor(Math.random()*game.numFloors));
-      game.enemies.push(E);
-      game.ticker.register(E);
-      game.drawer.register(E);
+      var e = new RB_Enemy(game,Math.floor(Math.random()*game.numFloors));
+      game.enemies.push(e);
+      game.ticker.register(e);
+      game.drawer.register(e);
     }
   }
 }
@@ -86,6 +87,8 @@ var RB_Enemy = function(game, floor)
   self.floor = floor;
   self.x = 1000;
   self.y = (game.numFloors-self.floor)*100;
+  self.width = 50;
+  self.height = 50;
 
   //switch asset, and don't actually load new image for every entity
   var man = new Image();
@@ -94,17 +97,77 @@ var RB_Enemy = function(game, floor)
   self.tick = function()
   {
     self.x--;
-    if(self.x < -20)
+    if(self.x < -20) self.kill();
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.drawImage(man,self.x,self.y,self.width,self.height);
+  }
+
+  self.kill = function()
+  {
+    game.enemies.splice(game.enemies.indexOf(self),1);
+    game.ticker.unregister(self);
+    game.drawer.unregister(self);
+  }
+}
+
+
+var RB_SweaterFactory = function(game)
+{
+  var self = this;
+
+  self.produce = function()
+  {
+    var s = new RB_Sweater(game,game.player.floor);
+    game.sweaters.push(s);
+    game.ticker.register(s);
+    game.drawer.register(s);
+  }
+}
+
+var RB_Sweater = function(game, floor)
+{
+  var self = this;
+
+  self.floor = floor;
+  self.x = 0;
+  self.y = (game.numFloors-self.floor)*100;
+  self.width = 50;
+  self.height = 50;
+
+  //switch asset, and don't actually load new image for every entity
+  var man = new Image();
+  man.src = "assets/man.png";
+
+  self.tick = function()
+  {
+    self.x++;
+    if(self.x > 1000) self.kill();
+
+    //collision resolution. could/should go in a collision handler. #umad
+    for(var i = 0; i < game.enemies.length; i++)
     {
-      game.enemies.splice(game.enemies.indexOf(self),1);
-      game.ticker.unregister(self);
-      game.drawer.unregister(self);
+      if(self.floor == game.enemies[i].floor && self.x + (self.width/2) > game.enemies[i].x && self.x + (self.width/2) < game.enemies[i].x + game.enemies[i].width)
+      {
+        game.enemies[i].kill();
+        self.kill();
+        break;
+      }
     }
   }
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(man,self.x,self.y,50,50);
+    canv.context.drawImage(man,self.x,self.y,self.width,self.height);
+  }
+
+  self.kill = function()
+  {
+    game.sweaters.splice(game.sweaters.indexOf(self),1);
+    game.ticker.unregister(self);
+    game.drawer.unregister(self);
   }
 }
 
