@@ -43,7 +43,7 @@ var Dragger = function()
     addOffsetToEvt(evt);
     for(var i = 0; i < dragging.length; i++)
     {
-      callbackQueue.push(dragging[i].dragEnd);
+      callbackQueue.push(dragging[i].dragFinish);
       evtQueue.push(evt);
     }
     dragging = [];
@@ -80,7 +80,14 @@ var Draggable = function(args)
   self.w = args.w ? args.w : 0;
   self.h = args.h ? args.h : 0;
   self.dragStart  = args.dragStart  ? args.dragStart  : function(){};
-  self.drag       = args.drag       ? args.drag       : function(){};
+  self.drag       = args.drag       ? args.drag       : function(evt){ self.x = evt.offsetX-(self.w/2); self.y = evt.offsetY-(self.h/2); };
   self.dragFinish = args.dragFinish ? args.dragFinish : function(){};
+
+  //nice for debugging purposes
+  self.draw = function(canv)
+  {
+    canv.context.strokeStyle = "#00FF00";
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+  }
 }
 

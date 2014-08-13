@@ -23,14 +23,14 @@ var RainBarrelScene = function(game, canv)
     self.buttons = [];
     self.barrels = [];
 
-    self.buttons.push(new Clickable({"x":0,"y":100,"w":100,"h":100,"callback":function(){}}));
-    self.buttons.push(new Clickable({"x":0,"y":200,"w":100,"h":100,"callback":function(){}}));
-    self.buttons.push(new Clickable({"x":0,"y":300,"w":100,"h":100,"callback":function(){}}));
-    self.buttons.push(new Clickable({"x":0,"y":400,"w":100,"h":100,"callback":function(){}}));
-    self.buttons.push(new Clickable({"x":0,"y":500,"w":100,"h":100,"callback":function(){}}));
+    self.buttons.push(new Draggable({"x":0,"y":100,"w":100,"h":100}));
+    self.buttons.push(new Draggable({"x":0,"y":200,"w":100,"h":100}));
+    self.buttons.push(new Draggable({"x":0,"y":300,"w":100,"h":100}));
+    self.buttons.push(new Draggable({"x":0,"y":400,"w":100,"h":100}));
+    self.buttons.push(new Draggable({"x":0,"y":500,"w":100,"h":100}));
     for(var i = 0; i < self.buttons.length; i++)
     {
-      self.clicker.register(self.buttons[i]);
+      self.dragger.register(self.buttons[i]);
       self.drawer.register(self.buttons[i]);
     }
 
