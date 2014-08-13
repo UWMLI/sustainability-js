@@ -20,12 +20,12 @@ var RainBarrelScene = function(game, canv)
     self.assetter = new Assetter();
 
     self.barrels = [];
-    self.barrels.push(new SW_Barrel(self,{"x":20,"y":100}));
-    self.barrels.push(new SW_Barrel(self,{"x":100,"y":75}));
-    self.barrels.push(new SW_Barrel(self,{"x":50,"y":50}));
-    self.barrels.push(new SW_Barrel(self,{"x":140,"y":33}));
-    self.barrels.push(new SW_Barrel(self,{"x":90,"y":190}));
-    self.map = new SW_Map(self);
+    self.barrels.push(new RB_Barrel(self,{"x":20,"y":100}));
+    self.barrels.push(new RB_Barrel(self,{"x":100,"y":75}));
+    self.barrels.push(new RB_Barrel(self,{"x":50,"y":50}));
+    self.barrels.push(new RB_Barrel(self,{"x":140,"y":33}));
+    self.barrels.push(new RB_Barrel(self,{"x":90,"y":190}));
+    self.map = new RB_Map(self);
     for(var i = 0; i < self.barrels.length; i++)
     {
       self.clicker.register(self.barrels[i]);
@@ -53,7 +53,7 @@ var RainBarrelScene = function(game, canv)
   };
 };
 
-var SW_Map = function(game)
+var RB_Map = function(game)
 {
   var self = this;
   self.img = game.assetter.asset("assets/man.png");
@@ -101,7 +101,7 @@ var SW_Map = function(game)
   }
 }
 
-var SW_Barrel = function(game, args)
+var RB_Barrel = function(game, args)
 {
   var self = this;
 
