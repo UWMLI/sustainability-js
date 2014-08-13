@@ -1,17 +1,10 @@
-//hack for browser compatibility
-function addOffsetToEvt(evt)
-{
-  if(evt.offsetX != undefined) return;
-  evt.offsetX = evt.layerX-evt.originalTarget.offsetLeft;
-  evt.offsetY = evt.layerY-evt.originalTarget.offsetTop;
-}
-
 var Clicker = function()
 {
   var self = this;
 
   var clickables = [];
   var callbackQueue = [];
+  var evtQueue = [];
   self.register = function(clickable) { clickables.push(clickable); }
   self.unregister = function(clickable) { clickables.splice(clickables.indexOf(clickable),1); }
   self.clear = function() { clickables = []; }
@@ -27,20 +20,27 @@ var Clicker = function()
         evt.offsetY >= clickables[i].y &&
         evt.offsetY <= clickables[i].y+clickables[i].h
       )
-        callbackQueue.push(clickables[i].callback);
+      {
+        callbackQueue.push(clickables[i].click);
+        evtQueue.push(evt);
+      }
     }
   }
   self.flush = function()
   {
     for(var i = 0; i < callbackQueue.length; i++)
-      callbackQueue[i]();
+      callbackQueue[i](evtQueue[i]);
     callbackQueue = [];
+    evtQueue = [];
   }
 
-  document.getElementById("stage_container").addEventListener('click', click, false);
+  if(platform == "PC")
+    document.getElementById("stage_container").addEventListener('mousedown', click, false);
+  else if(platform == "MOBILE")
+    document.getElementById("stage_container").addEventListener('touchstart', click, false);
 }
 
-//example clickable- just needs x,y,w,h and callback
+//example clickable- just needs x,y,w,h and click callback
 var Clickable = function(args)
 {
   var self = this;
@@ -49,7 +49,7 @@ var Clickable = function(args)
   self.y = args.y ? args.y : 0;
   self.w = args.w ? args.w : 0;
   self.h = args.h ? args.h : 0;
-  self.callback = args.callback ? args.callback : function(){};
+  self.click = args.click ? args.click : function(){};
 
   //nice for debugging purposes
   self.draw = function(canv)

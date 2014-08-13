@@ -11,17 +11,20 @@
 <link href="style.css" rel="stylesheet" type="text/css"></link>
 <script type='text/javascript' src='src/utils/webgl-utils.js'></script>
 <script type="text/javascript" src="src/utils/canv.js"></script>
+<script type="text/javascript" src="src/utils/inputhacks.js"></script>
 <script type="text/javascript" src="src/stage.js"></script>
 <script type="text/javascript" src="src/game.js"></script>
 <script type="text/javascript" src="src/model.js"></script>
 <script type="text/javascript" src="src/ticker.js"></script>
 <script type="text/javascript" src="src/drawer.js"></script>
 <script type="text/javascript" src="src/clicker.js"></script>
+<script type="text/javascript" src="src/dragger.js"></script>
 <script type="text/javascript" src="src/assetter.js"></script>
 <script type="text/javascript" src="src/scenes/nullScene.js"></script>
 <script type="text/javascript" src="src/scenes/loadingScene.js"></script>
 <!--<script type="text/javascript" src="src/scenes/gameplayScene.js"></script>--><!--Just acts as example for scene- not actually used.-->
 <script type="text/javascript" src="src/scenes/sweater/sweaterScene.js"></script>
+<script type="text/javascript" src="src/scenes/rainbarrel/rainbarrelScene.js"></script>
 <script type="text/javascript">
     //window.onerror = function(msg, url, linenumber) { console.log('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber); return true; };
 
@@ -35,7 +38,7 @@
     ARIS.ready = function() { partReady(); };
     window.addEventListener('load', partReady, false);
     //Sync with ARIS for data
-    function jsLoaded() { m = new Model(); m.fetchSync(function(){ g = new Game(SweaterScene); g.begin(); }); }
+    function jsLoaded() { m = new Model(); m.fetchSync(function(){ g = new Game(RainBarrelScene); g.begin(); }); }
 
     //Uncomment to test on PC
     ///*
