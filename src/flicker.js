@@ -68,7 +68,8 @@ var Flickable = function(args)
 {
   var self = this;
 
-  //nice in smooth flicking
+  self.flicked = false;
+
   self.startX = 0;
   self.startY = 0;
   self.vec = {"x":0,"y":0};
@@ -78,8 +79,8 @@ var Flickable = function(args)
   self.w = args.w ? args.w : 0;
   self.h = args.h ? args.h : 0;
   self.r = args.r ? args.r : 0;
-  self.flickStart = args.flickStart ? args.flickStart : function(evt){ self.startX = evt.offsetX; self.startY = evt.offsetY; };
-  self.flicking   = args.flicking   ? args.flicking   : function(evt){ self.vec.x = (evt.offsetX-self.startX); self.vec.y = (evt.offsetY-self.startY); if(Math.sqrt((self.vec.x*self.vec.x)+(self.vec.y*self.vec.y)) >= self.r) self.flick(self.vec.x, self.vec.y); };
+  self.flickStart = args.flickStart ? args.flickStart : function(evt){ self.startX = evt.offsetX; self.startY = evt.offsetY; self.flicked = false; };
+  self.flicking   = args.flicking   ? args.flicking   : function(evt){ if(self.flicked) return; self.vec.x = (evt.offsetX-self.startX); self.vec.y = (evt.offsetY-self.startY); if(Math.sqrt((self.vec.x*self.vec.x)+(self.vec.y*self.vec.y)) >= self.r) { self.flick(self.vec); self.flicked = true; }};
   self.flick      = args.flick      ? args.flick      : function(vec){};
 
   //nice for debugging purposes
