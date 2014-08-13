@@ -75,12 +75,16 @@ var Draggable = function(args)
 {
   var self = this;
 
+  //nice in smooth dragging
+  self.offX = 0;
+  self.offY = 0;
+
   self.x = args.x ? args.x : 0;
   self.y = args.y ? args.y : 0;
   self.w = args.w ? args.w : 0;
   self.h = args.h ? args.h : 0;
-  self.dragStart  = args.dragStart  ? args.dragStart  : function(){};
-  self.drag       = args.drag       ? args.drag       : function(evt){ self.x = evt.offsetX-(self.w/2); self.y = evt.offsetY-(self.h/2); };
+  self.dragStart  = args.dragStart  ? args.dragStart  : function(evt){ self.offX = self.x+(self.w/2)-evt.offsetX; self.offY = self.y+(self.h/2)-evt.offsetY; };
+  self.drag       = args.drag       ? args.drag       : function(evt){ self.x = evt.offsetX-(self.w/2)+self.offX; self.y = evt.offsetY-(self.h/2)+self.offY; };
   self.dragFinish = args.dragFinish ? args.dragFinish : function(){};
 
   //nice for debugging purposes
