@@ -1,4 +1,4 @@
-var RainBarrelScene = function(game, canv)
+var SweaterScene = function(game, canv)
 {
   var self = this;
 
@@ -24,13 +24,13 @@ var RainBarrelScene = function(game, canv)
     self.drawer = new Drawer(canv);
     self.assetter = new Assetter();
 
-    self.player = new RB_Player(self);
+    self.player = new SW_Player(self);
     self.buttons = [];
     self.enemies = [];
     self.sweaters = [];
 
-    self.enemyFactory = new RB_EnemyFactory(self);
-    self.sweaterFactory = new RB_SweaterFactory(self);
+    self.enemyFactory = new SW_EnemyFactory(self);
+    self.sweaterFactory = new SW_SweaterFactory(self);
 
     self.buttons.push(new Clickable({"x":0,"y":100,"w":100,"h":100,"callback":function(){self.player.setFloor(4);}}));
     self.buttons.push(new Clickable({"x":0,"y":200,"w":100,"h":100,"callback":function(){self.player.setFloor(3);}}));
@@ -65,7 +65,7 @@ var RainBarrelScene = function(game, canv)
   };
 };
 
-var RB_Player = function(game)
+var SW_Player = function(game)
 {
   var self = this;
   self.floor = 0;
@@ -88,7 +88,7 @@ var RB_Player = function(game)
   }
 }
 
-var RB_EnemyFactory = function(game)
+var SW_EnemyFactory = function(game)
 {
   var self = this;
 
@@ -97,7 +97,7 @@ var RB_EnemyFactory = function(game)
     if(Math.random() < 0.01)
     {
       
-      var e = new RB_Enemy(game,Math.floor(Math.random()*game.numFloors));
+      var e = new SW_Enemy(game,Math.floor(Math.random()*game.numFloors));
       game.enemies.push(e);
       game.ticker.register(e);
       game.drawer.register(e);
@@ -105,7 +105,7 @@ var RB_EnemyFactory = function(game)
   }
 }
 
-var RB_Enemy = function(game, floor)
+var SW_Enemy = function(game, floor)
 {
   var self = this;
 
@@ -137,20 +137,20 @@ var RB_Enemy = function(game, floor)
 }
 
 
-var RB_SweaterFactory = function(game)
+var SW_SweaterFactory = function(game)
 {
   var self = this;
 
   self.produce = function()
   {
-    var s = new RB_Sweater(game,game.player.floor);
+    var s = new SW_Sweater(game,game.player.floor);
     game.sweaters.push(s);
     game.ticker.register(s);
     game.drawer.register(s);
   }
 }
 
-var RB_Sweater = function(game, floor)
+var SW_Sweater = function(game, floor)
 {
   var self = this;
 
