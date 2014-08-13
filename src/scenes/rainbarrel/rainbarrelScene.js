@@ -8,9 +8,8 @@ var RainBarrelScene = function(game, canv)
   self.drawer;
   self.assetter;
 
-  self.player;
-  self.buttons;
   self.barrels;
+  self.map;
 
   self.ready = function()
   {
@@ -20,19 +19,20 @@ var RainBarrelScene = function(game, canv)
     self.drawer = new Drawer(canv);
     self.assetter = new Assetter();
 
-    self.buttons = [];
     self.barrels = [];
-
-    self.buttons.push(new Draggable({"x":0,"y":100,"w":100,"h":100}));
-    self.buttons.push(new Draggable({"x":0,"y":200,"w":100,"h":100}));
-    self.buttons.push(new Draggable({"x":0,"y":300,"w":100,"h":100}));
-    self.buttons.push(new Draggable({"x":0,"y":400,"w":100,"h":100}));
-    self.buttons.push(new Draggable({"x":0,"y":500,"w":100,"h":100}));
-    for(var i = 0; i < self.buttons.length; i++)
+    self.barrels.push(new SW_Barrel(self,{"x":20,"y":100}));
+    self.barrels.push(new SW_Barrel(self,{"x":100,"y":75}));
+    self.barrels.push(new SW_Barrel(self,{"x":50,"y":50}));
+    self.barrels.push(new SW_Barrel(self,{"x":140,"y":33}));
+    self.barrels.push(new SW_Barrel(self,{"x":90,"y":190}));
+    self.map = new SW_Map(self);
+    for(var i = 0; i < self.barrels.length; i++)
     {
-      self.dragger.register(self.buttons[i]);
-      self.drawer.register(self.buttons[i]);
+      self.clicker.register(self.barrels[i]);
+      self.drawer.register(self.barrels[i]);
     }
+    self.dragger.register(self.map);
+    self.drawer.register(self.map);
 
   };
 
@@ -53,97 +53,82 @@ var RainBarrelScene = function(game, canv)
   };
 };
 
-var SW_Player = function(game)
+var SW_Map = function(game)
 {
   var self = this;
-  self.floor = 0;
   self.img = game.assetter.asset("assets/man.png");
 
-  self.setFloor = function(floor)
-  {
-    if(floor == self.floor) game.sweaterFactory.produce();
-    self.floor = floor;
-  }
-
-  self.tick = function()
-  {
-
-  }
-
-  self.draw = function(canv)
-  {
-    canv.context.drawImage(self.img,10,(game.numFloors-self.floor)*100);
-  }
-}
-
-var SW_Enemy = function(game, floor)
-{
-  var self = this;
-
-  self.floor = floor;
-  self.x = 1000;
-  self.y = (game.numFloors-self.floor)*100;
-  self.width = 50;
-  self.height = 50;
-
-  self.img = game.assetter.asset("assets/man.png");
-
-  self.tick = function()
-  {
-    self.x--;
-    if(self.x < -20) self.kill();
-  }
-
-  self.draw = function(canv)
-  {
-    canv.context.drawImage(self.img,self.x,self.y,self.width,self.height);
-  }
-
-  self.kill = function()
-  {
-    game.enemies.splice(game.enemies.indexOf(self),1);
-    game.ticker.unregister(self);
-    game.drawer.unregister(self);
-  }
-}
-
-var SW_Sweater = function(game, floor)
-{
-  var self = this;
-
-  self.floor = floor;
+  //nice in smooth dragging
+  self.offX = 0;
+  self.offY = 0;
+  self.deltaX = 0;
+  self.deltaY = 0;
   self.x = 0;
-  self.y = (game.numFloors-self.floor)*100;
-  self.width = 50;
-  self.height = 50;
+  self.y = 0;
+  self.w = 200;
+  self.h = 200;
+
+  self.tick = function()
+  {
+
+  }
+
+  self.dragStart = function(evt)
+  {
+    self.offX = self.x+(self.w/2)-evt.offsetX;
+    self.offY = self.y+(self.h/2)-evt.offsetY;
+  };
+  self.drag = function(evt)
+  {
+    self.deltaX = (evt.offsetX-(self.w/2)+self.offX)-self.x;
+    self.deltaY = (evt.offsetY-(self.h/2)+self.offY)-self.y;
+    self.x += self.deltaX;
+    self.y += self.deltaY;
+    for(var i = 0; i < game.barrels.length; i++)
+    {
+      game.barrels[i].x += self.deltaX;
+      game.barrels[i].y += self.deltaY;
+    }
+  };
+  self.dragFinish = function()
+  {
+  };
+
+  self.draw = function(canv)
+  {
+    canv.context.strokeStyle = "#00FF00";
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+  }
+}
+
+var SW_Barrel = function(game, args)
+{
+  var self = this;
+
+  self.x = args.x ? args.x : 0;
+  self.y = args.y ? args.y : 0;
+  self.w = 10;
+  self.h = 10;
 
   self.img = game.assetter.asset("assets/man.png");
 
   self.tick = function()
   {
-    self.x++;
-    if(self.x > 1000) self.kill();
+  }
 
-    //collision resolution. could/should go in a collision handler. #umad
-    for(var i = 0; i < game.enemies.length; i++)
-    {
-      if(self.floor == game.enemies[i].floor && self.x + (self.width/2) > game.enemies[i].x && self.x + (self.width/2) < game.enemies[i].x + game.enemies[i].width)
-      {
-        game.enemies[i].kill();
-        self.kill();
-        break;
-      }
-    }
+  self.click = function(evt)
+  {
+    console.log(self);
   }
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,self.y,self.width,self.height);
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   }
 
   self.kill = function()
   {
-    game.sweaters.splice(game.sweaters.indexOf(self),1);
+    game.barrels.splice(game.barrels.indexOf(self),1);
     game.ticker.unregister(self);
     game.drawer.unregister(self);
   }
