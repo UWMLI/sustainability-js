@@ -17,8 +17,8 @@ var BulbScene = function(game, canv)
   self.bulbs;
   self.janitors;
 
-  self.floorHeight = 100;
-  self.floorWidth = 100;
+  self.floorHeight = 500;
+  self.floorWidth = 500;
   self.houseOffX = 100;
   self.houseOffY = 100;
   self.numFloors = 5;
@@ -34,6 +34,7 @@ var BulbScene = function(game, canv)
     self.player = new BU_Player(self, 0);
 
     self.bulbs = [];
+    self.nullBulb = new BU_Bulb(self,0,0);
     for(var i = 0; i < self.numFloors; i++)
       for(var j = 0; j < self.bulbsPerFloor; j++)
         self.bulbs.push(new BU_Bulb(self, i, j));
@@ -84,6 +85,7 @@ var BulbScene = function(game, canv)
       if(self.bulbs[i].node.n_y == node.n_y && self.bulbs[i].node.n_x == node.n_x)
         return self.bulbs[i];
     }
+    return self.nullBulb;
   }
 
   self.injectNearestGoalIntoNode = function(node)
@@ -92,9 +94,9 @@ var BulbScene = function(game, canv)
     var bestScore = 10000000; //terrible
     for(var i = 0; i < self.bulbs.length; i++)
     {
-      if(!(self.bulbs[i].type == "BURNT_GOOD" || self.bulbs[i].type == "BURNT_BAD")) continue;
+      if(!(self.bulbs[i].type == "BURNT_GOOD" || self.bulbs[i].type == "BURNT_BAD" || self.bulbs[i].type == "NONE")) continue;
       var score = Math.abs(self.bulbs[i].node.n_y - node.n_y)*(10*self.bulbsPerFloor)+Math.abs(self.bulbs[i].node.n_x - node.n_x);
-      if(score < bestScore) { bestScore == score; bestNode = self.bubls[i].node; }
+      if(score < bestScore) { bestScore == score; bestNode = self.bulbs[i].node; }
     }
     if(!bestNode) return;
     node.configure(bestNode.n_x,bestNode.n_y);
@@ -142,13 +144,12 @@ var BU_Player = function(game, floor)
     {
       node.configure(game.bulbsPerFloor,self.floor);
       if(self.x+(self.w/2) < node.x) self.x++;
-      else self.floor = self.goalNode.n_y;
+      else { self.floor = self.goalNode.n_y; self.y = self.goalNode.y-(self.h/2); }
     }
     else
     {
-      node.configure(game.bulbsPerFloor,self.floor);
-      if(self.x+(self.w/2) < node.x) self.x++;
-      else if(self.x+(self.w/2) > node.x) self.x--;
+      if(self.x+(self.w/2) < self.goalNode.x) self.x++;
+      else if(self.x+(self.w/2) > self.goalNode.x) self.x--;
       else game.bulbAt(self.goalNode).setType("GOOD");
     }
   }
@@ -176,18 +177,17 @@ var BU_Janitor = function(game, floor)
 
   self.tick = function()
   {
-    self.game.injectNearestGoalIntoNode(self.goalNode);
+    game.injectNearestGoalIntoNode(self.goalNode);
     if(self.floor != self.goalNode.n_y)
     {
       node.configure(game.bulbsPerFloor,self.floor);
       if(self.x+(self.w/2) < node.x) self.x++;
-      else self.floor = self.goalNode.n_y;
+      else { self.floor = self.goalNode.n_y; self.y = self.goalNode.y-(self.h/2); }
     }
     else
     {
-      node.configure(game.bulbsPerFloor,self.floor);
-      if(self.x+(self.w/2) < node.x) self.x++;
-      else if(self.x > node.x) self.x--;
+      if(self.x+(self.w/2) < self.goalNode.x) self.x++;
+      else if(self.x+(self.w/2) > self.goalNode.x) self.x--;
       else game.bulbAt(self.goalNode).setType("BAD");
     }
   }
@@ -209,9 +209,9 @@ var BU_Bulb = function(game, floor, bulb)
   self.node = new BU_Node(game); //for re-use throughout lifetime
   self.w = 20;
   self.h = 20;
-  node.configure(bulb,floor);
-  self.x = node.x-(self.w/2);
-  self.y = node.y-(self.h/2);
+  self.node.configure(bulb,floor);
+  self.x = self.node.x-(self.w/2);
+  self.y = self.node.y-(self.h/2);
 
   self.img = game.assetter.asset("assets/man.png");
 
@@ -221,7 +221,7 @@ var BU_Bulb = function(game, floor, bulb)
   self.light = 0.0;
   self.energy = 100.0; //never run out
 
-  self.setBulbType = function(type)
+  self.setType = function(type)
   {
     switch(type)
     {
