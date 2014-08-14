@@ -1,3 +1,9 @@
+//
+//NOTE-
+//Floor 0 = top floor
+//Bulb 0 = left bulb
+//
+
 var BulbScene = function(game, canv)
 {
   var self = this;
@@ -8,14 +14,15 @@ var BulbScene = function(game, canv)
   self.assetter;
 
   self.player;
-  self.buttons;
-  self.enemies;
   self.bulbs;
+  self.janitors;
 
-  self.enemyFactory;
-  self.bulbFactory;
-
+  self.floorHeight = 100;
+  self.floorWidth = 100;
+  self.houseOffX = 0;
+  self.houseOffY = 0;
   self.numFloors = 5;
+  self.bulbsPerFloor = 5;
 
   self.ready = function()
   {
@@ -24,29 +31,31 @@ var BulbScene = function(game, canv)
     self.drawer = new Drawer(canv);
     self.assetter = new Assetter();
 
-    self.player = new BU_Player(self);
-    self.buttons = [];
-    self.enemies = [];
+    self.player = new BU_Player(self, 0);
+
     self.bulbs = [];
+    for(var i = 0; i < self.numFloors; i++)
+      for(var j = 0; j < self.bulbsPerFloor; j++)
+        self.bulbs.push(new BU_Bulb(self, i, j));
 
-    self.enemyFactory = new BU_EnemyFactory(self);
-    self.bulbFactory = new BU_BulbFactory(self);
+    self.janitors = [];
+    self.janitors.push(new BU_Janitor(self, 0));
+    self.janitors.push(new BU_Janitor(self, self.numFloors-1));
 
-    self.buttons.push(new Clickable({"x":0,"y":100,"w":100,"h":100,"click":function(){self.player.setFloor(4);}}));
-    self.buttons.push(new Clickable({"x":0,"y":200,"w":100,"h":100,"click":function(){self.player.setFloor(3);}}));
-    self.buttons.push(new Clickable({"x":0,"y":300,"w":100,"h":100,"click":function(){self.player.setFloor(2);}}));
-    self.buttons.push(new Clickable({"x":0,"y":400,"w":100,"h":100,"click":function(){self.player.setFloor(1);}}));
-    self.buttons.push(new Clickable({"x":0,"y":500,"w":100,"h":100,"click":function(){self.player.setFloor(0);}}));
-    for(var i = 0; i < self.buttons.length; i++)
+    for(var i = 0; i < self.bulbs.length; i++)
     {
-      self.clicker.register(self.buttons[i]);
-      self.drawer.register(self.buttons[i]);
+      self.clicker.register(self.bulbs[i]);
+      self.ticker.register(self.bulbs[i]);
+      self.drawer.register(self.bulbs[i]);
+    }
+    for(var i = 0; i < self.janitors.length; i++)
+    {
+      self.ticker.register(self.janitors[i]);
+      self.drawer.register(self.janitors[i]);
     }
 
     self.ticker.register(self.player);
     self.drawer.register(self.player);
-
-    self.ticker.register(self.enemyFactory);
   };
 
   self.tick = function()
@@ -65,116 +74,100 @@ var BulbScene = function(game, canv)
   };
 };
 
-var BU_Player = function(game)
+//standardize grid positions, origin top left
+var BU_Node = function(game)
 {
   var self = this;
-  self.floor = 0;
-  self.img = game.assetter.asset("assets/man.png");
 
-  self.setFloor = function(floor)
+  //allow node re-use (per-frame allocs blow in js)
+  self.configure = function(x,y)
   {
-    if(floor == self.floor) game.bulbFactory.produce();
-    self.floor = floor;
-  }
+    self.n_x = x;
+    self.n_y = y;
 
-  self.tick = function()
-  {
-
+    self.x = game.houseOffX+(x*(game.floorWidth/game.bulbsPerFloor+1));
+    self.y = game.houseOffY+(y*(game.floorHeight/game.numFloors+1));
+    self.w = 0;
+    self.h = 0;
   }
-
-  self.draw = function(canv)
-  {
-    canv.context.drawImage(self.img,10,(game.numFloors-self.floor)*100);
-  }
+  self.configure(x,y);
 }
 
-var BU_EnemyFactory = function(game)
+var BU_Player = function(game, floor)
 {
+  //almost identical to janitor
   var self = this;
 
-  self.tick = function()
-  {
-    if(Math.random() < 0.01)
-    {
-      
-      var e = new BU_Enemy(game,Math.floor(Math.random()*game.numFloors));
-      game.enemies.push(e);
-      game.ticker.register(e);
-      game.drawer.register(e);
-    }
-  }
-}
-
-var BU_Enemy = function(game, floor)
-{
-  var self = this;
+  var node = new BU_Node(game); //for re-use throughout lifetime
 
   self.floor = floor;
-  self.x = 1000;
-  self.y = (game.numFloors-self.floor)*100;
-  self.width = 50;
-  self.height = 50;
-
+  self.w = 100;
+  self.h = 100;
+  node.configure(0,floor);
+  self.x = node.x-(self.w/2);
+  self.y = node.y-(self.h/2);
+  self.goalFloor = floor;
+  self.goalBulb = 0;
   self.img = game.assetter.asset("assets/man.png");
 
   self.tick = function()
   {
-    self.x--;
-    if(self.x < -20) self.kill();
+    if(self.floor != goalFloor)
+    {
+      node.configure(game.bulbsPerFloor,self.floor);
+      if(self.x < node.x) self.x++;
+      else (self.floor = self.goalFloor);
+    }
+    else
+    {
+      node.configure(game.bulbsPerFloor,self.floor);
+      if(self.x < node.x) self.x++;
+      else if(self.x > node.x) self.x--;
+      else
+      {
+        //change the lightbulb or whatever
+      }
+    }
   }
 
   self.draw = function(canv)
   {
     canv.context.drawImage(self.img,self.x,self.y,self.width,self.height);
   }
-
-  self.kill = function()
-  {
-    game.enemies.splice(game.enemies.indexOf(self),1);
-    game.ticker.unregister(self);
-    game.drawer.unregister(self);
-  }
 }
 
-
-var BU_BulbFactory = function(game)
+var BU_Janitor = function(game, floor)
 {
   var self = this;
 
-  self.produce = function()
-  {
-    var s = new BU_Bulb(game,game.player.floor);
-    game.bulbs.push(s);
-    game.ticker.register(s);
-    game.drawer.register(s);
-  }
-}
-
-var BU_Bulb = function(game, floor)
-{
-  var self = this;
+  var node = new BU_Node(game); //for re-use throughout lifetime
 
   self.floor = floor;
-  self.x = 0;
-  self.y = (game.numFloors-self.floor)*100;
-  self.width = 50;
-  self.height = 50;
-
+  self.w = 100;
+  self.h = 100;
+  node.configure(0,floor);
+  self.x = node.x-(self.w/2);
+  self.y = node.y-(self.h/2);
+  self.goalFloor = floor;
+  self.goalBulb = 0;
   self.img = game.assetter.asset("assets/man.png");
 
   self.tick = function()
   {
-    self.x++;
-    if(self.x > 1000) self.kill();
-
-    //collision resolution. could/should go in a collision handler. #umad
-    for(var i = 0; i < game.enemies.length; i++)
+    if(self.floor != goalFloor)
     {
-      if(self.floor == game.enemies[i].floor && self.x + (self.width/2) > game.enemies[i].x && self.x + (self.width/2) < game.enemies[i].x + game.enemies[i].width)
+      node.configure(game.bulbsPerFloor,self.floor);
+      if(self.x < node.x) self.x++;
+      else (self.floor = self.goalFloor);
+    }
+    else
+    {
+      node.configure(game.bulbsPerFloor,self.floor);
+      if(self.x < node.x) self.x++;
+      else if(self.x > node.x) self.x--;
+      else
       {
-        game.enemies[i].kill();
-        self.kill();
-        break;
+        //change the lightbulb or whatever
       }
     }
   }
@@ -184,11 +177,99 @@ var BU_Bulb = function(game, floor)
     canv.context.drawImage(self.img,self.x,self.y,self.width,self.height);
   }
 
-  self.kill = function()
+}
+
+var BU_Bulb = function(game, floor, bulb)
+{
+  var self = this;
+
+  self.ticksPerTick = 1000;
+  self.ticksTilTick = self.ticksPerTick;
+
+  self.floor = floor;
+  self.bulb = bulb;
+  self.w = 20;
+  self.h = 20;
+  var pos = BU_BulbCenterPosition(game, floor, bulb);
+  self.x = pos.x-(self.w/2);
+  self.y = pos.y-(self.h/2);
+
+  self.img = game.assetter.asset("assets/man.png");
+
+  self.type = "NONE";
+  self.dollarPer = 0.0;
+  self.energyPer = 0.0;
+  self.light = 0.0;
+  self.energy = 100.0; //never run out
+
+  self.setBulbType = function(type)
   {
-    game.bulbs.splice(game.bulbs.indexOf(self),1);
-    game.ticker.unregister(self);
-    game.drawer.unregister(self);
+    switch(type)
+    {
+      case "BAD":
+        self.type = type;
+        self.dollarPer = 0.25;
+        self.energyPer = 0.25;
+        self.light = 0.25;
+        self.energy = 100.0;
+        self.img = game.assetter.asset("assets/man.png");
+        break;
+      case "BURNT_BAD":
+        self.type = type;
+        self.dollarPer = 0.0;
+        self.energyPer = 0.0;
+        self.light = 0.0;
+        self.energy = 100.0;
+        self.img = game.assetter.asset("assets/man.png");
+        break;
+      case "GOOD":
+        self.type = type;
+        self.dollarPer = 0.15;
+        self.energyPer = 0.15;
+        self.light = 0.35;
+        self.energy = 100.0;
+        self.img = game.assetter.asset("assets/man.png");
+        break;
+      case "BURNT_GOOD":
+        self.type = type;
+        self.dollarPer = 0.0;
+        self.energyPer = 0.0;
+        self.light = 0.0;
+        self.energy = 100.0;
+        self.img = game.assetter.asset("assets/man.png");
+        break;
+      case "NONE":
+      default:
+        self.type = type;
+        self.dollarPer = 0.0;
+        self.energyPer = 0.0;
+        self.light = 0.0;
+        self.energy = 100.0;
+        self.img = game.assetter.asset("assets/man.png");
+        break;
+    }
+  }
+
+  self.click = function()
+  {
+    game.player.bulbClicked(self.floor,self.bulb);
+  }
+
+  self.tick = function()
+  {
+    self.ticksTilTick--;
+    if(ticksTilTick <= 0)
+    {
+      self.ticksTilTick = self.ticksPerTick;
+      self.energy -= self.energyPer;
+      game.spend(self.dollarPer);
+      if(energy <= 0) self.setType("BURNT_"+self.type);
+    }
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.drawImage(self.img,self.x,self.y,self.width,self.height);
   }
 }
 
