@@ -27,6 +27,7 @@
 <script type="text/javascript" src="src/scenes/sweater/sweaterScene.js"></script>
 <script type="text/javascript" src="src/scenes/rainbarrel/rainbarrelScene.js"></script>
 <script type="text/javascript" src="src/scenes/heatwheel/heatwheelScene.js"></script>
+<script type="text/javascript" src="src/scenes/bulb/bulbScene.js"></script>
 <script type="text/javascript">
     //window.onerror = function(msg, url, linenumber) { console.log('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber); return true; };
 
@@ -40,7 +41,7 @@
     ARIS.ready = function() { partReady(); };
     window.addEventListener('load', partReady, false);
     //Sync with ARIS for data
-    function jsLoaded() { m = new Model(); m.fetchSync(function(){ g = new Game(HeatWheelScene); g.begin(); }); }
+    function jsLoaded() { m = new Model(); m.fetchSync(function(){ g = new Game(BulbScene); g.begin(); }); }
 
     //Uncomment to test on PC
     ///*
