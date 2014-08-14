@@ -19,8 +19,8 @@ var BulbScene = function(game, canv)
 
   self.floorHeight = 100;
   self.floorWidth = 100;
-  self.houseOffX = 0;
-  self.houseOffY = 0;
+  self.houseOffX = 100;
+  self.houseOffY = 100;
   self.numFloors = 5;
   self.bulbsPerFloor = 5;
 
@@ -73,10 +73,31 @@ var BulbScene = function(game, canv)
   {
   };
 
-
   self.spend = function()
   {
+  }
 
+  self.bulbAt = function(node)
+  {
+    for(var i = 0; i < self.bulbs.length; i++)
+    {
+      if(self.bulbs[i].node.n_y == node.n_y && self.bulbs[i].node.n_x == node.n_x)
+        return self.bulbs[i];
+    }
+  }
+
+  self.injectNearestGoalIntoNode = function(node)
+  {
+    var bestNode;
+    var bestScore = 10000000; //terrible
+    for(var i = 0; i < self.bulbs.length; i++)
+    {
+      if(!(self.bulbs[i].type == "BURNT_GOOD" || self.bulbs[i].type == "BURNT_BAD")) continue;
+      var score = Math.abs(self.bulbs[i].node.n_y - node.n_y)*(10*self.bulbsPerFloor)+Math.abs(self.bulbs[i].node.n_x - node.n_x);
+      if(score < bestScore) { bestScore == score; bestNode = self.bubls[i].node; }
+    }
+    if(!bestNode) return;
+    node.configure(bestNode.n_x,bestNode.n_y);
   }
 };
 
@@ -112,27 +133,23 @@ var BU_Player = function(game, floor)
   node.configure(0,floor);
   self.x = node.x-(self.w/2);
   self.y = node.y-(self.h/2);
-  self.goalFloor = floor;
-  self.goalBulb = 0;
+  self.goalNode = new BU_Node(game);
   self.img = game.assetter.asset("assets/man.png");
 
   self.tick = function()
   {
-    if(self.floor != self.goalFloor)
+    if(self.floor != self.goalNode.n_y)
     {
       node.configure(game.bulbsPerFloor,self.floor);
-      if(self.x < node.x) self.x++;
-      else (self.floor = self.goalFloor);
+      if(self.x+(self.w/2) < node.x) self.x++;
+      else self.floor = self.goalNode.n_y;
     }
     else
     {
       node.configure(game.bulbsPerFloor,self.floor);
-      if(self.x < node.x) self.x++;
-      else if(self.x > node.x) self.x--;
-      else
-      {
-        //change the lightbulb or whatever
-      }
+      if(self.x+(self.w/2) < node.x) self.x++;
+      else if(self.x+(self.w/2) > node.x) self.x--;
+      else game.bulbAt(self.goalNode).setType("GOOD");
     }
   }
 
@@ -154,27 +171,24 @@ var BU_Janitor = function(game, floor)
   node.configure(0,floor);
   self.x = node.x-(self.w/2);
   self.y = node.y-(self.h/2);
-  self.goalFloor = floor;
-  self.goalBulb = 0;
+  self.goalNode = new BU_Node(game);
   self.img = game.assetter.asset("assets/man.png");
 
   self.tick = function()
   {
-    if(self.floor != self.goalFloor)
+    self.game.injectNearestGoalIntoNode(self.goalNode);
+    if(self.floor != self.goalNode.n_y)
     {
       node.configure(game.bulbsPerFloor,self.floor);
-      if(self.x < node.x) self.x++;
-      else (self.floor = self.goalFloor);
+      if(self.x+(self.w/2) < node.x) self.x++;
+      else self.floor = self.goalNode.n_y;
     }
     else
     {
       node.configure(game.bulbsPerFloor,self.floor);
-      if(self.x < node.x) self.x++;
+      if(self.x+(self.w/2) < node.x) self.x++;
       else if(self.x > node.x) self.x--;
-      else
-      {
-        //change the lightbulb or whatever
-      }
+      else game.bulbAt(self.goalNode).setType("BAD");
     }
   }
 
@@ -189,13 +203,10 @@ var BU_Bulb = function(game, floor, bulb)
 {
   var self = this;
 
-  var node = new BU_Node(game); //for re-use throughout lifetime
-
   self.ticksPerTick = 1000;
   self.ticksTilTick = self.ticksPerTick;
 
-  self.floor = floor;
-  self.bulb = bulb;
+  self.node = new BU_Node(game); //for re-use throughout lifetime
   self.w = 20;
   self.h = 20;
   node.configure(bulb,floor);
@@ -260,7 +271,7 @@ var BU_Bulb = function(game, floor, bulb)
 
   self.click = function()
   {
-    game.player.bulbClicked(self.floor,self.bulb);
+    game.player.bulbClicked(self.node);
   }
 
   self.tick = function()
