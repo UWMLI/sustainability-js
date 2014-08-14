@@ -112,8 +112,8 @@ var SW_Enemy = function(game, floor)
   self.floor = floor;
   self.x = 1000;
   self.y = (game.numFloors-self.floor)*100;
-  self.width = 50;
-  self.height = 50;
+  self.w = 50;
+  self.h = 50;
 
   self.img = game.assetter.asset("assets/man.png");
 
@@ -125,7 +125,7 @@ var SW_Enemy = function(game, floor)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,self.y,self.width,self.height);
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   }
 
   self.kill = function()
@@ -157,8 +157,8 @@ var SW_Sweater = function(game, floor)
   self.floor = floor;
   self.x = 0;
   self.y = (game.numFloors-self.floor)*100;
-  self.width = 50;
-  self.height = 50;
+  self.w = 50;
+  self.h = 50;
 
   self.img = game.assetter.asset("assets/man.png");
 
@@ -170,7 +170,7 @@ var SW_Sweater = function(game, floor)
     //collision resolution. could/should go in a collision handler. #umad
     for(var i = 0; i < game.enemies.length; i++)
     {
-      if(self.floor == game.enemies[i].floor && self.x + (self.width/2) > game.enemies[i].x && self.x + (self.width/2) < game.enemies[i].x + game.enemies[i].width)
+      if(self.floor == game.enemies[i].floor && self.x + (self.w/2) > game.enemies[i].x && self.x + (self.w/2) < game.enemies[i].x + game.enemies[i].w)
       {
         game.enemies[i].kill();
         self.kill();
@@ -181,7 +181,7 @@ var SW_Sweater = function(game, floor)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,self.y,self.width,self.height);
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   }
 
   self.kill = function()

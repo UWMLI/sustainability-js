@@ -72,6 +72,12 @@ var BulbScene = function(game, canv)
   self.cleanup = function()
   {
   };
+
+
+  self.spend = function()
+  {
+
+  }
 };
 
 //standardize grid positions, origin top left
@@ -90,7 +96,7 @@ var BU_Node = function(game)
     self.w = 0;
     self.h = 0;
   }
-  self.configure(x,y);
+  self.configure(0,0);
 }
 
 var BU_Player = function(game, floor)
@@ -112,7 +118,7 @@ var BU_Player = function(game, floor)
 
   self.tick = function()
   {
-    if(self.floor != goalFloor)
+    if(self.floor != self.goalFloor)
     {
       node.configure(game.bulbsPerFloor,self.floor);
       if(self.x < node.x) self.x++;
@@ -132,7 +138,7 @@ var BU_Player = function(game, floor)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,self.y,self.width,self.height);
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   }
 }
 
@@ -154,7 +160,7 @@ var BU_Janitor = function(game, floor)
 
   self.tick = function()
   {
-    if(self.floor != goalFloor)
+    if(self.floor != self.goalFloor)
     {
       node.configure(game.bulbsPerFloor,self.floor);
       if(self.x < node.x) self.x++;
@@ -174,7 +180,7 @@ var BU_Janitor = function(game, floor)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,self.y,self.width,self.height);
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   }
 
 }
@@ -183,6 +189,8 @@ var BU_Bulb = function(game, floor, bulb)
 {
   var self = this;
 
+  var node = new BU_Node(game); //for re-use throughout lifetime
+
   self.ticksPerTick = 1000;
   self.ticksTilTick = self.ticksPerTick;
 
@@ -190,9 +198,9 @@ var BU_Bulb = function(game, floor, bulb)
   self.bulb = bulb;
   self.w = 20;
   self.h = 20;
-  var pos = BU_BulbCenterPosition(game, floor, bulb);
-  self.x = pos.x-(self.w/2);
-  self.y = pos.y-(self.h/2);
+  node.configure(bulb,floor);
+  self.x = node.x-(self.w/2);
+  self.y = node.y-(self.h/2);
 
   self.img = game.assetter.asset("assets/man.png");
 
@@ -258,18 +266,18 @@ var BU_Bulb = function(game, floor, bulb)
   self.tick = function()
   {
     self.ticksTilTick--;
-    if(ticksTilTick <= 0)
+    if(self.ticksTilTick <= 0)
     {
       self.ticksTilTick = self.ticksPerTick;
       self.energy -= self.energyPer;
       game.spend(self.dollarPer);
-      if(energy <= 0) self.setType("BURNT_"+self.type);
+      if(self.energy <= 0) self.setType("BURNT_"+self.type);
     }
   }
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,self.y,self.width,self.height);
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   }
 }
 
