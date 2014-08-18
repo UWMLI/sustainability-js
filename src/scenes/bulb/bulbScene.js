@@ -98,7 +98,7 @@ var BulbScene = function(game, canv)
       var score = Math.abs(self.bulbs[i].node.n_y - fromNode.n_y)*(10*self.bulbsPerFloor)+Math.abs(self.bulbs[i].node.n_x - fromNode.n_x);
       if(score < bestScore) { bestScore = score; bestNode = self.bulbs[i].node; }
     }
-    if(!bestNode) return;
+    if(!bestNode) bestNode = fromNode;
     node.configure(bestNode.n_x,bestNode.n_y);
   }
 };
@@ -157,13 +157,25 @@ var BU_Player = function(game, floor)
     {
       if(self.x+(self.w/2) < self.goalNode.x) self.x++;
       else if(self.x+(self.w/2) > self.goalNode.x) self.x--;
-      else game.bulbAt(self.goalNode).setType("GOOD");
+      else
+      {
+        var b = game.bulbAt(self.goalNode);
+        if(b.type == "BURNT_GOOD" || b.type == "BURNT_BAD" || b.type == "NONE") 
+        game.bulbAt(self.goalNode).setType("GOOD");
+      }
     }
   }
 
   self.draw = function(canv)
   {
     canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+    canv.context.strokeStyle = "#00FF00";
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+  }
+
+  self.bulbClicked = function(node)
+  {
+    self.goalNode = node;
   }
 }
 
