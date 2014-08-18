@@ -28,6 +28,7 @@
 <script type="text/javascript" src="src/scenes/barrel/barrelScene.js"></script>
 <script type="text/javascript" src="src/scenes/wheel/wheelScene.js"></script>
 <script type="text/javascript" src="src/scenes/bulb/bulbScene.js"></script>
+<script type="text/javascript" src="src/scenes/window/windowScene.js"></script>
 <script type="text/javascript">
     //window.onerror = function(msg, url, linenumber) { console.log('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber); return true; };
 
@@ -51,6 +52,7 @@
           case "barrel":  g = new Game(BarrelScene);  break;
           case "wheel":   g = new Game(WheelScene);   break;
           case "bulb":    g = new Game(BulbScene);    break;
+          case "window":  g = new Game(WindowScene);  break;
           default:        g = new Game(SweaterScene); break;
         }
         g.begin();
