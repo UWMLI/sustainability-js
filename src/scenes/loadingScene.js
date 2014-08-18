@@ -5,7 +5,7 @@ var LoadingScene = function(game, canv)
   var progress;
 
   var imagesloaded = 0;
-  var imagesrc = ["assets/man.png"];
+  var imagesrc = ["assets/man.png","assets/back1.png","assets/back2.png"];
   var images = [];
 
   var imageLoaded = function()

@@ -29,6 +29,7 @@
 <script type="text/javascript" src="src/scenes/wheel/wheelScene.js"></script>
 <script type="text/javascript" src="src/scenes/bulb/bulbScene.js"></script>
 <script type="text/javascript" src="src/scenes/window/windowScene.js"></script>
+<script type="text/javascript" src="src/scenes/pavement/pavementScene.js"></script>
 <script type="text/javascript">
     //window.onerror = function(msg, url, linenumber) { console.log('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber); return true; };
 
@@ -48,12 +49,13 @@
       m.fetchSync(function(){
         switch(m.gameType)
         {
-          case "sweater": g = new Game(SweaterScene); break;
-          case "barrel":  g = new Game(BarrelScene);  break;
-          case "wheel":   g = new Game(WheelScene);   break;
-          case "bulb":    g = new Game(BulbScene);    break;
-          case "window":  g = new Game(WindowScene);  break;
-          default:        g = new Game(SweaterScene); break;
+          case "sweater":  g = new Game(SweaterScene);  break;
+          case "barrel":   g = new Game(BarrelScene);   break;
+          case "wheel":    g = new Game(WheelScene);    break;
+          case "bulb":     g = new Game(BulbScene);     break;
+          case "window":   g = new Game(WindowScene);   break;
+          case "pavement": g = new Game(PavementScene); break;
+          default:         g = new Game(SweaterScene);  break;
         }
         g.begin();
       });
@@ -75,7 +77,7 @@
 </head>
 
 <body class='full_screen'>
-  <div id="stage_container" style="width:640px; height:640px;"></div>
+  <div id='stage_container' class='full_screen'></div>
 </body>
 
 </html>

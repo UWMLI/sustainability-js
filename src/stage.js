@@ -7,7 +7,7 @@ var Stage = function()
   this.drawCanv.context.fillStyle = "#000000";
   this.drawCanv.context.strokeStyle = "#000000";
   this.drawCanv.context.font = "12px vg_font";
-  this.dispCanv = new Canv(width,height);
+  this.dispCanv = new Canv(width-4,height-4); //-4 so I can see border for debugging
   this.dispCanv.canvas.style.border = "1px solid black";
 
   this.draw = function()
