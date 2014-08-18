@@ -58,7 +58,17 @@ var PV_ScratchableBackground = function(game)
   self.lastPtX = 0;
   self.lastPtY = 0;
 
-  self.dragStart = function(evt){ self.lastPtX = evt.offsetX; self.lastPtY = evt.offsetY; };
+  self.dragStart = function(evt)
+  {
+    //just draw circle
+    self.canv.context.fillStyle = "#000000";
+    self.canv.context.beginPath();
+    self.canv.context.arc(evt.offsetX,evt.offsetY,25,0,Math.PI*2,true);
+    self.canv.context.fill();
+
+    self.lastPtX = evt.offsetX;
+    self.lastPtY = evt.offsetY; 
+  };
   self.drag = function(evt)
   {
     //draw line (for long frames)
