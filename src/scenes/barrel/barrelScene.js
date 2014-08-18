@@ -1,4 +1,4 @@
-var RainBarrelScene = function(game, canv)
+var BarrelScene = function(game, canv)
 {
   var self = this;
 

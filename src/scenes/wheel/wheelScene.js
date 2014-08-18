@@ -1,4 +1,4 @@
-var HeatWheelScene = function(game, canv)
+var WheelScene = function(game, canv)
 {
   var self = this;
 

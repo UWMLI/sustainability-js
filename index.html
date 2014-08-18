@@ -25,8 +25,8 @@
 <script type="text/javascript" src="src/scenes/loadingScene.js"></script>
 <!--<script type="text/javascript" src="src/scenes/gameplayScene.js"></script>--><!--Just acts as example for scene- not actually used.-->
 <script type="text/javascript" src="src/scenes/sweater/sweaterScene.js"></script>
-<script type="text/javascript" src="src/scenes/rainbarrel/rainbarrelScene.js"></script>
-<script type="text/javascript" src="src/scenes/heatwheel/heatwheelScene.js"></script>
+<script type="text/javascript" src="src/scenes/barrel/barrelScene.js"></script>
+<script type="text/javascript" src="src/scenes/wheel/wheelScene.js"></script>
 <script type="text/javascript" src="src/scenes/bulb/bulbScene.js"></script>
 <script type="text/javascript">
     //window.onerror = function(msg, url, linenumber) { console.log('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber); return true; };
@@ -41,11 +41,31 @@
     ARIS.ready = function() { partReady(); };
     window.addEventListener('load', partReady, false);
     //Sync with ARIS for data
-    function jsLoaded() { m = new Model(); m.fetchSync(function(){ g = new Game(BulbScene); g.begin(); }); }
+    function jsLoaded()
+    {
+      m = new Model();
+      m.fetchSync(function(){
+        switch(m.gameType)
+        {
+          case "sweater": g = new Game(SweaterScene); break;
+          case "barrel":  g = new Game(BarrelScene);  break;
+          case "wheel":   g = new Game(WheelScene);   break;
+          case "bulb":    g = new Game(BulbScene);    break;
+          default:        g = new Game(SweaterScene); break;
+        }
+        g.begin();
+      });
+    }
 
     //Uncomment to test on PC
     ///*
-    ARIS.parseURLParams = function(url){ return {"gameId":0,"playerId":0,"webPageId":0}; };
+    ARIS.parseURLParams = function(url)
+    { 
+      var gameType = "";
+      var vars = window.location.search.substring(1).split("&");
+      for (var i=0;i<vars.length;i++) { var pair = vars[i].split("="); if(pair[0] == "game") gameType = pair[1]; } 
+      return {"gameId":0,"playerId":0,"webPageId":0,"gameType":gameType};
+    };
     ARIS.getItemCount = function(itemId){ ARIS.didUpdateItemQty(itemId, 1); };
     ARIS.ready();
     //*/
