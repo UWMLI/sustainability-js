@@ -23,6 +23,7 @@ var PavementScene = function(game, canv)
     self.drawer.register(self.cleanBG);
     self.drawer.register(self.dirtyBG);
     self.dragger.register(self.dirtyBG);
+    self.ticker.register(self.dirtyBG);
   };
 
   self.tick = function()
@@ -54,17 +55,52 @@ var PV_ScratchableBackground = function(game)
   self.img = game.assetter.asset("assets/back2.png");
   self.canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   self.canv.context.globalCompositeOperation = "destination-out";
+  self.canv.context.fillStyle = "#000000";
+  self.canv.context.strokeStyle = "#000000";
+  self.canv.context.lineWidth = 50;
+
+  var qRatio = 0.05;
+  self.qw = Math.round(self.w*qRatio);
+  self.qh = Math.round(self.h*qRatio);
+  self.qcanv = new Canv(self.qw,self.qh);
+  self.qcanv.context.fillStyle = "#000000";
+  self.qcanv.context.fillRect(0,0,self.qw,self.qh);
+  self.qcanv.context.fillStyle = "#FFFFFF";
+  self.qcanv.context.strokeStyle = "#FFFFFF";
+  self.qcanv.context.lineWidth = 50*qRatio;
 
   self.lastPtX = 0;
   self.lastPtY = 0;
 
+  self.filled = 0;
+  self.ticks = 0;
+  //spread out tally over multiple ticks
+  self.tick = function()
+  {
+    var pixs = self.qcanv.context.getImageData(0, self.ticks, self.qw, 1).data; //add up one row
+    for(var i = 0; i < pixs.length; i+=4) //+=4 because pixs = [R,G,B,A,R,G,B,A,...]
+      self.filled += (pixs[i]) ? 1 : 0; //only check red because who cares
+
+    self.ticks++;
+    if(self.ticks % self.qh == 0)
+    {
+      if(self.filled > 1550) console.log("FILLED!");
+      self.ticks = 0;
+      self.filled = 0;
+    }
+  }
+
   self.dragStart = function(evt)
   {
     //just draw circle
-    self.canv.context.fillStyle = "#000000";
+    ////canv
     self.canv.context.beginPath();
     self.canv.context.arc(evt.offsetX,evt.offsetY,25,0,Math.PI*2,true);
     self.canv.context.fill();
+    ////qcanv
+    self.qcanv.context.beginPath();
+    self.qcanv.context.arc(evt.offsetX*qRatio,evt.offsetY*qRatio,25*qRatio,0,Math.PI*2,true);
+    self.qcanv.context.fill();
 
     self.lastPtX = evt.offsetX;
     self.lastPtY = evt.offsetY; 
@@ -72,18 +108,26 @@ var PV_ScratchableBackground = function(game)
   self.drag = function(evt)
   {
     //draw line (for long frames)
-    self.canv.context.strokeStyle = "#000000";
-    self.canv.context.lineWidth = 50;
+    ////canv
     self.canv.context.beginPath();
     self.canv.context.moveTo(self.lastPtX, self.lastPtY);
     self.canv.context.lineTo(evt.offsetX, evt.offsetY);
     self.canv.context.stroke();
+    ////qcanv
+    self.qcanv.context.beginPath();
+    self.qcanv.context.moveTo(self.lastPtX*qRatio, self.lastPtY*qRatio);
+    self.qcanv.context.lineTo(evt.offsetX*qRatio, evt.offsetY*qRatio);
+    self.qcanv.context.stroke();
 
     //draw circle (for short frames)
-    self.canv.context.fillStyle = "#000000";
+    ////canv
     self.canv.context.beginPath();
     self.canv.context.arc(evt.offsetX,evt.offsetY,25,0,Math.PI*2,true);
     self.canv.context.fill();
+    ////qcanv
+    self.qcanv.context.beginPath();
+    self.qcanv.context.arc(evt.offsetX*qRatio,evt.offsetY*qRatio,25*qRatio,0,Math.PI*2,true);
+    self.qcanv.context.fill();
 
     self.lastPtX = evt.offsetX;
     self.lastPtY = evt.offsetY;
