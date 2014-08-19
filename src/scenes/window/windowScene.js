@@ -55,7 +55,7 @@ var WI_Window = function(game, room, floor)
   self.floor = floor;
 
   self.x = room*75+100;
-  self.y = floor*75+100;
+  self.y = floor*100+100;
   self.w = 65;
   self.h = 90;
 
@@ -69,13 +69,6 @@ var WI_Window = function(game, room, floor)
   self.draw = function(canv)
   {
     canv.context.drawImage(self.imgs[self.state],self.x,self.y,self.w,self.h);
-    switch(states[self.state])
-    {
-      case s_CLOSED: canv.context.strokeStyle = "#666666"; break;
-      case s_DARKED: canv.context.strokeStyle = "#000000"; break;
-      case s_OPENED: canv.context.strokeStyle = "#DDDDDD"; break;
-    }
-    canv.context.strokeRect(self.x,self.y,self.w,self.h);
   }
 
   self.click = function()
