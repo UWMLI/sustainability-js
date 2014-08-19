@@ -65,18 +65,27 @@ var WI_Sky = function(game)
   self.h = 2016;
 
   self.t = 0;
-  self.offy = 0;
+  self.period = 1000;
 
-  self.img = game.assetter.asset("win_sky.png");
+  self.sky_img = game.assetter.asset("win_sky.png");
+  self.moon_img = game.assetter.asset("win_moon.png");
+  self.sun_img = game.assetter.asset("win_sun.png");
 
   self.tick = function()
   {
     self.t++;
-    self.offy = Math.sin(self.t/100)*640+120;
   }
+  var sin;
+  var cos;
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,self.y+self.offy,self.w,self.h);
+    sin = Math.sin((self.t/self.period)*2*Math.PI);
+    cos = Math.cos((self.t/self.period)*2*Math.PI);
+    canv.context.drawImage(self.sky_img,self.x,self.y+(sin*640+125),self.w,self.h);
+    canv.context.drawImage(self.moon_img,cos*640+320-100,sin*640+700-100,200,200);
+    sin = Math.sin((self.t/self.period)*2*Math.PI+Math.PI);
+    cos = Math.cos((self.t/self.period)*2*Math.PI+Math.PI);
+    canv.context.drawImage(self.sun_img,cos*640+320-100,sin*640+700-100,200,200);
   }
 }
 
