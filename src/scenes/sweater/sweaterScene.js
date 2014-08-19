@@ -69,7 +69,7 @@ var SW_Player = function(game)
 {
   var self = this;
   self.floor = 0;
-  self.img = game.assetter.asset("assets/man.png");
+  self.img = game.assetter.asset("man.png");
 
   self.setFloor = function(floor)
   {
@@ -115,7 +115,7 @@ var SW_Enemy = function(game, floor)
   self.w = 50;
   self.h = 50;
 
-  self.img = game.assetter.asset("assets/man.png");
+  self.img = game.assetter.asset("man.png");
 
   self.tick = function()
   {
@@ -160,7 +160,7 @@ var SW_Sweater = function(game, floor)
   self.w = 50;
   self.h = 50;
 
-  self.img = game.assetter.asset("assets/man.png");
+  self.img = game.assetter.asset("man.png");
 
   self.tick = function()
   {

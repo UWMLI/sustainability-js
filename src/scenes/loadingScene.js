@@ -5,7 +5,7 @@ var LoadingScene = function(game, canv)
   var progress;
 
   var imagesloaded = 0;
-  var imagesrc = ["assets/man.png","assets/back1.png","assets/back2.png"];
+  var imagesrc = ["back1.png","back2.png","man.png","win_building.png","win_closed.png","win_drawn.png","win_moon.png","win_open.png","win_sky.png","win_sun.png"]
   var images = [];
 
   var imageLoaded = function()
@@ -26,7 +26,7 @@ var LoadingScene = function(game, canv)
     {
       images[i] = new Image();
       images[i].onload = imageLoaded; 
-      images[i].src = imagesrc[i]; 
+      images[i].src = "assets/"+imagesrc[i]; 
     }
   };
 

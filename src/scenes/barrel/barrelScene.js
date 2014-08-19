@@ -56,7 +56,7 @@ var BarrelScene = function(game, canv)
 var RB_Map = function(game)
 {
   var self = this;
-  self.img = game.assetter.asset("assets/man.png");
+  self.img = game.assetter.asset("man.png");
 
   //nice in smooth dragging
   self.offX = 0;
@@ -110,7 +110,7 @@ var RB_Barrel = function(game, args)
   self.w = 10;
   self.h = 10;
 
-  self.img = game.assetter.asset("assets/man.png");
+  self.img = game.assetter.asset("man.png");
 
   self.tick = function()
   {

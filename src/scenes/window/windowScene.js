@@ -56,21 +56,19 @@ var WI_Window = function(game, room, floor)
 
   self.x = room*75+100;
   self.y = floor*75+100;
-  self.w = 50;
-  self.h = 50;
+  self.w = 65;
+  self.h = 90;
 
-  self.img = game.assetter.asset("assets/man.png");
-
+  self.state = 0;
   var s_CLOSED = "CLOSED";
   var s_DARKED = "DARKED";
   var s_OPENED = "OPENED";
   var states = [s_CLOSED,s_DARKED,s_OPENED];
-
-  self.state = 0;
+  self.imgs = [game.assetter.asset("win_closed.png"),game.assetter.asset("win_drawn.png"),game.assetter.asset("win_open.png")];
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+    canv.context.drawImage(self.imgs[self.state],self.x,self.y,self.w,self.h);
     switch(states[self.state])
     {
       case s_CLOSED: canv.context.strokeStyle = "#666666"; break;

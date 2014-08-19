@@ -6,6 +6,7 @@ var Assetter = function(canv)
   var assets = [];
   self.asset = function(file)
   {
+    file = "assets/"+file;
     if(!assets[file])
     {
       assets[file] = new Image();

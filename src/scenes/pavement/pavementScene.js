@@ -52,7 +52,7 @@ var PV_ScratchableBackground = function(game)
   self.h = 1008;
 
   self.canv = new Canv(self.w,self.h);
-  self.img = game.assetter.asset("assets/back2.png");
+  self.img = game.assetter.asset("back2.png");
   self.canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   self.canv.context.globalCompositeOperation = "destination-out";
   self.canv.context.fillStyle = "#000000";
@@ -150,7 +150,7 @@ var PV_Background = function(game)
   self.w = 640;
   self.h = 1080;
 
-  self.img = game.assetter.asset("assets/back1.png");
+  self.img = game.assetter.asset("back1.png");
 
   self.draw = function(canv)
   {

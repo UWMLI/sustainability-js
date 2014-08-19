@@ -143,7 +143,7 @@ var BU_Player = function(game, floor)
   self.x = node.x-(self.w/2);
   self.y = node.y-(self.h/2);
   self.goalNode = new BU_Node(game);
-  self.img = game.assetter.asset("assets/man.png");
+  self.img = game.assetter.asset("man.png");
 
   self.tick = function()
   {
@@ -193,7 +193,7 @@ var BU_Janitor = function(game, floor)
   self.y = node.y-(self.h/2);
   self.goalNode = new BU_Node(game);
   self.lastNode = new BU_Node(game);
-  self.img = game.assetter.asset("assets/man.png");
+  self.img = game.assetter.asset("man.png");
 
   self.tick = function()
   {
@@ -233,7 +233,7 @@ var BU_Bulb = function(game, floor, bulb)
   self.x = self.node.x-(self.w/2);
   self.y = self.node.y-(self.h/2);
 
-  self.img = game.assetter.asset("assets/man.png");
+  self.img = game.assetter.asset("man.png");
 
   self.type = "NONE";
   self.dollarPer = 0.0;
@@ -251,7 +251,7 @@ var BU_Bulb = function(game, floor, bulb)
         self.energyPer = 5.0;
         self.light = 0.25;
         self.energy = 100.0;
-        self.img = game.assetter.asset("assets/man.png");
+        self.img = game.assetter.asset("man.png");
         break;
       case "BURNT_BAD":
         self.type = type;
@@ -259,7 +259,7 @@ var BU_Bulb = function(game, floor, bulb)
         self.energyPer = 0.0;
         self.light = 0.0;
         self.energy = 100.0;
-        self.img = game.assetter.asset("assets/man.png");
+        self.img = game.assetter.asset("man.png");
         break;
       case "GOOD":
         self.type = type;
@@ -267,7 +267,7 @@ var BU_Bulb = function(game, floor, bulb)
         self.energyPer = 3.0;
         self.light = 0.35;
         self.energy = 100.0;
-        self.img = game.assetter.asset("assets/man.png");
+        self.img = game.assetter.asset("man.png");
         break;
       case "BURNT_GOOD":
         self.type = type;
@@ -275,7 +275,7 @@ var BU_Bulb = function(game, floor, bulb)
         self.energyPer = 0.0;
         self.light = 0.0;
         self.energy = 100.0;
-        self.img = game.assetter.asset("assets/man.png");
+        self.img = game.assetter.asset("man.png");
         break;
       case "NONE":
       default:
@@ -284,7 +284,7 @@ var BU_Bulb = function(game, floor, bulb)
         self.energyPer = 0.0;
         self.light = 0.0;
         self.energy = 100.0;
-        self.img = game.assetter.asset("assets/man.png");
+        self.img = game.assetter.asset("man.png");
         break;
     }
   }
