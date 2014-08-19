@@ -40,7 +40,6 @@ var Dragger = function()
   function end(evt)
   {
     addOffsetToEvt(evt);
-    addOffsetToEvt(evt);
     for(var i = 0; i < dragging.length; i++)
     {
       callbackQueue.push(dragging[i].dragFinish);

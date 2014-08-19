@@ -3,7 +3,7 @@ var WindowScene = function(game, canv)
   var self = this;
 
   self.ticker;
-  self.clicker;
+  self.presser;
   self.drawer;
   self.assetter;
 
@@ -15,7 +15,7 @@ var WindowScene = function(game, canv)
   self.ready = function()
   {
     self.ticker = new Ticker();
-    self.clicker = new Clicker();
+    self.presser = new Presser();
     self.drawer = new Drawer(canv);
     self.assetter = new Assetter();
 
@@ -26,14 +26,14 @@ var WindowScene = function(game, canv)
         self.windows.push(new WI_Window(self, i, j));
     for(var i = 0; i < self.windows.length; i++)
     {
-      self.clicker.register(self.windows[i]);
+      self.presser.register(self.windows[i]);
       self.drawer.register(self.windows[i]);
     }
   };
 
   self.tick = function()
   {
-    self.clicker.flush();
+    self.presser.flush();
     self.ticker.flush();
   };
 
@@ -71,7 +71,7 @@ var WI_Window = function(game, room, floor)
     canv.context.drawImage(self.imgs[self.state],self.x,self.y,self.w,self.h);
   }
 
-  self.click = function()
+  self.press = function()
   {
     self.state = (self.state+1)%states.length;
   }
