@@ -7,10 +7,12 @@ var WindowScene = function(game, canv)
   self.drawer;
   self.assetter;
 
+  self.sky;
+  self.building;
   self.windows;
 
   self.numFloors = 5;
-  self.numRooms = 5;
+  self.numRooms = 4;
 
   self.ready = function()
   {
@@ -19,11 +21,17 @@ var WindowScene = function(game, canv)
     self.drawer = new Drawer(canv);
     self.assetter = new Assetter();
 
+    self.sky = new WI_Sky(self);
+    self.building = new WI_Building(self);
     self.windows = [];
 
     for(var i = 0; i < self.numRooms; i++)
       for(var j = 0; j < self.numFloors; j++)
         self.windows.push(new WI_Window(self, i, j));
+
+    self.drawer.register(self.sky);
+    self.ticker.register(self.sky);
+    self.drawer.register(self.building);
     for(var i = 0; i < self.windows.length; i++)
     {
       self.presser.register(self.windows[i]);
@@ -47,6 +55,49 @@ var WindowScene = function(game, canv)
   };
 };
 
+var WI_Sky = function(game)
+{
+  var self = this;
+
+  self.x = 0;
+  self.y = -1008;
+  self.w = 640;
+  self.h = 2016;
+
+  self.t = 0;
+  self.offy = 0;
+
+  self.img = game.assetter.asset("win_sky.png");
+
+  self.tick = function()
+  {
+    self.t++;
+    self.offy = Math.sin(self.t/100)*640+120;
+  }
+  self.draw = function(canv)
+  {
+    canv.context.drawImage(self.img,self.x,self.y+self.offy,self.w,self.h);
+  }
+}
+
+//literally just the building image
+var WI_Building = function(game)
+{
+  var self = this;
+
+  self.x = 0;
+  self.y = 0;
+  self.w = 640;
+  self.h = 1008;
+
+  self.img = game.assetter.asset("win_building.png");
+
+  self.draw = function(canv)
+  {
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+  }
+}
+
 var WI_Window = function(game, room, floor)
 {
   var self = this;
@@ -54,8 +105,8 @@ var WI_Window = function(game, room, floor)
   self.room = room;
   self.floor = floor;
 
-  self.x = room*75+100;
-  self.y = floor*100+100;
+  self.x = room*80+160;
+  self.y = floor*110+210;
   self.w = 65;
   self.h = 90;
 

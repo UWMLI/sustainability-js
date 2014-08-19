@@ -148,7 +148,7 @@ var PV_Background = function(game)
   self.x = 0;
   self.y = 0;
   self.w = 640;
-  self.h = 1080;
+  self.h = 1008;
 
   self.img = game.assetter.asset("back1.png");
 
