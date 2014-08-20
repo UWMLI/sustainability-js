@@ -12,14 +12,15 @@ var Dragger = function()
 
   function begin(evt)
   {
+    debugLog("BeginDrag");
     addOffsetToEvt(evt);
     for(var i = 0; i < draggables.length; i++)
     {
       if(
-        evt.offsetX >= draggables[i].x &&
-        evt.offsetX <= draggables[i].x+draggables[i].w &&
-        evt.offsetY >= draggables[i].y &&
-        evt.offsetY <= draggables[i].y+draggables[i].h
+        evt.philX >= draggables[i].x &&
+        evt.philX <= draggables[i].x+draggables[i].w &&
+        evt.philY >= draggables[i].y &&
+        evt.philY <= draggables[i].y+draggables[i].h
       )
       {
         dragging.push(draggables[i]);
@@ -30,6 +31,7 @@ var Dragger = function()
   }
   function drag(evt)
   {
+    debugLog("Drag");
     addOffsetToEvt(evt);
     for(var i = 0; i < dragging.length; i++)
     {
@@ -39,6 +41,7 @@ var Dragger = function()
   }
   function end(evt)
   {
+    debugLog("EndDrag");
     addOffsetToEvt(evt);
     for(var i = 0; i < dragging.length; i++)
     {
@@ -82,8 +85,8 @@ var Draggable = function(args)
   self.y = args.y ? args.y : 0;
   self.w = args.w ? args.w : 0;
   self.h = args.h ? args.h : 0;
-  self.dragStart  = args.dragStart  ? args.dragStart  : function(evt){ self.offX = self.x+(self.w/2)-evt.offsetX; self.offY = self.y+(self.h/2)-evt.offsetY; };
-  self.drag       = args.drag       ? args.drag       : function(evt){ self.x = evt.offsetX-(self.w/2)+self.offX; self.y = evt.offsetY-(self.h/2)+self.offY; };
+  self.dragStart  = args.dragStart  ? args.dragStart  : function(evt){ self.offX = self.x+(self.w/2)-evt.philX; self.offY = self.y+(self.h/2)-evt.philY; };
+  self.drag       = args.drag       ? args.drag       : function(evt){ self.x = evt.philX-(self.w/2)+self.offX; self.y = evt.philY-(self.h/2)+self.offY; };
   self.dragFinish = args.dragFinish ? args.dragFinish : function(){};
 
   //nice for debugging purposes

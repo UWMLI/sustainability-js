@@ -11,14 +11,15 @@ var Clicker = function()
 
   function click(evt)
   {
+    debugLog("Click");
     addOffsetToEvt(evt);
     for(var i = 0; i < clickables.length; i++)
     {
       if(
-        evt.offsetX >= clickables[i].x &&
-        evt.offsetX <= clickables[i].x+clickables[i].w &&
-        evt.offsetY >= clickables[i].y &&
-        evt.offsetY <= clickables[i].y+clickables[i].h
+        evt.philX >= clickables[i].x &&
+        evt.philX <= clickables[i].x+clickables[i].w &&
+        evt.philY >= clickables[i].y &&
+        evt.philY <= clickables[i].y+clickables[i].h
       )
       {
         callbackQueue.push(clickables[i].click);

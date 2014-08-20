@@ -12,14 +12,15 @@ var Flicker = function()
 
   function begin(evt)
   {
+    debugLog("BeginFlick");
     addOffsetToEvt(evt);
     for(var i = 0; i < flickables.length; i++)
     {
       if(
-        evt.offsetX >= flickables[i].x &&
-        evt.offsetX <= flickables[i].x+flickables[i].w &&
-        evt.offsetY >= flickables[i].y &&
-        evt.offsetY <= flickables[i].y+flickables[i].h
+        evt.philX >= flickables[i].x &&
+        evt.philX <= flickables[i].x+flickables[i].w &&
+        evt.philY >= flickables[i].y &&
+        evt.philY <= flickables[i].y+flickables[i].h
       )
       {
         flicking.push(flickables[i]);
@@ -30,6 +31,7 @@ var Flicker = function()
   }
   function drag(evt)
   {
+    debugLog("DragFlick");
     addOffsetToEvt(evt);
     for(var i = 0; i < flicking.length; i++)
     {
@@ -39,6 +41,7 @@ var Flicker = function()
   }
   function end(evt)
   {
+    debugLog("EndFlick");
     flicking = []; //clear all currently flicking
   }
   self.flush = function()
@@ -79,8 +82,8 @@ var Flickable = function(args)
   self.w = args.w ? args.w : 0;
   self.h = args.h ? args.h : 0;
   self.r = args.r ? args.r : 0;
-  self.flickStart = args.flickStart ? args.flickStart : function(evt){ self.startX = evt.offsetX; self.startY = evt.offsetY; self.flicked = false; };
-  self.flicking   = args.flicking   ? args.flicking   : function(evt){ if(self.flicked) return; self.vec.x = (evt.offsetX-self.startX); self.vec.y = (evt.offsetY-self.startY); if(Math.sqrt((self.vec.x*self.vec.x)+(self.vec.y*self.vec.y)) >= self.r) { self.flick(self.vec); self.flicked = true; }};
+  self.flickStart = args.flickStart ? args.flickStart : function(evt){ self.startX = evt.philX; self.startY = evt.philY; self.flicked = false; };
+  self.flicking   = args.flicking   ? args.flicking   : function(evt){ if(self.flicked) return; self.vec.x = (evt.philX-self.startX); self.vec.y = (evt.philY-self.startY); if(Math.sqrt((self.vec.x*self.vec.x)+(self.vec.y*self.vec.y)) >= self.r) { self.flick(self.vec); self.flicked = true; }};
   self.flick      = args.flick      ? args.flick      : function(vec){};
 
   //nice for debugging purposes

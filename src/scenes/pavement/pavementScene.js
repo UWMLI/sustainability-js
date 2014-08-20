@@ -95,15 +95,15 @@ var PV_ScratchableBackground = function(game)
     //just draw circle
     ////canv
     self.canv.context.beginPath();
-    self.canv.context.arc(evt.offsetX,evt.offsetY,25,0,Math.PI*2,true);
+    self.canv.context.arc(evt.philX,evt.philY,25,0,Math.PI*2,true);
     self.canv.context.fill();
     ////qcanv
     self.qcanv.context.beginPath();
-    self.qcanv.context.arc(evt.offsetX*qRatio,evt.offsetY*qRatio,25*qRatio,0,Math.PI*2,true);
+    self.qcanv.context.arc(evt.philX*qRatio,evt.philY*qRatio,25*qRatio,0,Math.PI*2,true);
     self.qcanv.context.fill();
 
-    self.lastPtX = evt.offsetX;
-    self.lastPtY = evt.offsetY; 
+    self.lastPtX = evt.philX;
+    self.lastPtY = evt.philY; 
   };
   self.drag = function(evt)
   {
@@ -111,26 +111,26 @@ var PV_ScratchableBackground = function(game)
     ////canv
     self.canv.context.beginPath();
     self.canv.context.moveTo(self.lastPtX, self.lastPtY);
-    self.canv.context.lineTo(evt.offsetX, evt.offsetY);
+    self.canv.context.lineTo(evt.philX, evt.philY);
     self.canv.context.stroke();
     ////qcanv
     self.qcanv.context.beginPath();
     self.qcanv.context.moveTo(self.lastPtX*qRatio, self.lastPtY*qRatio);
-    self.qcanv.context.lineTo(evt.offsetX*qRatio, evt.offsetY*qRatio);
+    self.qcanv.context.lineTo(evt.philX*qRatio, evt.philY*qRatio);
     self.qcanv.context.stroke();
 
     //draw circle (for short frames)
     ////canv
     self.canv.context.beginPath();
-    self.canv.context.arc(evt.offsetX,evt.offsetY,25,0,Math.PI*2,true);
+    self.canv.context.arc(evt.philX,evt.philY,25,0,Math.PI*2,true);
     self.canv.context.fill();
     ////qcanv
     self.qcanv.context.beginPath();
-    self.qcanv.context.arc(evt.offsetX*qRatio,evt.offsetY*qRatio,25*qRatio,0,Math.PI*2,true);
+    self.qcanv.context.arc(evt.philX*qRatio,evt.philY*qRatio,25*qRatio,0,Math.PI*2,true);
     self.qcanv.context.fill();
 
-    self.lastPtX = evt.offsetX;
-    self.lastPtY = evt.offsetY;
+    self.lastPtX = evt.philX;
+    self.lastPtY = evt.philY;
   };
   self.dragFinish = function(){ self.lastPtX = 0; self.lastPtY = 0; };
 

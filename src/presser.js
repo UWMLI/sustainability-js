@@ -11,26 +11,26 @@ var Presser = function()
   self.unregister = function(pressable) { pressables.splice(pressables.indexOf(pressable),1); }
   self.clear = function() { pressables = []; }
 
-
-
   function begin(evt)
   {
+    debugLog("BeginPress");
     down = true;
     press(evt);
   }
   function press(evt)
   {
     if(!down) return;
+    debugLog("Press");
 
     addOffsetToEvt(evt);
     var alreadypressing;
     for(var i = 0; i < pressables.length; i++)
     {
       if(
-        evt.offsetX >= pressables[i].x &&
-        evt.offsetX <= pressables[i].x+pressables[i].w &&
-        evt.offsetY >= pressables[i].y &&
-        evt.offsetY <= pressables[i].y+pressables[i].h
+        evt.philX >= pressables[i].x &&
+        evt.philX <= pressables[i].x+pressables[i].w &&
+        evt.philY >= pressables[i].y &&
+        evt.philY <= pressables[i].y+pressables[i].h
       )
       {
         alreadypressing = false;
@@ -48,10 +48,10 @@ var Presser = function()
     for(var i = 0; i < pressing.length; i++)
     {
       if(
-        evt.offsetX < pressing[i].x ||
-        evt.offsetX > pressing[i].x+pressing[i].w ||
-        evt.offsetY < pressing[i].y ||
-        evt.offsetY > pressing[i].y+pressing[i].h
+        evt.philX < pressing[i].x ||
+        evt.philX > pressing[i].x+pressing[i].w ||
+        evt.philY < pressing[i].y ||
+        evt.philY > pressing[i].y+pressing[i].h
       )
       {
         pressing.splice(i,1);
@@ -61,6 +61,7 @@ var Presser = function()
   }
   function end(evt)
   {
+    debugLog("EndPress");
     down = false;
     pressing = [];
   }

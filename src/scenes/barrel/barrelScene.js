@@ -75,13 +75,13 @@ var RB_Map = function(game)
 
   self.dragStart = function(evt)
   {
-    self.offX = self.x+(self.w/2)-evt.offsetX;
-    self.offY = self.y+(self.h/2)-evt.offsetY;
+    self.offX = self.x+(self.w/2)-evt.philX;
+    self.offY = self.y+(self.h/2)-evt.philY;
   };
   self.drag = function(evt)
   {
-    self.deltaX = (evt.offsetX-(self.w/2)+self.offX)-self.x;
-    self.deltaY = (evt.offsetY-(self.h/2)+self.offY)-self.y;
+    self.deltaX = (evt.philX-(self.w/2)+self.offX)-self.x;
+    self.deltaY = (evt.philY-(self.h/2)+self.offY)-self.y;
     self.x += self.deltaX;
     self.y += self.deltaY;
     for(var i = 0; i < game.barrels.length; i++)

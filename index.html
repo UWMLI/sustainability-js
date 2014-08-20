@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="no-cache" />
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<meta name="viewport" content="width=device-width initial-scale=1.0 maximum-scale=1.0 user-scalable=no" />
+<meta name="viewport" content="width=640 initial-scale=1.0 maximum-scale=1.0 user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 
 <title>Game</title>
@@ -40,11 +40,11 @@
     //Prepare and load HTML+JS
     var ARIS = {};
     var readyCount = 2;
-    function partReady() { readyCount--; if(readyCount == 0) jsLoaded(); }
+    function partReady() { readyCount--; if(readyCount == 0) stackLoaded(); }
     ARIS.ready = function() { partReady(); };
     window.addEventListener('load', partReady, false);
     //Sync with ARIS for data
-    function jsLoaded()
+    function stackLoaded()
     {
       m = new Model();
       m.fetchSync(function(){
@@ -58,6 +58,7 @@
           case "pavement": g = new Game(PavementScene); break;
           default:         g = new Game(SweaterScene);  break;
         }
+        hackInputs(); //ugh (note- must wait til after game creation)
         g.begin();
       });
     }
@@ -77,8 +78,9 @@
 </script>
 </head>
 
-<body id='dabody' class='full_screen'>
+<body id='dabody' class='full_screen' style='position:fixed;'>
   <div id='stage_container' class='full_screen'></div>
+  <div id='debug' class='full_screen' style='position:absolute; top:0px; left:0px; color:white; pointer-events:none;'></div>
 </body>
 
 </html>
