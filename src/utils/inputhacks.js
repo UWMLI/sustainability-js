@@ -1,4 +1,4 @@
-var platform = "PC";
+var platform = "MOBILE";
 var debug = false;
 
 var theoreticalWidthOfStuff = 640;
@@ -13,15 +13,20 @@ function debugLog(txt)
 }
 function addOffsetToEvt(evt)
 {
-  if(evt.offsetX == undefined)
-  {
-    evt.philX = evt.layerX-evt.originalTarget.offsetLeft;
-    evt.philY = evt.layerY-evt.originalTarget.offsetTop;
-  }
-  else
+  if(evt.offsetX != undefined)
   {
     evt.philX = evt.offsetX;
     evt.philY = evt.offsetY;
+  }
+  else if(evt.touches != undefined)
+  {
+    evt.philX = evt.touches[0].pageX - evt.touches[0].target.offsetLeft;
+    evt.philY = evt.touches[0].pageY - evt.touches[0].target.offsetTop;
+  }
+  else
+  {
+    evt.philX = evt.layerX-evt.originalTarget.offsetLeft;
+    evt.philY = evt.layerY-evt.originalTarget.offsetTop;
   }
 
   evt.philX = (evt.philX/actualWidthOfStuff)*theoreticalWidthOfStuff;

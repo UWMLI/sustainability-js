@@ -46,6 +46,7 @@
     //Sync with ARIS for data
     function stackLoaded()
     {
+      window.scrollTo(0,1);
       m = new Model();
       m.fetchSync(function(){
         switch(m.gameType)
