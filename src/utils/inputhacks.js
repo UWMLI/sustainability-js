@@ -1,4 +1,4 @@
-var platform = "MOBILE";
+var platform = "MOBILE"; //"MOBILE" or "PC"
 var debug = false;
 
 var theoreticalWidthOfStuff = 640;
@@ -34,6 +34,7 @@ function addOffsetToEvt(evt)
 }
 function hackInputs()
 {
+  window.addEventListener('touchstart', function(e){ e.preventDefault() }); //prevent browser from doing anything funny
   actualWidthOfStuff = window.innerWidth;
   actualHeightOfStuff = window.innerHeight;
   document.getElementById("dabody").style.width = actualWidthOfStuff+"px";
