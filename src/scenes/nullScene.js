@@ -1,21 +1,23 @@
-var NullScene = function(game, canv)
+var NullScene = function(game, stage)
 {
-  this.ready = function()
+  var self = this;
+
+  self.ready = function()
   {
 
   };
 
-  this.tick = function()
+  self.tick = function()
   {
 
   };
 
-  this.draw = function()
+  self.draw = function()
   {
 
   };
 
-  this.cleanup = function()
+  self.cleanup = function()
   {
 
   };

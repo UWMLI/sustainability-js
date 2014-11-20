@@ -1,6 +1,14 @@
-var Presser = function()
+var Presser = function(init)
 {
+  var default_init =
+  {
+    source:document.createElement('div'),
+    physical_rect:{x:0,y:0,w:1,h:1},
+    theoretical_rect:{x:0,y:0,w:1,h:1}
+  }
+
   var self = this;
+  doMapInitDefaults(self,init,default_init);
 
   var pressables = [];
   var pressing = [];
@@ -13,24 +21,22 @@ var Presser = function()
 
   function begin(evt)
   {
-    debugLog("BeginPress");
     down = true;
     press(evt);
   }
   function press(evt)
   {
     if(!down) return;
-    debugLog("Press");
 
-    addOffsetToEvt(evt);
+    doSetPosOnEvent(evt,self.physical_rect,self.theoretical_rect);
     var alreadypressing;
     for(var i = 0; i < pressables.length; i++)
     {
       if(
-        evt.philX >= pressables[i].x &&
-        evt.philX <= pressables[i].x+pressables[i].w &&
-        evt.philY >= pressables[i].y &&
-        evt.philY <= pressables[i].y+pressables[i].h
+        evt.doX >= pressables[i].x &&
+        evt.doX <= pressables[i].x+pressables[i].w &&
+        evt.doY >= pressables[i].y &&
+        evt.doY <= pressables[i].y+pressables[i].h
       )
       {
         alreadypressing = false;
@@ -48,10 +54,10 @@ var Presser = function()
     for(var i = 0; i < pressing.length; i++)
     {
       if(
-        evt.philX < pressing[i].x ||
-        evt.philX > pressing[i].x+pressing[i].w ||
-        evt.philY < pressing[i].y ||
-        evt.philY > pressing[i].y+pressing[i].h
+        evt.doX < pressing[i].x ||
+        evt.doX > pressing[i].x+pressing[i].w ||
+        evt.doY < pressing[i].y ||
+        evt.doY > pressing[i].y+pressing[i].h
       )
       {
         pressing.splice(i,1);
@@ -61,7 +67,6 @@ var Presser = function()
   }
   function end(evt)
   {
-    debugLog("EndPress");
     down = false;
     pressing = [];
   }
@@ -75,15 +80,15 @@ var Presser = function()
 
   if(platform == "PC")
   {
-    document.getElementById("stage_container").addEventListener('mousedown', begin, false);
-    document.getElementById("stage_container").addEventListener('mousemove', press, false);
-    document.getElementById("stage_container").addEventListener('mouseup',   end,   false);
+    self.source.addEventListener('mousedown', begin, false);
+    self.source.addEventListener('mousemove', press, false);
+    self.source.addEventListener('mouseup',   end,   false);
   }
   else if(platform == "MOBILE")
   {
-    document.getElementById("stage_container").addEventListener('touchstart', begin, false);
-    document.getElementById("stage_container").addEventListener('touchmove',  press, false);
-    document.getElementById("stage_container").addEventListener('touchend',   end,   false);
+    self.source.addEventListener('touchstart', begin, false);
+    self.source.addEventListener('touchmove',  press, false);
+    self.source.addEventListener('touchend',   end,   false);
   }
 }
 

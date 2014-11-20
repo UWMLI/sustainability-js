@@ -1,7 +1,9 @@
-var WindowScene = function(game, canv)
+var WindowScene = function(game, stage)
 {
   var self = this;
 
+  var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
+  var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.ticker;
   self.presser;
   self.drawer;
@@ -16,10 +18,10 @@ var WindowScene = function(game, canv)
 
   self.ready = function()
   {
-    self.ticker = new Ticker();
-    self.presser = new Presser();
-    self.drawer = new Drawer(canv);
-    self.assetter = new Assetter();
+    self.ticker = new Ticker({});
+    self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.drawer = new Drawer({source:stage.drawCanv});
+    self.assetter = new Assetter({});
 
     self.sky = new WI_Sky(self);
     self.building = new WI_Building(self);
@@ -53,6 +55,7 @@ var WindowScene = function(game, canv)
   self.cleanup = function()
   {
   };
+
 };
 
 var WI_Sky = function(game)

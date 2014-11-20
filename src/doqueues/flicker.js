@@ -1,6 +1,14 @@
-var Flicker = function()
+var Flicker = function(init)
 {
+  var default_init =
+  {
+    source:document.createElement('div'),
+    physical_rect:{x:0,y:0,w:1,h:1},
+    theoretical_rect:{x:0,y:0,w:1,h:1}
+  }
+
   var self = this;
+  doMapInitDefaults(self,init,default_init);
 
   var flickables = [];
   var flicking = [];
@@ -12,15 +20,14 @@ var Flicker = function()
 
   function begin(evt)
   {
-    debugLog("BeginFlick");
-    addOffsetToEvt(evt);
+    doSetPosOnEvent(evt,self.physical_rect,self.theoretical_rect);
     for(var i = 0; i < flickables.length; i++)
     {
       if(
-        evt.philX >= flickables[i].x &&
-        evt.philX <= flickables[i].x+flickables[i].w &&
-        evt.philY >= flickables[i].y &&
-        evt.philY <= flickables[i].y+flickables[i].h
+        evt.doX >= flickables[i].x &&
+        evt.doX <= flickables[i].x+flickables[i].w &&
+        evt.doY >= flickables[i].y &&
+        evt.doY <= flickables[i].y+flickables[i].h
       )
       {
         flicking.push(flickables[i]);
@@ -31,8 +38,7 @@ var Flicker = function()
   }
   function drag(evt)
   {
-    debugLog("DragFlick");
-    addOffsetToEvt(evt);
+    doSetPosOnEvent(evt,self.physical_rect,self.theoretical_rect);
     for(var i = 0; i < flicking.length; i++)
     {
       callbackQueue.push(flicking[i].flicking);
@@ -41,7 +47,6 @@ var Flicker = function()
   }
   function end(evt)
   {
-    debugLog("EndFlick");
     flicking = []; //clear all currently flicking
   }
   self.flush = function()
@@ -54,15 +59,15 @@ var Flicker = function()
 
   if(platform == "PC")
   {
-    document.getElementById("stage_container").addEventListener('mousedown', begin, false);
-    document.getElementById("stage_container").addEventListener('mousemove', drag,  false);
-    document.getElementById("stage_container").addEventListener('mouseup',   end,   false);
+    self.source.addEventListener('mousedown', begin, false);
+    self.source.addEventListener('mousemove', drag,  false);
+    self.source.addEventListener('mouseup',   end,   false);
   }
   else if(platform == "MOBILE")
   {
-    document.getElementById("stage_container").addEventListener('touchstart', begin, false);
-    document.getElementById("stage_container").addEventListener('touchmove',  drag,  false);
-    document.getElementById("stage_container").addEventListener('touchend',   end,   false);
+    self.source.addEventListener('touchstart', begin, false);
+    self.source.addEventListener('touchmove',  drag,  false);
+    self.source.addEventListener('touchend',   end,   false);
   }
 }
 
@@ -82,8 +87,8 @@ var Flickable = function(args)
   self.w = args.w ? args.w : 0;
   self.h = args.h ? args.h : 0;
   self.r = args.r ? args.r : 0;
-  self.flickStart = args.flickStart ? args.flickStart : function(evt){ self.startX = evt.philX; self.startY = evt.philY; self.flicked = false; };
-  self.flicking   = args.flicking   ? args.flicking   : function(evt){ if(self.flicked) return; self.vec.x = (evt.philX-self.startX); self.vec.y = (evt.philY-self.startY); if(Math.sqrt((self.vec.x*self.vec.x)+(self.vec.y*self.vec.y)) >= self.r) { self.flick(self.vec); self.flicked = true; }};
+  self.flickStart = args.flickStart ? args.flickStart : function(evt){ self.startX = evt.doX; self.startY = evt.doY; self.flicked = false; };
+  self.flicking   = args.flicking   ? args.flicking   : function(evt){ if(self.flicked) return; self.vec.x = (evt.doX-self.startX); self.vec.y = (evt.doY-self.startY); if(Math.sqrt((self.vec.x*self.vec.x)+(self.vec.y*self.vec.y)) >= self.r) { self.flick(self.vec); self.flicked = true; }};
   self.flick      = args.flick      ? args.flick      : function(vec){};
 
   //nice for debugging purposes

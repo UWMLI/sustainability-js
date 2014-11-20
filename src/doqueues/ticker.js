@@ -1,6 +1,11 @@
-var Ticker = function()
+var Ticker = function(init)
 {
+  var default_init =
+  {
+  }
+
   var self = this;
+  doMapInitDefaults(self,init,default_init);
 
   var tickables = [];
   self.register = function(tickable) { tickables.push(tickable); }

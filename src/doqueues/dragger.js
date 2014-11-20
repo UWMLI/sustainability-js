@@ -1,6 +1,14 @@
-var Dragger = function()
+var Dragger = function(init)
 {
+  var default_init =
+  {
+    source:document.createElement('div'),
+    physical_rect:{x:0,y:0,w:1,h:1},
+    theoretical_rect:{x:0,y:0,w:1,h:1}
+  }
+
   var self = this;
+  doMapInitDefaults(self,init,default_init);
 
   var draggables = [];
   var dragging = [];
@@ -12,15 +20,14 @@ var Dragger = function()
 
   function begin(evt)
   {
-    debugLog("BeginDrag");
-    addOffsetToEvt(evt);
+    doSetPosOnEvent(evt,self.physical_rect,self.theoretical_rect);
     for(var i = 0; i < draggables.length; i++)
     {
       if(
-        evt.philX >= draggables[i].x &&
-        evt.philX <= draggables[i].x+draggables[i].w &&
-        evt.philY >= draggables[i].y &&
-        evt.philY <= draggables[i].y+draggables[i].h
+        evt.doX >= draggables[i].x &&
+        evt.doX <= draggables[i].x+draggables[i].w &&
+        evt.doY >= draggables[i].y &&
+        evt.doY <= draggables[i].y+draggables[i].h
       )
       {
         dragging.push(draggables[i]);
@@ -31,8 +38,7 @@ var Dragger = function()
   }
   function drag(evt)
   {
-    debugLog("Drag");
-    addOffsetToEvt(evt);
+    doSetPosOnEvent(evt,self.physical_rect,self.theoretical_rect);
     for(var i = 0; i < dragging.length; i++)
     {
       callbackQueue.push(dragging[i].drag);
@@ -41,8 +47,7 @@ var Dragger = function()
   }
   function end(evt)
   {
-    debugLog("EndDrag");
-    addOffsetToEvt(evt);
+    doSetPosOnEvent(evt,self.physical_rect,self.theoretical_rect);
     for(var i = 0; i < dragging.length; i++)
     {
       callbackQueue.push(dragging[i].dragFinish);
@@ -60,15 +65,15 @@ var Dragger = function()
 
   if(platform == "PC")
   {
-    document.getElementById("stage_container").addEventListener('mousedown', begin, false);
-    document.getElementById("stage_container").addEventListener('mousemove', drag,  false);
-    document.getElementById("stage_container").addEventListener('mouseup',   end,   false);
+    self.source.addEventListener('mousedown', begin, false);
+    self.source.addEventListener('mousemove', drag,  false);
+    self.source.addEventListener('mouseup',   end,   false);
   }
   else if(platform == "MOBILE")
   {
-    document.getElementById("stage_container").addEventListener('touchstart', begin, false);
-    document.getElementById("stage_container").addEventListener('touchmove',  drag,  false);
-    document.getElementById("stage_container").addEventListener('touchend',   end,   false);
+    self.source.addEventListener('touchstart', begin, false);
+    self.source.addEventListener('touchmove',  drag,  false);
+    self.source.addEventListener('touchend',   end,   false);
   }
 }
 
@@ -85,8 +90,8 @@ var Draggable = function(args)
   self.y = args.y ? args.y : 0;
   self.w = args.w ? args.w : 0;
   self.h = args.h ? args.h : 0;
-  self.dragStart  = args.dragStart  ? args.dragStart  : function(evt){ self.offX = self.x+(self.w/2)-evt.philX; self.offY = self.y+(self.h/2)-evt.philY; };
-  self.drag       = args.drag       ? args.drag       : function(evt){ self.x = evt.philX-(self.w/2)+self.offX; self.y = evt.philY-(self.h/2)+self.offY; };
+  self.dragStart  = args.dragStart  ? args.dragStart  : function(evt){ self.offX = self.x+(self.w/2)-evt.doX; self.offY = self.y+(self.h/2)-evt.doY; };
+  self.drag       = args.drag       ? args.drag       : function(evt){ self.x = evt.doX-(self.w/2)+self.offX; self.y = evt.doY-(self.h/2)+self.offY; };
   self.dragFinish = args.dragFinish ? args.dragFinish : function(){};
 
   //nice for debugging purposes

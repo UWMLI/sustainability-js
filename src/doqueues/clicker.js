@@ -1,6 +1,14 @@
-var Clicker = function()
+var Clicker = function(init)
 {
+  var default_init =
+  {
+    source:document.createElement('div'),
+    physical_rect:{x:0,y:0,w:1,h:1},
+    theoretical_rect:{x:0,y:0,w:1,h:1}
+  }
+
   var self = this;
+  doMapInitDefaults(self,init,default_init);
 
   var clickables = [];
   var callbackQueue = [];
@@ -11,15 +19,14 @@ var Clicker = function()
 
   function click(evt)
   {
-    debugLog("Click");
-    addOffsetToEvt(evt);
+    doSetPosOnEvent(evt,self.physical_rect,self.theoretical_rect);
     for(var i = 0; i < clickables.length; i++)
     {
       if(
-        evt.philX >= clickables[i].x &&
-        evt.philX <= clickables[i].x+clickables[i].w &&
-        evt.philY >= clickables[i].y &&
-        evt.philY <= clickables[i].y+clickables[i].h
+        evt.doX >= clickables[i].x &&
+        evt.doX <= clickables[i].x+clickables[i].w &&
+        evt.doY >= clickables[i].y &&
+        evt.doY <= clickables[i].y+clickables[i].h
       )
       {
         callbackQueue.push(clickables[i].click);
@@ -36,9 +43,9 @@ var Clicker = function()
   }
 
   if(platform == "PC")
-    document.getElementById("stage_container").addEventListener('mousedown', click, false);
+    self.source.addEventListener('mousedown', click, false);
   else if(platform == "MOBILE")
-    document.getElementById("stage_container").addEventListener('touchstart', click, false);
+    self.source.addEventListener('touchstart', click, false);
 }
 
 //example clickable- just needs x,y,w,h and click callback

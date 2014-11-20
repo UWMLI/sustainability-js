@@ -1,26 +1,39 @@
-var Stage = function()
+//Wrapper for "high performance" drawing (really, just pseudo double-buffering)
+var Stage = function(init)
 {
-  var width = document.getElementById("stage_container").offsetWidth;
-  var height = document.getElementById("stage_container").offsetHeight;
-
-  this.drawCanv = new Canv(width,height);
-  this.drawCanv.context.fillStyle = "#000000";
-  this.drawCanv.context.strokeStyle = "#000000";
-  this.drawCanv.context.font = "12px vg_font";
-  this.dispCanv = new Canv(width-4,height-4); //-4 so I can see border for debugging
-  this.dispCanv.canvas.style.border = "1px solid black";
-
-  this.draw = function()
+  var default_init =
   {
-    this.drawCanv.blitTo(this.dispCanv);
+    width:640,
+    height:320,
+    physical_width:640,    //optional
+    physical_height:320,   //optional
+    theoretical_width:640, //optional
+    theoretical_height:320,//optional
+    container:"stage_container"
+  }
+
+  var self = this;
+  //odd chunk to prevent initdefaults form overriding rectmapping behavior if not specified
+  if(init.hasOwnProperty('width')  && !init.hasOwnProperty('physical_width'))     init.physical_width  = init.width;
+  if(init.hasOwnProperty('height') && !init.hasOwnProperty('physical_height'))    init.physical_height = init.height;
+  if(init.hasOwnProperty('width')  && !init.hasOwnProperty('theoretical_width'))  init.theoretical_width  = init.width;
+  if(init.hasOwnProperty('height') && !init.hasOwnProperty('theoretical_height')) init.theoretical_height = init.height;
+  doMapInitDefaults(self,init,default_init);
+
+  self.drawCanv = new Canv({width:self.theoretical_width, height:self.theoretical_height});
+  self.dispCanv = new Canv({width:self.physical_width,    height:self.physical_height});
+
+  self.draw = function()
+  {
+    self.drawCanv.blitTo(self.dispCanv);
   };
 
-  this.clear = function()
+  self.clear = function()
   {
-    this.drawCanv.clear();
-    this.dispCanv.clear();
+    self.drawCanv.clear();
+    self.dispCanv.clear();
   };
 
-  document.getElementById("stage_container").appendChild(this.dispCanv.canvas);
+  document.getElementById(self.container).appendChild(self.dispCanv.canvas);
 };
 

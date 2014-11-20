@@ -1,6 +1,12 @@
-var Drawer = function(canv)
+var Drawer = function(init)
 {
+  var default_init =
+  {
+    source:document.createElement('canvas')
+  }
+
   var self = this;
+  doMapInitDefaults(self,init,default_init);
 
   var drawables = [];
   self.register = function(drawable) { drawables.push(drawable); }
@@ -10,7 +16,7 @@ var Drawer = function(canv)
   self.flush = function()
   {
     for(var i = 0; i < drawables.length; i++)
-      drawables[i].draw(canv);
+      drawables[i].draw(self.source);
   }
 }
 
@@ -25,10 +31,10 @@ var Drawable = function(args)
   self.w = args.w ? args.w : 0;
   self.h = args.h ? args.h : 0;
 
-  self.draw = function(canv)
+  self.draw = function(source)
   {
-    canv.context.strokeStyle = "#00FF00";
-    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    source.context.strokeStyle = "#00FF00";
+    source.context.strokeRect(self.x,self.y,self.w,self.h);
   }
 }
 

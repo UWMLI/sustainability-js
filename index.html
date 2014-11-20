@@ -7,82 +7,124 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 
 <title>Game</title>
-
-<link href="style.css" rel="stylesheet" type="text/css"></link>
+<script type='text/javascript' src='src/config.js'></script>
+<script type='text/javascript' src='src/utils/js_hacks.js'></script>
 <script type='text/javascript' src='src/utils/webgl-utils.js'></script>
-<script type="text/javascript" src="src/utils/canv.js"></script>
-<script type="text/javascript" src="src/utils/inputhacks.js"></script>
+<script type="text/javascript" src="src/canv.js"></script>
 <script type="text/javascript" src="src/stage.js"></script>
 <script type="text/javascript" src="src/game.js"></script>
 <script type="text/javascript" src="src/model.js"></script>
-<script type="text/javascript" src="src/ticker.js"></script>
-<script type="text/javascript" src="src/drawer.js"></script>
-<script type="text/javascript" src="src/clicker.js"></script>
-<script type="text/javascript" src="src/dragger.js"></script>
-<script type="text/javascript" src="src/presser.js"></script>
-<script type="text/javascript" src="src/flicker.js"></script>
-<script type="text/javascript" src="src/assetter.js"></script>
+
+<script type="text/javascript" src="src/doqueues/assetter.js"></script>
+<script type="text/javascript" src="src/doqueues/clicker.js"></script>
+<script type="text/javascript" src="src/doqueues/debugger.js"></script>
+<script type="text/javascript" src="src/doqueues/dragger.js"></script>
+<script type="text/javascript" src="src/doqueues/drawer.js"></script>
+<script type="text/javascript" src="src/doqueues/flicker.js"></script>
+<script type="text/javascript" src="src/doqueues/hoverer.js"></script>
+<script type="text/javascript" src="src/doqueues/presser.js"></script>
+<script type="text/javascript" src="src/doqueues/ticker.js"></script>
+
 <script type="text/javascript" src="src/scenes/nullScene.js"></script>
 <script type="text/javascript" src="src/scenes/loadingScene.js"></script>
-<!--<script type="text/javascript" src="src/scenes/gameplayScene.js"></script>--><!--Just acts as example for scene- not actually used.-->
-<script type="text/javascript" src="src/scenes/sweater/sweaterScene.js"></script>
-<script type="text/javascript" src="src/scenes/barrel/barrelScene.js"></script>
-<script type="text/javascript" src="src/scenes/wheel/wheelScene.js"></script>
-<script type="text/javascript" src="src/scenes/bulb/bulbScene.js"></script>
-<script type="text/javascript" src="src/scenes/window/windowScene.js"></script>
-<script type="text/javascript" src="src/scenes/pavement/pavementScene.js"></script>
+<script type="text/javascript" src="src/scenes/sweaterScene.js"></script>
+<script type="text/javascript" src="src/scenes/barrelScene.js"></script>
+<script type="text/javascript" src="src/scenes/wheelScene.js"></script>
+<script type="text/javascript" src="src/scenes/bulbScene.js"></script>
+<script type="text/javascript" src="src/scenes/windowScene.js"></script>
+<script type="text/javascript" src="src/scenes/pavementScene.js"></script>
+
 <script type="text/javascript">
-    //window.onerror = function(msg, url, linenumber) { console.log('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber); return true; };
+var m; //model
+var g; //game
 
-    var m;//model
-    var g;//game
+//Prepare and load HTML+JS
+var ARIS = {};
+var readyCount = 2;
+function partReady() { readyCount--; if(readyCount == 0) stackLoaded(); }
+ARIS.ready = function() { partReady(); };
+window.addEventListener('load', partReady, false);
 
-    //Prepare and load HTML+JS
-    var ARIS = {};
-    var readyCount = 2;
-    function partReady() { readyCount--; if(readyCount == 0) stackLoaded(); }
-    ARIS.ready = function() { partReady(); };
-    window.addEventListener('load', partReady, false);
-    //Sync with ARIS for data
-    function stackLoaded()
+//Sync with ARIS for data
+function stackLoaded()
+{
+  window.scrollTo(0,1);
+  m = new Model();
+  m.fetchSync(function()
+  {
+    var actualWidthOfStuff = window.innerWidth;
+    var actualHeightOfStuff = window.innerHeight;
+    document.body.style.width  = actualWidthOfStuff+"px";
+    document.body.style.height = actualHeightOfStuff+"px";
+    document.getElementById("content").style.width = actualWidthOfStuff+"px";
+    document.getElementById("content").style.height = actualHeightOfStuff+"px";
+    document.getElementById("debug_div").style.width = actualWidthOfStuff+"px";
+    document.getElementById("debug_div").style.height = actualHeightOfStuff+"px";
+    document.getElementById("stage_container").style.width = actualWidthOfStuff+"px";
+    document.getElementById("stage_container").style.height = actualHeightOfStuff+"px";
+
+    g = new Game(
     {
-      window.scrollTo(0,1);
-      m = new Model();
-      m.fetchSync(function(){
-        switch(m.gameType)
-        {
-          case "sweater":  g = new Game(SweaterScene);  break;
-          case "barrel":   g = new Game(BarrelScene);   break;
-          case "wheel":    g = new Game(WheelScene);    break;
-          case "bulb":     g = new Game(BulbScene);     break;
-          case "window":   g = new Game(WindowScene);   break;
-          case "pavement": g = new Game(PavementScene); break;
-          default:         g = new Game(SweaterScene);  break;
-        }
-        hackInputs(); //ugh (note- must wait til after game creation)
-        g.begin();
-      });
+      width:actualWidthOfStuff,
+      height:actualHeightOfStuff,
+      physical_width:actualWidthOfStuff,   //the size displayed on screen
+      physical_height:actualHeightOfStuff, //the size displayed on screen
+      theoretical_width:640,  //the size referenced within game
+      theoretical_height:1008,//the size referenced within game
+      container:"stage_container"
+    });
+
+    switch(m.gameType)
+    {
+      case "sweater":  g.setMainScene(SweaterScene);  break;
+      case "barrel":   g.setMainScene(BarrelScene);   break;
+      case "wheel":    g.setMainScene(WheelScene);    break;
+      case "bulb":     g.setMainScene(BulbScene);     break;
+      case "window":   g.setMainScene(WindowScene);   break;
+      case "pavement": g.setMainScene(PavementScene); break;
+      default:         g.setMainScene(WindowScene);  break;
     }
+    g.begin();
+  });
+}
 
-    //Uncomment to test on PC
-    ///*
-    ARIS.parseURLParams = function(url)
-    { 
-      var gameType = "";
-      var vars = window.location.search.substring(1).split("&");
-      for (var i=0;i<vars.length;i++) { var pair = vars[i].split("="); if(pair[0] == "game") gameType = pair[1]; } 
-      return {"gameId":0,"playerId":0,"webPageId":0,"gameType":gameType};
-    };
-    ARIS.getItemCount = function(itemId){ ARIS.didUpdateItemQty(itemId, 1); };
-    ARIS.ready();
-    //*/
+//Simulates injection of ARISjs- Uncomment to test outside ARIS
+///*
+ARIS.parseURLParams = function(url)
+{
+  var gameType = "";
+  var vars = window.location.search.substring(1).split("&");
+  for (var i=0;i<vars.length;i++) { var pair = vars[i].split("="); if(pair[0] == "gameType") gameType = pair[1].replace('/',''); } 
+  return {"gameId":0,"playerId":0,"webPageId":0,"gameType":gameType};
+};
+ARIS.getItemCount = function(itemId){ ARIS.didUpdateItemQty(itemId, 1); };
+ARIS.ready();
+//*/
+
+window.addEventListener('touchstart', function(e){ e.preventDefault() }); //prevent browser from doing anything funny
 </script>
+
+<style>
+.do
+{
+  display:block;
+  position:absolute;
+  top:0px;
+  left:0px;
+  margin:0px;
+  padding:0px;
+  user-select:none;
+}
+</style>
+
 </head>
+<body class="do">
 
-<body id='dabody' class='full_screen' style='position:fixed;'>
-  <div id='stage_container' class='full_screen'></div>
-  <div id='debug' class='full_screen' style='position:absolute; top:0px; left:0px; color:white; pointer-events:none;'></div>
+<div id="content" class="do">
+  <div id="debug_div" class="do" style="pointer-events:none;"> </div>
+  <div id="stage_container" class="do"> </div>
+</div>
+
 </body>
-
 </html>
 

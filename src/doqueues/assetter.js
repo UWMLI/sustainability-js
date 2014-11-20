@@ -1,7 +1,12 @@
 //ok "assetter" doesn't really make as much sense as "drawer" or "ticker", but hell if I'm changing it...
-var Assetter = function(canv)
+var Assetter = function(init)
 {
+  var default_init =
+  {
+  }
+
   var self = this;
+  doMapInitDefaults(self,init,default_init);
 
   var assets = [];
   self.asset = function(file)
@@ -14,6 +19,5 @@ var Assetter = function(canv)
     }
     return assets[file];
   }
-
 }
 

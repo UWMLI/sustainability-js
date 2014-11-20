@@ -1,7 +1,9 @@
-var PavementScene = function(game, canv)
+var PavementScene = function(game, stage)
 {
   var self = this;
 
+  var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
+  var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.ticker;
   self.dragger;
   self.drawer;
@@ -12,10 +14,10 @@ var PavementScene = function(game, canv)
 
   self.ready = function()
   {
-    self.ticker = new Ticker();
-    self.dragger = new Dragger();
-    self.drawer = new Drawer(canv);
-    self.assetter = new Assetter();
+    self.ticker = new Ticker({});
+    self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.drawer = new Drawer({source:stage.drawCanv});
+    self.assetter = new Assetter({});
 
     self.cleanBG = new PV_Background(self);
     self.dirtyBG = new PV_ScratchableBackground(self);
