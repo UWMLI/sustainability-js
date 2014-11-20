@@ -7,6 +7,7 @@
 var BulbScene = function(game, stage)
 {
   var self = this;
+  self.stage = stage;
 
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
@@ -19,8 +20,8 @@ var BulbScene = function(game, stage)
   self.bulbs;
   self.janitors;
 
-  self.floorHeight = 500;
-  self.floorWidth = 500;
+  self.floorHeight = self.stage.drawCanv.canvas.height-200;
+  self.floorWidth = self.stage.drawCanv.canvas.width-200;
   self.houseOffX = 100;
   self.houseOffY = 100;
   self.numFloors = 5;

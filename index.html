@@ -121,10 +121,18 @@ window.addEventListener('touchstart', function(e){ e.preventDefault() }); //prev
   padding:0px;
   user-select:none;
 }
+.noselect {
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  -khtml-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+}
 </style>
 
 </head>
-<body class="do">
+<body class="do noselect">
 
 <div id="content" class="do">
   <div id="debug_div" class="do" style="pointer-events:none;"> </div>

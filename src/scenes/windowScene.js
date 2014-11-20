@@ -4,6 +4,7 @@ var WindowScene = function(game, stage)
 
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
+  self.dbugger;
   self.ticker;
   self.presser;
   self.drawer;
@@ -18,6 +19,7 @@ var WindowScene = function(game, stage)
 
   self.ready = function()
   {
+    self.dbugger = new Debugger({source:document.getElementById("debug_div")});
     self.ticker = new Ticker({});
     self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
