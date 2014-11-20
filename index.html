@@ -94,7 +94,13 @@ ARIS.parseURLParams = function(url)
 {
   var gameType = "";
   var vars = window.location.search.substring(1).split("&");
-  for (var i=0;i<vars.length;i++) { var pair = vars[i].split("="); if(pair[0] == "gameType") gameType = pair[1].replace('/',''); } 
+  for (var i=0;i<vars.length;i++)
+  {
+    var pair = vars[i].split("=");
+    if(pair[0].toLowerCase() == "gameType".toLowerCase()) gameType = pair[1].replace('/','').toLowerCase();
+    if(pair[0].toLowerCase() == "platform".toLowerCase()) platform = pair[1].replace('/','').toUpperCase(); //part of config
+    if(pair[0].toLowerCase() == "debug".toLowerCase()) debug = (pair[1].replace('/','').toLowerCase() == "true"); //part of config
+  }
   return {"gameId":0,"playerId":0,"webPageId":0,"gameType":gameType};
 };
 ARIS.getItemCount = function(itemId){ ARIS.didUpdateItemQty(itemId, 1); };
