@@ -27,9 +27,16 @@ var LoadingScene = function(game, stage)
     canv.context.fillText(".",0,0);// funky way to encourage any custom font to load
 
     //put strings in 'img_srcs' as separate array to get "static" count
-    /*
-    img_srcs[0] = "assets/man.png";
-    */
+    img_srcs.push("assets/man.png");
+    img_srcs.push("assets/back1.png");
+    img_srcs.push("assets/back2.png");
+    img_srcs.push("assets/win_building.png");
+    img_srcs.push("assets/win_closed.png");
+    img_srcs.push("assets/win_drawn.png");
+    img_srcs.push("assets/win_moon.png");
+    img_srcs.push("assets/win_open.png");
+    img_srcs.push("assets/win_sky.png");
+    img_srcs.push("assets/win_sun.png");
     for(var i = 0; i < img_srcs.length; i++)
     {
       images[i] = new Image();

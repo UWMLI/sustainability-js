@@ -1,9 +1,11 @@
 var BarrelScene = function(game, stage)
 {
   var self = this;
+  self.stage = stage;
 
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
+  self.dbugger;
   self.ticker;
   self.clicker;
   self.dragger;
@@ -15,6 +17,7 @@ var BarrelScene = function(game, stage)
 
   self.ready = function()
   {
+    self.dbugger = new Debugger({source:document.getElementById("debug_div")});
     self.ticker = new Ticker({});
     self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
@@ -22,11 +25,13 @@ var BarrelScene = function(game, stage)
     self.assetter = new Assetter({});
 
     self.barrels = [];
-    self.barrels.push(new RB_Barrel(self,{"x":20,"y":100}));
-    self.barrels.push(new RB_Barrel(self,{"x":100,"y":75}));
-    self.barrels.push(new RB_Barrel(self,{"x":50,"y":50}));
-    self.barrels.push(new RB_Barrel(self,{"x":140,"y":33}));
-    self.barrels.push(new RB_Barrel(self,{"x":90,"y":190}));
+    var randx = function(){ return Math.random()*self.stage.drawCanv.canvas.width; }
+    var randy = function(){ return Math.random()*self.stage.drawCanv.canvas.height; }
+    self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
+    self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
+    self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
+    self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
+    self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
     self.map = new RB_Map(self);
     for(var i = 0; i < self.barrels.length; i++)
     {
@@ -67,8 +72,8 @@ var RB_Map = function(game)
   self.deltaY = 0;
   self.x = 0;
   self.y = 0;
-  self.w = 200;
-  self.h = 200;
+  self.w = game.stage.drawCanv.canvas.width;
+  self.h = game.stage.drawCanv.canvas.height;
 
   self.tick = function()
   {
@@ -77,13 +82,13 @@ var RB_Map = function(game)
 
   self.dragStart = function(evt)
   {
-    self.offX = self.x+(self.w/2)-evt.philX;
-    self.offY = self.y+(self.h/2)-evt.philY;
+    self.offX = self.x+(self.w/2)-evt.doX;
+    self.offY = self.y+(self.h/2)-evt.doY;
   };
   self.drag = function(evt)
   {
-    self.deltaX = (evt.philX-(self.w/2)+self.offX)-self.x;
-    self.deltaY = (evt.philY-(self.h/2)+self.offY)-self.y;
+    self.deltaX = (evt.doX-(self.w/2)+self.offX)-self.x;
+    self.deltaY = (evt.doY-(self.h/2)+self.offY)-self.y;
     self.x += self.deltaX;
     self.y += self.deltaY;
     for(var i = 0; i < game.barrels.length; i++)
@@ -100,6 +105,7 @@ var RB_Map = function(game)
   {
     canv.context.strokeStyle = "#00FF00";
     canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    game.dbugger.log("("+self.x+","+self.y+","+self.w+","+self.h+")");
   }
 }
 
@@ -109,8 +115,8 @@ var RB_Barrel = function(game, args)
 
   self.x = args.x ? args.x : 0;
   self.y = args.y ? args.y : 0;
-  self.w = 10;
-  self.h = 10;
+  self.w = 30;
+  self.h = 30;
 
   self.img = game.assetter.asset("man.png");
 
