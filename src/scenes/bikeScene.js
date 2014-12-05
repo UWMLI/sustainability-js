@@ -28,6 +28,7 @@ var BikeScene = function(game, stage)
     self.currentPane = 0;
     self.panes.push(new B_GrabKeysPane(self));
     self.panes.push(new B_PumpTirePane(self));
+    self.panes.push(new B_CardChoicePane(self));
 
     /*
     //Examples
@@ -251,6 +252,87 @@ var B_PumpTirePane = function(scene)
     scene.ticker.unregister(p);
     scene.drawer.unregister(p);
     scene.clicker.unregister(p);
+  }
+};
+
+var B_CardChoicePane = function(scene)
+{
+  var finished = false;
+  var won = false;
+
+  var Card = function(pane)
+  {
+    var self = this;
+    self.x = 200;
+    self.y = 300;
+    self.offY = 0;
+    self.offX = 0;
+    self.w = 100;
+    self.h = 500;
+
+    self.tick = function()
+    {
+    }
+
+    self.dragStart  = function(evt)
+    {
+      self.offY = self.y+(self.h/2)-evt.doY;
+      self.offX = self.x+(self.w/2)-evt.doX;
+    };
+    self.drag = function(evt)
+    {
+      self.y = evt.doY-(self.h/2)+self.offY;
+      self.x = evt.doX-(self.w/2)+self.offX;
+    };
+    self.dragFinish = function()
+    {
+    };
+
+    self.draw = function(canv)
+    {
+      canv.context.strokeStyle = "#00FF00";
+      canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    }
+  }
+
+  var c;
+  var self = this;
+  self.begin = function()
+  {
+    finished = false;
+    won = false;
+    c = new Card(self);
+    scene.ticker.register(c);
+    scene.drawer.register(c);
+    scene.dragger.register(c);
+  }
+  self.tick = function() //return 0 for continue, 1 for lose, 2 for win
+  {
+    //let scene handle ticking of doodles, any other ticks can go here
+    if(c.x > 100 && c.x < 200 &&
+       c.y > 100 && c.y < 200)
+    {
+      finished = true;
+      won = true;
+    }
+    if(c.x > 200 && c.x < 300 &&
+       c.y > 200 && c.y < 300)
+    {
+      finished = true;
+      won = false;
+    }
+
+    return finished+won; //#clever
+  }
+  self.draw = function()
+  {
+    //let scene handle drawing of doodles, any other draws can go here
+  }
+  self.end = function()
+  {
+    scene.ticker.unregister(c);
+    scene.drawer.unregister(c);
+    scene.clicker.unregister(c);
   }
 };
 
