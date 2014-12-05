@@ -27,9 +27,8 @@ var LoadingScene = function(game, stage)
     canv.context.fillText(".",0,0);// funky way to encourage any custom font to load
 
     //put strings in 'img_srcs' as separate array to get "static" count
-    img_srcs.push("assets/man.png");
-    img_srcs.push("assets/back1.png");
-    img_srcs.push("assets/back2.png");
+
+    //win
     img_srcs.push("assets/win_building.png");
     img_srcs.push("assets/win_closed.png");
     img_srcs.push("assets/win_drawn.png");
@@ -37,6 +36,17 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/win_open.png");
     img_srcs.push("assets/win_sky.png");
     img_srcs.push("assets/win_sun.png");
+    //bike
+    img_srcs.push("assets/bike_hand_open.png");
+    img_srcs.push("assets/bike_hand_hit.png");
+    img_srcs.push("assets/bike_hand_closed.png");
+    img_srcs.push("assets/bike_keys.png");
+    img_srcs.push("assets/bike_smack.png");
+    img_srcs.push("assets/bike_fail.png");
+    //misc
+    img_srcs.push("assets/man.png");
+    img_srcs.push("assets/back1.png");
+    img_srcs.push("assets/back2.png");
     for(var i = 0; i < img_srcs.length; i++)
     {
       images[i] = new Image();
@@ -48,7 +58,7 @@ var LoadingScene = function(game, stage)
 
   self.tick = function()
   {
-    if(progress <= imagesloaded/(img_srcs.length+1)) progress += 0.01;
+    if(progress <= imagesloaded/(img_srcs.length+1)) progress += 0.1;
     if(progress >= 1.0) game.nextScene();
   };
 

@@ -103,25 +103,66 @@ var B_GrabKeysPane = function(scene)
   var finished = false;
   var won = false;
 
+  var hand_open_img = scene.assetter.asset("bike_hand_open.png");
+  var hand_hit_img = scene.assetter.asset("bike_hand_hit.png");
+  var hand_closed_img = scene.assetter.asset("bike_hand_closed.png");
+  var keys_img = scene.assetter.asset("bike_keys.png");
+  var smack_img = scene.assetter.asset("bike_smack.png");
+  var fail_img = scene.assetter.asset("bike_fail.png");
+
   var Hand = function(pane)
   {
     var self = this;
-    self.x = 200;
+    self.x = 540;
     self.y = 300;
-    self.w = 100;
-    self.h = 500;
+    self.w = 640;
+    self.h = 320;
+
+    self.tapped = false;
+    self.tappedCountDown = 100;
+
+    self.grabbed = false;
+    self.grabbedCountDown = 100;
+
     self.tick = function()
     {
-      self.x-=0.1; //move left
+      if(self.tapped)
+      {
+        //only alert parent after time for 'animation' has passed
+        self.tappedCountDown--;
+        if(self.tappedCountDown == 0)
+        {
+          pane.handTapped();
+        }
+      }
+      else if(h.x < 20)
+      {
+        self.grabbed = true;
+        //only alert parent after time for 'animation' has passed
+        self.grabbedCountDown--;
+        if(self.grabbedCountDown == 0)
+        {
+          pane.handGrabbed();
+        }
+      }
+      else self.x-=3; //move left
     }
     self.click = function()
     {
-      pane.handTapped();
+      self.tapped = true;
     }
-    self.draw = function(canv)
+    self.draw = function(canv) //handle drawing keys here too, because of swapping precidence
     {
-      canv.context.strokeStyle = "#00FF00";
-      canv.context.strokeRect(self.x,self.y,self.w,self.h);
+      if(self.grabbed) //draw keys first
+        canv.context.drawImage(keys_img,30,200,150,300);
+
+      if(self.tapped) canv.context.drawImage(hand_hit_img,self.x,self.y,self.w,self.h);
+      else if(self.grabbed) canv.context.drawImage(hand_closed_img,self.x,self.y,self.w,self.h);
+      else canv.context.drawImage(hand_open_img,self.x,self.y,self.w,self.h);
+
+      if(!self.grabbed) //draw keys second
+        canv.context.drawImage(keys_img,30,200,150,300);
+
     }
   }
 
@@ -139,12 +180,6 @@ var B_GrabKeysPane = function(scene)
   self.tick = function() //return 0 for continue, 1 for lose, 2 for win
   {
     //let scene handle ticking of doodles, any other ticks can go here
-    if(h.x < 0)
-    {
-      finished = true;
-      won = false;
-    }
-
     return finished+won; //#clever
   }
   self.draw = function()
@@ -164,6 +199,13 @@ var B_GrabKeysPane = function(scene)
     won = true;
     console.log('tapped');
   }
+  self.handGrabbed = function()
+  {
+    finished = true;
+    won = false;
+    console.log('grabbed');
+  }
+
 };
 
 var B_PumpTirePane = function(scene)

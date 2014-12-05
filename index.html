@@ -55,6 +55,12 @@ function stackLoaded()
   {
     var actualWidthOfStuff = window.innerWidth;
     var actualHeightOfStuff = window.innerHeight;
+    if(platform == "PC")
+    {
+      //just force it to "fake" phone size rather than adapting to browser
+      actualWidthOfStuff = 640;
+      actualHeightOfStuff = 1008;
+    }
     document.body.style.width  = actualWidthOfStuff+"px";
     document.body.style.height = actualHeightOfStuff+"px";
     document.getElementById("content").style.width = actualWidthOfStuff+"px";
