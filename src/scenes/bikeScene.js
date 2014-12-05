@@ -213,16 +213,19 @@ var B_PumpTirePane = function(scene)
   var finished = false;
   var won = false;
 
+  var pump_base_img = scene.assetter.asset("bike_pump_base.png");
+  var pump_handle_img = scene.assetter.asset("bike_pump_handle.png");
+
   var Pump = function(pane)
   {
     var self = this;
     self.x = 200;
-    self.y = 300;
+    self.y = 200; //handle (used for drag)
+    self.baseY = 300;
     self.offY = 0;
     self.w = 100;
     self.h = 500;
 
-    self.handleY = 300;
     self.lastState = 0; //0 = down, 1 = up
     self.halfCycles = 0;
 
@@ -232,23 +235,23 @@ var B_PumpTirePane = function(scene)
 
     self.dragStart  = function(evt)
     {
-      self.offY = self.handleY+(self.h/2)-evt.doY;
+      self.offY = self.y+(self.h/2)-evt.doY;
     };
     self.drag = function(evt)
     {
-      self.handleY = evt.doY-(self.h/2)+self.offY;
-      if(self.handleY > 380) //handle down
+      self.y = evt.doY-(self.h/2)+self.offY;
+      if(self.y > 220) //handle down
       {
 
         if(self.lastState == 1) self.halfCycles++;
         self.lastState = 0;
-        self.handleY = 380;
+        self.y = 220;
       }
-      if(self.handleY < 220) //handle up
+      if(self.y < 80) //handle up
       {
         if(self.lastState == 0) self.halfCycles++;
         self.lastState = 1;
-        self.handleY = 220;
+        self.y = 80;
       }
     };
     self.dragFinish = function()
@@ -257,9 +260,8 @@ var B_PumpTirePane = function(scene)
 
     self.draw = function(canv)
     {
-      canv.context.strokeStyle = "#00FF00";
-      canv.context.strokeRect(self.x,self.y,self.w,self.h);
-      canv.context.strokeRect(self.x,self.handleY,self.w,self.h);
+      canv.context.drawImage(pump_handle_img,self.x,self.y,self.w,self.h);
+      canv.context.drawImage(pump_base_img,self.x,self.baseY,self.w,self.h);
     }
   }
 

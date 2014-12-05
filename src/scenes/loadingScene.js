@@ -37,12 +37,16 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/win_sky.png");
     img_srcs.push("assets/win_sun.png");
     //bike
+      //keys
     img_srcs.push("assets/bike_hand_open.png");
     img_srcs.push("assets/bike_hand_hit.png");
     img_srcs.push("assets/bike_hand_closed.png");
     img_srcs.push("assets/bike_keys.png");
     img_srcs.push("assets/bike_smack.png");
     img_srcs.push("assets/bike_fail.png");
+      //pump
+    img_srcs.push("assets/bike_pump_base.png");
+    img_srcs.push("assets/bike_pump_handle.png");
     //misc
     img_srcs.push("assets/man.png");
     img_srcs.push("assets/back1.png");
@@ -58,7 +62,7 @@ var LoadingScene = function(game, stage)
 
   self.tick = function()
   {
-    if(progress <= imagesloaded/(img_srcs.length+1)) progress += 0.1;
+    if(progress <= imagesloaded/(img_srcs.length+1)) progress += 0.5;
     if(progress >= 1.0) game.nextScene();
   };
 
