@@ -25,6 +25,7 @@ var BikeScene = function(game, stage)
     self.assetter = new Assetter({});
 
     self.currentPane = 0;
+    self.panes.push(new B_FindHelmetPane(self));
     self.panes.push(new B_PumpTirePane(self));
     self.panes.push(new B_GrabKeysPane(self));
     self.panes.push(new B_CardChoicePane(self));
@@ -142,7 +143,7 @@ var B_GrabKeysPane = function(scene)
           pane.handGrabbed();
         }
       }
-      else self.x-=3; //move left
+      else self.x-=5; //move left
     }
     self.click = function()
     {
@@ -339,10 +340,6 @@ var B_CardChoicePane = function(scene)
     self.touch_offset_x = 0;
     self.touch_offset_y = 0;
 
-    self.tick = function()
-    {
-    }
-
     self.dragStart  = function(evt)
     {
       self.touch_offset_x = self.x+(self.w/2)-evt.doX;
@@ -383,6 +380,7 @@ var B_CardChoicePane = function(scene)
     {
       if(self.glow) canv.context.drawImage(glow_square_img,self.x,self.y,self.w,self.h);
       else          canv.context.drawImage(dull_square_img,self.x,self.y,self.w,self.h);
+      canv.context.drawImage(self.img,self.x+30,self.y+30,self.w-60,self.h-60);
     }
   }
 
@@ -396,10 +394,11 @@ var B_CardChoicePane = function(scene)
     won = false;
     c = new Card(self);
     b_box = new GlowBox(self);
+    b_box.img = bike_img;
     b_box.x = 50;
     g_box = new GlowBox(self);
+    g_box.img = gas_img;
     g_box.x = 400;
-    scene.ticker.register(c);
     scene.drawer.register(b_box);
     scene.drawer.register(g_box);
     scene.drawer.register(c);
@@ -413,13 +412,12 @@ var B_CardChoicePane = function(scene)
 
     return finished+won; //#clever
   }
-  self.draw = function()
+  self.draw = function(canv)
   {
     //let scene handle drawing of doodles, any other draws can go here
   }
   self.end = function()
   {
-    scene.ticker.unregister(c);
     scene.drawer.unregister(c);
     scene.drawer.unregister(b_box);
     scene.drawer.unregister(g_box);
@@ -438,6 +436,158 @@ var B_CardChoicePane = function(scene)
       finished = true;
       win = false;
     }
+  }
+};
+
+var B_FindHelmetPane = function(scene)
+{
+  var finished = false;
+  var won = false;
+
+  var ace_img = scene.assetter.asset("bike_ace.png");
+  var bible_img = scene.assetter.asset("bike_bible.png");
+  var bowl_img = scene.assetter.asset("bike_bowl.png");
+  var hamster_img = scene.assetter.asset("bike_hamster.png");
+  var helmet_img = scene.assetter.asset("bike_helmet.png");
+  var pizza_img = scene.assetter.asset("bike_pizza.png");
+  var salt_img = scene.assetter.asset("bike_salt.png");
+  var mask_img = scene.assetter.asset("bike_mask.png");
+
+  var Helmet = function(pane)
+  {
+    var self = this;
+    self.x = 150;
+    self.y = 180;
+    self.w = 200;
+    self.h = 175;
+    self.draw = function(canv) { canv.context.drawImage(helmet_img,self.x,self.y,self.w,self.h); }
+    self.click = function(evt) { pane.helmetTouched() };
+  }
+  var Ace = function(pane)
+  {
+    var self = this;
+    self.x = 370;
+    self.y = 300;
+    self.w = 75;
+    self.h = 100;
+    self.draw = function(canv) { canv.context.drawImage(ace_img,self.x,self.y,self.w,self.h); }
+  }
+  var Bible = function(pane)
+  {
+    var self = this;
+    self.x = 50;
+    self.y = 20;
+    self.w = 200;
+    self.h = 150;
+    self.draw = function(canv) { canv.context.drawImage(bible_img,self.x,self.y,self.w,self.h); }
+  }
+  var Bowl = function(pane)
+  {
+    var self = this;
+    self.x = 180;
+    self.y = 360;
+    self.w = 200;
+    self.h = 150;
+    self.draw = function(canv) { canv.context.drawImage(bowl_img,self.x,self.y,self.w,self.h); }
+  }
+  var Hamster = function(pane)
+  {
+    var self = this;
+    self.x = 75;
+    self.y = 340;
+    self.w = 100;
+    self.h = 75;
+    self.draw = function(canv) { canv.context.drawImage(hamster_img,self.x,self.y,self.w,self.h); }
+  }
+  var Pizza = function(pane)
+  {
+    var self = this;
+    self.x = 220;
+    self.y = 75;
+    self.w = 200;
+    self.h = 200;
+    self.draw = function(canv) { canv.context.drawImage(pizza_img,self.x,self.y,self.w,self.h); }
+  }
+  var Salt = function(pane)
+  {
+    var self = this;
+    self.x = 50;
+    self.y = 200;
+    self.w = 75;
+    self.h = 100;
+    self.draw = function(canv) { canv.context.drawImage(salt_img,self.x,self.y,self.w,self.h); }
+  }
+  var Mask = function(pane)
+  {
+    var self = this;
+    self.x = 80;
+    self.y = 520;
+    self.w = 200;
+    self.h = 100;
+    self.draw = function(canv) { canv.context.drawImage(mask_img,self.x,self.y,self.w,self.h); }
+  }
+
+
+
+  var hel;
+  var ace;
+  var bib;
+  var bow;
+  var ham;
+  var piz;
+  var sal;
+  var mas;
+  var self = this;
+  self.begin = function()
+  {
+    finished = false;
+    won = false;
+
+    hel = new Helmet(self);
+    ace = new Ace(self);
+    bib = new Bible(self);
+    bow = new Bowl(self);
+    ham = new Hamster(self);
+    piz = new Pizza(self);
+    sal = new Salt(self);
+    mas = new Mask(self);
+
+    scene.clicker.register(hel);
+    scene.drawer.register(hel);
+    scene.drawer.register(ace);
+    scene.drawer.register(bib);
+    scene.drawer.register(bow);
+    scene.drawer.register(ham);
+    scene.drawer.register(piz);
+    scene.drawer.register(sal);
+    scene.drawer.register(mas);
+  }
+  self.tick = function() //return 0 for continue, 1 for lose, 2 for win
+  {
+    //let scene handle ticking of doodles, any other ticks can go here
+    return finished+won; //#clever
+  }
+  self.draw = function()
+  {
+    //let scene handle drawing of doodles, any other draws can go here
+  }
+  self.end = function()
+  {
+    scene.clicker.unregister(hel);
+    scene.drawer.unregister(hel);
+    scene.drawer.unregister(ace);
+    scene.drawer.unregister(bib);
+    scene.drawer.unregister(bow);
+    scene.drawer.unregister(ham);
+    scene.drawer.unregister(piz);
+    scene.drawer.unregister(sal);
+    scene.drawer.unregister(mas);
+  }
+
+  self.helmetTouched = function()
+  {
+    finished = true;
+    win = true;
   }
 };
 

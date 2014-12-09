@@ -53,6 +53,15 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/bike_glow_square.png");
     img_srcs.push("assets/bike_bike.png");
     img_srcs.push("assets/bike_gas.png");
+      //helmet
+    img_srcs.push("assets/bike_helmet.png");
+    img_srcs.push("assets/bike_ace.png");
+    img_srcs.push("assets/bike_bible.png");
+    img_srcs.push("assets/bike_bowl.png");
+    img_srcs.push("assets/bike_hamster.png");
+    img_srcs.push("assets/bike_pizza.png");
+    img_srcs.push("assets/bike_salt.png");
+    img_srcs.push("assets/bike_mask.png");
     //misc
     img_srcs.push("assets/man.png");
     img_srcs.push("assets/back1.png");
