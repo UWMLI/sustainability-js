@@ -355,6 +355,7 @@ var B_CardChoicePane = function(scene)
     };
     self.dragFinish = function()
     {
+      pane.cardStoppedDrag();
     };
 
     self.draw = function(canv)
@@ -368,8 +369,8 @@ var B_CardChoicePane = function(scene)
     var self = this;
     self.x = 50;
     self.y = 50;
-    self.w = 100;
-    self.h = 100;
+    self.w = 200;
+    self.h = 200;
 
     self.glow = false;
 
@@ -397,11 +398,11 @@ var B_CardChoicePane = function(scene)
     b_box = new GlowBox(self);
     b_box.x = 50;
     g_box = new GlowBox(self);
-    g_box.x = 200;
+    g_box.x = 400;
     scene.ticker.register(c);
-    scene.drawer.register(c);
     scene.drawer.register(b_box);
     scene.drawer.register(g_box);
+    scene.drawer.register(c);
     scene.dragger.register(c);
   }
   self.tick = function() //return 0 for continue, 1 for lose, 2 for win
@@ -409,21 +410,6 @@ var B_CardChoicePane = function(scene)
     //let scene handle ticking of doodles, any other ticks can go here
     b_box.glow = b_box.collide(c);
     g_box.glow = g_box.collide(c);
-
-    /*
-    if(c.x > 100 && c.x < 200 &&
-       c.y > 100 && c.y < 200)
-    {
-      finished = true;
-      won = true;
-    }
-    if(c.x > 200 && c.x < 300 &&
-       c.y > 200 && c.y < 300)
-    {
-      finished = true;
-      won = false;
-    }
-    */
 
     return finished+won; //#clever
   }
@@ -437,7 +423,21 @@ var B_CardChoicePane = function(scene)
     scene.drawer.unregister(c);
     scene.drawer.unregister(b_box);
     scene.drawer.unregister(g_box);
-    scene.clicker.unregister(c);
+    scene.dragger.unregister(c);
+  }
+
+  self.cardStoppedDrag = function()
+  {
+    if(b_box.collide(c) && !g_box.collide(c))
+    {
+      finished = true;
+      win = true;
+    }
+    if(g_box.collide(c) && !b_box.collide(c))
+    {
+      finished = true;
+      win = false;
+    }
   }
 };
 
