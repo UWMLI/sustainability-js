@@ -62,6 +62,7 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/bike_pizza.png");
     img_srcs.push("assets/bike_salt.png");
     img_srcs.push("assets/bike_mask.png");
+    img_srcs.push("assets/bike_excuse_helmet.png");
     //misc
     img_srcs.push("assets/man.png");
     img_srcs.push("assets/back1.png");

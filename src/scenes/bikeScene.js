@@ -87,7 +87,7 @@ var BikeScene = function(game, stage)
   {
     self.drawer.flush();
 
-    self.panes[self.currentPane].draw();
+    self.panes[self.currentPane].draw(stage.drawCanv);
   };
 
   self.cleanup = function()
@@ -95,7 +95,199 @@ var BikeScene = function(game, stage)
   };
 };
 
+
 //mini scenes
+var B_FindHelmetPane = function(scene)
+{
+  var finished = false;
+  var won = false;
+
+  var ace_img = scene.assetter.asset("bike_ace.png");
+  var bible_img = scene.assetter.asset("bike_bible.png");
+  var bowl_img = scene.assetter.asset("bike_bowl.png");
+  var hamster_img = scene.assetter.asset("bike_hamster.png");
+  var helmet_img = scene.assetter.asset("bike_helmet.png");
+  var pizza_img = scene.assetter.asset("bike_pizza.png");
+  var salt_img = scene.assetter.asset("bike_salt.png");
+  var mask_img = scene.assetter.asset("bike_mask.png");
+  var intro_text_img = scene.assetter.asset("bike_excuse_helmet.png");
+
+  var Helmet = function(pane)
+  {
+    var self = this;
+    self.x = 150;
+    self.y = 180;
+    self.w = 200;
+    self.h = 175;
+    self.draw = function(canv) { canv.context.drawImage(helmet_img,self.x,self.y,self.w,self.h); }
+    self.click = function(evt) { pane.helmetTouched() };
+  }
+  var Ace = function(pane)
+  {
+    var self = this;
+    self.x = 370;
+    self.y = 300;
+    self.w = 75;
+    self.h = 100;
+    self.draw = function(canv) { canv.context.drawImage(ace_img,self.x,self.y,self.w,self.h); }
+  }
+  var Bible = function(pane)
+  {
+    var self = this;
+    self.x = 50;
+    self.y = 20;
+    self.w = 200;
+    self.h = 150;
+    self.draw = function(canv) { canv.context.drawImage(bible_img,self.x,self.y,self.w,self.h); }
+  }
+  var Bowl = function(pane)
+  {
+    var self = this;
+    self.x = 180;
+    self.y = 360;
+    self.w = 200;
+    self.h = 150;
+    self.draw = function(canv) { canv.context.drawImage(bowl_img,self.x,self.y,self.w,self.h); }
+  }
+  var Hamster = function(pane)
+  {
+    var self = this;
+    self.x = 75;
+    self.y = 340;
+    self.w = 100;
+    self.h = 75;
+    self.draw = function(canv) { canv.context.drawImage(hamster_img,self.x,self.y,self.w,self.h); }
+  }
+  var Pizza = function(pane)
+  {
+    var self = this;
+    self.x = 220;
+    self.y = 75;
+    self.w = 200;
+    self.h = 200;
+    self.draw = function(canv) { canv.context.drawImage(pizza_img,self.x,self.y,self.w,self.h); }
+  }
+  var Salt = function(pane)
+  {
+    var self = this;
+    self.x = 50;
+    self.y = 200;
+    self.w = 75;
+    self.h = 100;
+    self.draw = function(canv) { canv.context.drawImage(salt_img,self.x,self.y,self.w,self.h); }
+  }
+  var Mask = function(pane)
+  {
+    var self = this;
+    self.x = 80;
+    self.y = 520;
+    self.w = 200;
+    self.h = 100;
+    self.draw = function(canv) { canv.context.drawImage(mask_img,self.x,self.y,self.w,self.h); }
+  }
+
+
+  var Intro = function(pane)
+  {
+    var self = this;
+    self.intro_count = 0;
+    self.tick = function()
+    {
+      if(pane.mode != 0) return;
+      self.intro_count+=0.5;
+      if(self.intro_count > 100) pane.introFinished();
+    }
+    self.draw = function(canv)
+    {
+      var x;
+      if(self.intro_count < 5)        x = -500+((self.intro_count/5)*500);
+      else if(self.intro_count < 95)  x = (((self.intro_count-5)/90)*100);
+      else if(self.intro_count < 100) x = 100+(((self.intro_count-95)/5)*500);
+      else return;
+
+      canv.context.drawImage(intro_text_img, x, 100, 500, 500);
+    }
+  }
+
+
+  var hel;
+  var ace;
+  var bib;
+  var bow;
+  var ham;
+  var piz;
+  var sal;
+  var mas;
+  var intro;
+  var self = this;
+  self.mode = 0; //0 = intro, 1 = play, 2 = outro
+
+  self.begin = function()
+  {
+    finished = false;
+    won = false;
+    self.mode = 0;
+
+    hel = new Helmet(self);
+    ace = new Ace(self);
+    bib = new Bible(self);
+    bow = new Bowl(self);
+    ham = new Hamster(self);
+    piz = new Pizza(self);
+    sal = new Salt(self);
+    mas = new Mask(self);
+    intro = new Intro(self);
+
+    scene.clicker.register(hel);
+    scene.drawer.register(hel);
+    scene.drawer.register(ace);
+    scene.drawer.register(bib);
+    scene.drawer.register(bow);
+    scene.drawer.register(ham);
+    scene.drawer.register(piz);
+    scene.drawer.register(sal);
+    scene.drawer.register(mas);
+    scene.drawer.register(intro);
+    scene.ticker.register(intro);
+  }
+  self.tick = function() //return 0 for continue, 1 for lose, 2 for win
+  {
+    return finished+won;
+  }
+  self.draw = function(canv)
+  {
+  }
+  self.end = function()
+  {
+    scene.clicker.unregister(hel);
+    scene.drawer.unregister(hel);
+    scene.drawer.unregister(ace);
+    scene.drawer.unregister(bib);
+    scene.drawer.unregister(bow);
+    scene.drawer.unregister(ham);
+    scene.drawer.unregister(piz);
+    scene.drawer.unregister(sal);
+    scene.drawer.unregister(mas);
+    scene.drawer.unregister(intro);
+    scene.ticker.unregister(intro);
+  }
+
+  self.introFinished = function()
+  {
+    self.mode = 1;
+  }
+  self.helmetTouched = function()
+  {
+    if(self.mode != 1) return;
+    finished = true;
+    win = true;
+  }
+};
+
+
+
+
+
 var B_GrabKeysPane = function(scene)
 {
   var finished = false;
@@ -436,158 +628,6 @@ var B_CardChoicePane = function(scene)
       finished = true;
       win = false;
     }
-  }
-};
-
-var B_FindHelmetPane = function(scene)
-{
-  var finished = false;
-  var won = false;
-
-  var ace_img = scene.assetter.asset("bike_ace.png");
-  var bible_img = scene.assetter.asset("bike_bible.png");
-  var bowl_img = scene.assetter.asset("bike_bowl.png");
-  var hamster_img = scene.assetter.asset("bike_hamster.png");
-  var helmet_img = scene.assetter.asset("bike_helmet.png");
-  var pizza_img = scene.assetter.asset("bike_pizza.png");
-  var salt_img = scene.assetter.asset("bike_salt.png");
-  var mask_img = scene.assetter.asset("bike_mask.png");
-
-  var Helmet = function(pane)
-  {
-    var self = this;
-    self.x = 150;
-    self.y = 180;
-    self.w = 200;
-    self.h = 175;
-    self.draw = function(canv) { canv.context.drawImage(helmet_img,self.x,self.y,self.w,self.h); }
-    self.click = function(evt) { pane.helmetTouched() };
-  }
-  var Ace = function(pane)
-  {
-    var self = this;
-    self.x = 370;
-    self.y = 300;
-    self.w = 75;
-    self.h = 100;
-    self.draw = function(canv) { canv.context.drawImage(ace_img,self.x,self.y,self.w,self.h); }
-  }
-  var Bible = function(pane)
-  {
-    var self = this;
-    self.x = 50;
-    self.y = 20;
-    self.w = 200;
-    self.h = 150;
-    self.draw = function(canv) { canv.context.drawImage(bible_img,self.x,self.y,self.w,self.h); }
-  }
-  var Bowl = function(pane)
-  {
-    var self = this;
-    self.x = 180;
-    self.y = 360;
-    self.w = 200;
-    self.h = 150;
-    self.draw = function(canv) { canv.context.drawImage(bowl_img,self.x,self.y,self.w,self.h); }
-  }
-  var Hamster = function(pane)
-  {
-    var self = this;
-    self.x = 75;
-    self.y = 340;
-    self.w = 100;
-    self.h = 75;
-    self.draw = function(canv) { canv.context.drawImage(hamster_img,self.x,self.y,self.w,self.h); }
-  }
-  var Pizza = function(pane)
-  {
-    var self = this;
-    self.x = 220;
-    self.y = 75;
-    self.w = 200;
-    self.h = 200;
-    self.draw = function(canv) { canv.context.drawImage(pizza_img,self.x,self.y,self.w,self.h); }
-  }
-  var Salt = function(pane)
-  {
-    var self = this;
-    self.x = 50;
-    self.y = 200;
-    self.w = 75;
-    self.h = 100;
-    self.draw = function(canv) { canv.context.drawImage(salt_img,self.x,self.y,self.w,self.h); }
-  }
-  var Mask = function(pane)
-  {
-    var self = this;
-    self.x = 80;
-    self.y = 520;
-    self.w = 200;
-    self.h = 100;
-    self.draw = function(canv) { canv.context.drawImage(mask_img,self.x,self.y,self.w,self.h); }
-  }
-
-
-
-  var hel;
-  var ace;
-  var bib;
-  var bow;
-  var ham;
-  var piz;
-  var sal;
-  var mas;
-  var self = this;
-  self.begin = function()
-  {
-    finished = false;
-    won = false;
-
-    hel = new Helmet(self);
-    ace = new Ace(self);
-    bib = new Bible(self);
-    bow = new Bowl(self);
-    ham = new Hamster(self);
-    piz = new Pizza(self);
-    sal = new Salt(self);
-    mas = new Mask(self);
-
-    scene.clicker.register(hel);
-    scene.drawer.register(hel);
-    scene.drawer.register(ace);
-    scene.drawer.register(bib);
-    scene.drawer.register(bow);
-    scene.drawer.register(ham);
-    scene.drawer.register(piz);
-    scene.drawer.register(sal);
-    scene.drawer.register(mas);
-  }
-  self.tick = function() //return 0 for continue, 1 for lose, 2 for win
-  {
-    //let scene handle ticking of doodles, any other ticks can go here
-    return finished+won; //#clever
-  }
-  self.draw = function()
-  {
-    //let scene handle drawing of doodles, any other draws can go here
-  }
-  self.end = function()
-  {
-    scene.clicker.unregister(hel);
-    scene.drawer.unregister(hel);
-    scene.drawer.unregister(ace);
-    scene.drawer.unregister(bib);
-    scene.drawer.unregister(bow);
-    scene.drawer.unregister(ham);
-    scene.drawer.unregister(piz);
-    scene.drawer.unregister(sal);
-    scene.drawer.unregister(mas);
-  }
-
-  self.helmetTouched = function()
-  {
-    finished = true;
-    win = true;
   }
 };
 
