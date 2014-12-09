@@ -47,6 +47,12 @@ var LoadingScene = function(game, stage)
       //pump
     img_srcs.push("assets/bike_pump_base.png");
     img_srcs.push("assets/bike_pump_handle.png");
+      //card
+    img_srcs.push("assets/bike_card.png");
+    img_srcs.push("assets/bike_dull_square.png");
+    img_srcs.push("assets/bike_glow_square.png");
+    img_srcs.push("assets/bike_bike.png");
+    img_srcs.push("assets/bike_gas.png");
     //misc
     img_srcs.push("assets/man.png");
     img_srcs.push("assets/back1.png");

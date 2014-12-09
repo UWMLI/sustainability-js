@@ -77,8 +77,6 @@ var BikeScene = function(game, stage)
     if((i = self.panes[self.currentPane].tick()))
     {
       self.panes[self.currentPane].end();
-      if(i == 1) console.log('lose :(');
-      if(i == 2) console.log('win :)');
       self.currentPane = (self.currentPane+1)%self.panes.length;
       self.panes[self.currentPane].begin();
     }
@@ -196,15 +194,12 @@ var B_GrabKeysPane = function(scene)
   {
     finished = true;
     won = true;
-    console.log('tapped');
   }
   self.handGrabbed = function()
   {
     finished = true;
     won = false;
-    console.log('grabbed');
   }
-
 };
 
 var B_PumpTirePane = function(scene)
@@ -328,15 +323,21 @@ var B_CardChoicePane = function(scene)
   var finished = false;
   var won = false;
 
+  var card_img = scene.assetter.asset("bike_card.png");
+  var dull_square_img = scene.assetter.asset("bike_dull_square.png");
+  var glow_square_img = scene.assetter.asset("bike_glow_square.png");
+  var bike_img = scene.assetter.asset("bike_bike.png");
+  var gas_img = scene.assetter.asset("bike_gas.png");
+
   var Card = function(pane)
   {
     var self = this;
     self.x = 200;
     self.y = 300;
-    self.offY = 0;
-    self.offX = 0;
-    self.w = 100;
-    self.h = 500;
+    self.w = 200;
+    self.h = 300;
+    self.touch_offset_x = 0;
+    self.touch_offset_y = 0;
 
     self.tick = function()
     {
@@ -344,13 +345,13 @@ var B_CardChoicePane = function(scene)
 
     self.dragStart  = function(evt)
     {
-      self.offY = self.y+(self.h/2)-evt.doY;
-      self.offX = self.x+(self.w/2)-evt.doX;
+      self.touch_offset_x = self.x+(self.w/2)-evt.doX;
+      self.touch_offset_y = self.y+(self.h/2)-evt.doY;
     };
     self.drag = function(evt)
     {
-      self.y = evt.doY-(self.h/2)+self.offY;
-      self.x = evt.doX-(self.w/2)+self.offX;
+      self.x = evt.doX-(self.w/2)+self.touch_offset_x;
+      self.y = evt.doY-(self.h/2)+self.touch_offset_y;
     };
     self.dragFinish = function()
     {
@@ -358,25 +359,58 @@ var B_CardChoicePane = function(scene)
 
     self.draw = function(canv)
     {
-      canv.context.strokeStyle = "#00FF00";
-      canv.context.strokeRect(self.x,self.y,self.w,self.h);
+      canv.context.drawImage(card_img,self.x,self.y,self.w,self.h);
+    }
+  }
+
+  var GlowBox = function(pane)
+  {
+    var self = this;
+    self.x = 50;
+    self.y = 50;
+    self.w = 100;
+    self.h = 100;
+
+    self.glow = false;
+
+    self.collide = function(obj)
+    {
+      return (self.x+self.w > obj.x) && (self.x < obj.x+obj.w) && (self.y+self.h > obj.y) && (self.y < obj.y+obj.h);
+    }
+
+    self.draw = function(canv)
+    {
+      if(self.glow) canv.context.drawImage(glow_square_img,self.x,self.y,self.w,self.h);
+      else          canv.context.drawImage(dull_square_img,self.x,self.y,self.w,self.h);
     }
   }
 
   var c;
+  var b_box;
+  var g_box;
   var self = this;
   self.begin = function()
   {
     finished = false;
     won = false;
     c = new Card(self);
+    b_box = new GlowBox(self);
+    b_box.x = 50;
+    g_box = new GlowBox(self);
+    g_box.x = 200;
     scene.ticker.register(c);
     scene.drawer.register(c);
+    scene.drawer.register(b_box);
+    scene.drawer.register(g_box);
     scene.dragger.register(c);
   }
   self.tick = function() //return 0 for continue, 1 for lose, 2 for win
   {
     //let scene handle ticking of doodles, any other ticks can go here
+    b_box.glow = b_box.collide(c);
+    g_box.glow = g_box.collide(c);
+
+    /*
     if(c.x > 100 && c.x < 200 &&
        c.y > 100 && c.y < 200)
     {
@@ -389,6 +423,7 @@ var B_CardChoicePane = function(scene)
       finished = true;
       won = false;
     }
+    */
 
     return finished+won; //#clever
   }
@@ -400,6 +435,8 @@ var B_CardChoicePane = function(scene)
   {
     scene.ticker.unregister(c);
     scene.drawer.unregister(c);
+    scene.drawer.unregister(b_box);
+    scene.drawer.unregister(g_box);
     scene.clicker.unregister(c);
   }
 };
