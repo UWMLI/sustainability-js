@@ -14,7 +14,6 @@ var BikeScene = function(game, stage)
 
   self.panes = [];
 
-
   self.ready = function()
   {
     self.dbugger = new Debugger({source:document.getElementById("debug_div")});
@@ -26,8 +25,8 @@ var BikeScene = function(game, stage)
     self.assetter = new Assetter({});
 
     self.currentPane = 0;
-    self.panes.push(new B_GrabKeysPane(self));
     self.panes.push(new B_PumpTirePane(self));
+    self.panes.push(new B_GrabKeysPane(self));
     self.panes.push(new B_CardChoicePane(self));
 
     /*
@@ -153,14 +152,14 @@ var B_GrabKeysPane = function(scene)
     }
     self.draw = function(canv) //handle drawing keys here too, because of swapping precidence
     {
-      if(self.grabbed) //draw keys first
+      if(self.grabbed || self.tapped) //draw keys first
         canv.context.drawImage(keys_img,30,200,150,300);
 
       if(self.tapped) canv.context.drawImage(hand_hit_img,self.x,self.y,self.w,self.h);
       else if(self.grabbed) canv.context.drawImage(hand_closed_img,self.x,self.y,self.w,self.h);
       else canv.context.drawImage(hand_open_img,self.x,self.y,self.w,self.h);
 
-      if(!self.grabbed) //draw keys second
+      if(!self.grabbed && !self.tapped) //draw keys second
         canv.context.drawImage(keys_img,30,200,150,300);
 
     }
@@ -219,15 +218,38 @@ var B_PumpTirePane = function(scene)
   var Pump = function(pane)
   {
     var self = this;
-    self.x = 200;
-    self.y = 200; //handle (used for drag)
-    self.baseY = 300;
-    self.offY = 0;
-    self.w = 100;
-    self.h = 500;
+
+    self.handle_up_y = 120;
+    self.handle_down_y = 300;
+
+    //used to detect drag (sync w/ handle pos)
+    self.x = 70;
+    self.y = self.handle_down_y; //start down
+    self.w = 200;
+    self.h = 300;
+
+    self.touch_offset_y = 0; // used to keep track of drag
+
+    self.handle_x = self.x;
+    self.handle_y = self.y;
+    self.handle_w = self.w;
+    self.handle_h = self.h;
+
+    self.base_x = 50;
+    self.base_y = 400;
+    self.base_w = 220;
+    self.base_h = 500;
 
     self.lastState = 0; //0 = down, 1 = up
     self.halfCycles = 0;
+
+    self.syncHandleWithDrag = function()
+    {
+      self.handle_x = self.x;
+      self.handle_y = self.y;
+      self.handle_w = self.w;
+      self.handle_h = self.h;
+    }
 
     self.tick = function()
     {
@@ -235,24 +257,26 @@ var B_PumpTirePane = function(scene)
 
     self.dragStart  = function(evt)
     {
-      self.offY = self.y+(self.h/2)-evt.doY;
+      self.touch_offset_y = self.y+(self.h/2)-evt.doY;
     };
     self.drag = function(evt)
     {
-      self.y = evt.doY-(self.h/2)+self.offY;
-      if(self.y > 220) //handle down
+      self.y = evt.doY-(self.h/2)+self.touch_offset_y;
+      if(self.y > self.handle_down_y)
       {
 
         if(self.lastState == 1) self.halfCycles++;
         self.lastState = 0;
-        self.y = 220;
+        self.y = self.handle_down_y;
       }
-      if(self.y < 80) //handle up
+      if(self.y < self.handle_up_y) //handle up
       {
         if(self.lastState == 0) self.halfCycles++;
         self.lastState = 1;
-        self.y = 80;
+        self.y = self.handle_up_y;
       }
+
+      self.syncHandleWithDrag();
     };
     self.dragFinish = function()
     {
@@ -260,8 +284,8 @@ var B_PumpTirePane = function(scene)
 
     self.draw = function(canv)
     {
-      canv.context.drawImage(pump_handle_img,self.x,self.y,self.w,self.h);
-      canv.context.drawImage(pump_base_img,self.x,self.baseY,self.w,self.h);
+      canv.context.drawImage(pump_handle_img,self.handle_x,self.handle_y,self.handle_w,self.handle_h);
+      canv.context.drawImage(pump_base_img,self.base_x,self.base_y,self.base_w,self.base_h);
     }
   }
 

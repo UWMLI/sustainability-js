@@ -32,6 +32,7 @@ var Stage = function(init)
   {
     self.drawCanv.clear();
     self.dispCanv.clear();
+    self.drawCanv.context.fillRect(0,0,self.drawCanv.canvas.width,self.drawCanv.canvas.height);
   };
 
   document.getElementById(self.container).appendChild(self.dispCanv.canvas);
