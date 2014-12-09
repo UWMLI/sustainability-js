@@ -81,14 +81,18 @@ var LoadingScene = function(game, stage)
 
   self.tick = function()
   {
-    if(progress <= imagesloaded/(img_srcs.length+1)) progress += 0.5;
+    if(progress <= imagesloaded/(img_srcs.length+1)) progress += 0.01;
     if(progress >= 1.0) game.nextScene();
   };
 
   self.draw = function()
   {
-    canv.context.fillRect(pad,canv.canvas.height/2,progress*barw,1);
-    canv.context.strokeRect(pad-1,(canv.canvas.height/2)-1,barw+2,3);
+    canv.context.fillStyle = "#FFFFFF";
+    canv.context.fillRect(0,0,canv.canvas.width,canv.canvas.height);
+    canv.context.fillStyle = "#000000";
+    canv.context.strokeStyle = "#000000";
+    canv.context.fillRect(pad,canv.canvas.height/2,progress*barw,3);
+    canv.context.strokeRect(pad-1,(canv.canvas.height/2)-1,barw+2,5);
   };
 
   self.cleanup = function()
