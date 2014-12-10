@@ -88,7 +88,7 @@ var BikeScene = function(game, stage)
     if((i = self.panes[self.currentPane].tick()))
     {
       self.panes[self.currentPane].end();
-      self.currentPane = (self.currentPane+1)%self.panes.length;
+      self.currentPane = (self.currentPane+i-1)%self.panes.length;
       self.panes[self.currentPane].begin();
     }
   };
@@ -124,7 +124,7 @@ var B_FindHelmetPane = function(scene)
   var salt_img = scene.assetter.asset("bike_salt.png");
   var mask_img = scene.assetter.asset("bike_mask.png");
   var intro_text_img = scene.assetter.asset("bike_excuse_helmet.png");
-  var outro_text_img = scene.assetter.asset("bike_victory_helmet.png");
+  var outro_win_img = scene.assetter.asset("bike_victory_helmet.png");
 
   var Intro = function(pane)
   {
@@ -166,7 +166,7 @@ var B_FindHelmetPane = function(scene)
       else if(self.outro_count < 100) x = 100+(((self.outro_count-95)/5)*500);
       else return;
 
-      canv.context.drawImage(outro_text_img, x, 100, 500, 500);
+      canv.context.drawImage(outro_win_img, x, 100, 500, 500);
     }
   }
 
@@ -439,7 +439,7 @@ var B_PumpTirePane = function(scene)
   var lights_1_img = scene.assetter.asset("bike_pump_sign_lights_1.png");
   var lights_2_img = scene.assetter.asset("bike_pump_sign_lights_2.png");
   var intro_text_img = scene.assetter.asset("bike_excuse_pump.png");
-  var outro_text_img = scene.assetter.asset("bike_victory_pump.png");
+  var outro_win_img = scene.assetter.asset("bike_victory_pump.png");
 
   var Intro = function(pane)
   {
@@ -481,7 +481,7 @@ var B_PumpTirePane = function(scene)
       else if(self.outro_count < 100) x = -150+(((self.outro_count-95)/5)*500);
       else return;
 
-      canv.context.drawImage(outro_text_img, x, 0, 800, 1008);
+      canv.context.drawImage(outro_win_img, x, 0, 800, 1008);
     }
   }
 
@@ -654,9 +654,9 @@ var B_GrabKeysPane = function(scene)
   var hand_closed_img = scene.assetter.asset("bike_hand_closed.png");
   var keys_img = scene.assetter.asset("bike_keys.png");
   var smack_img = scene.assetter.asset("bike_smack.png");
-  var fail_img = scene.assetter.asset("bike_fail.png");
   var intro_text_img = scene.assetter.asset("bike_excuse_keys.png");
-  var outro_text_img = scene.assetter.asset("bike_victory_keys.png");
+  var outro_win_img = scene.assetter.asset("bike_victory_keys.png");
+  var outro_lose_img = scene.assetter.asset("bike_fail_keys.png");
 
   var Intro = function(pane)
   {
@@ -698,7 +698,8 @@ var B_GrabKeysPane = function(scene)
       else if(self.outro_count < 100) x = 100+(((self.outro_count-95)/5)*500);
       else return;
 
-      canv.context.drawImage(outro_text_img, x, 100, 500, 500);
+      if(won) canv.context.drawImage(outro_win_img, x, 100, 500, 500);
+      else    canv.context.drawImage(outro_lose_img, x, 100, 500, 500);
     }
   }
 
@@ -836,7 +837,8 @@ var B_CardChoicePane = function(scene)
   var bike_img = scene.assetter.asset("bike_bike.png");
   var gas_img = scene.assetter.asset("bike_gas.png");
   var intro_text_img = scene.assetter.asset("bike_excuse_card.png");
-  var outro_text_img = scene.assetter.asset("bike_victory_card.png");
+  var outro_win_img = scene.assetter.asset("bike_victory_card.png");
+  var outro_lose_img = scene.assetter.asset("bike_fail_card.png");
 
   var Intro = function(pane)
   {
@@ -878,7 +880,8 @@ var B_CardChoicePane = function(scene)
       else if(self.outro_count < 100) x = 100+(((self.outro_count-95)/5)*500);
       else return;
 
-      canv.context.drawImage(outro_text_img, x, 100, 500, 200);
+      if(won) canv.context.drawImage(outro_win_img, x, 100, 500, 200);
+      else    canv.context.drawImage(outro_lose_img, x, 100, 500, 200);
     }
   }
 
@@ -999,12 +1002,12 @@ var B_CardChoicePane = function(scene)
     if(b_box.collide(c) && !g_box.collide(c))
     {
       self.mode = 2;
-      win = true;
+      won = true;
     }
     if(g_box.collide(c) && !b_box.collide(c))
     {
       self.mode = 2;
-      win = false;
+      won = false;
     }
   }
 
