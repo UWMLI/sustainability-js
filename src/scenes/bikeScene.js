@@ -702,6 +702,15 @@ var B_GrabKeysPane = function(scene)
     }
   }
 
+  var BG = function(pane)
+  {
+    var self = this;
+    self.draw = function(canv)
+    {
+      canv.context.drawImage(smack_img, 100, 600,500,300);
+    }
+  }
+
   var Hand = function(pane)
   {
     var self = this;
@@ -750,6 +759,7 @@ var B_GrabKeysPane = function(scene)
   }
 
   var h;
+  var bg;
   var intro;
   var outro;
   var self = this;
@@ -761,8 +771,10 @@ var B_GrabKeysPane = function(scene)
     self.mode = 0;
 
     h = new Hand(self);
+    bg = new BG(self);
     intro = new Intro(self);
     outro = new Outro(self);
+    scene.drawer.register(bg);
     scene.ticker.register(h);
     scene.drawer.register(h);
     scene.clicker.register(h);
@@ -782,6 +794,7 @@ var B_GrabKeysPane = function(scene)
   }
   self.end = function()
   {
+    scene.drawer.unregister(bg);
     scene.ticker.unregister(h);
     scene.drawer.unregister(h);
     scene.clicker.unregister(h);
@@ -873,7 +886,7 @@ var B_CardChoicePane = function(scene)
   {
     var self = this;
     self.x = 200;
-    self.y = 300;
+    self.y = 650;
     self.w = 200;
     self.h = 300;
     self.touch_offset_x = 0;
