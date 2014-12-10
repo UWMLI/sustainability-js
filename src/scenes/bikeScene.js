@@ -114,11 +114,12 @@ var B_FindHelmetPane = function(scene)
 
   var unhappy_man_img = scene.assetter.asset("bike_helmet_man_unhappy.png");
   var happy_man_img = scene.assetter.asset("bike_helmet_man_happy.png");
+  var helmet_img = scene.assetter.asset("bike_helmet.png");
+  var x_img = scene.assetter.asset("bike_x.png");
   var ace_img = scene.assetter.asset("bike_ace.png");
   var bible_img = scene.assetter.asset("bike_bible.png");
   var bowl_img = scene.assetter.asset("bike_bowl.png");
   var hamster_img = scene.assetter.asset("bike_hamster.png");
-  var helmet_img = scene.assetter.asset("bike_helmet.png");
   var pizza_img = scene.assetter.asset("bike_pizza.png");
   var salt_img = scene.assetter.asset("bike_salt.png");
   var mask_img = scene.assetter.asset("bike_mask.png");
@@ -189,7 +190,10 @@ var B_FindHelmetPane = function(scene)
     self.y = 180;
     self.w = 200;
     self.h = 175;
-    self.draw = function(canv) { canv.context.drawImage(helmet_img,self.x,self.y,self.w,self.h); }
+    self.draw = function(canv)
+    {
+      canv.context.drawImage(helmet_img,self.x,self.y,self.w,self.h);
+    }
     self.click = function(evt) { pane.helmetTouched() };
   }
   var Ace = function(pane)
@@ -199,7 +203,14 @@ var B_FindHelmetPane = function(scene)
     self.y = 300;
     self.w = 75;
     self.h = 100;
-    self.draw = function(canv) { canv.context.drawImage(ace_img,self.x,self.y,self.w,self.h); }
+    self.draw = function(canv)
+    {
+      canv.context.drawImage(ace_img,self.x,self.y,self.w,self.h);
+      if(self.xvis > 0)canv.context.drawImage(x_img,self.x,self.y,self.w,self.h);
+    }
+    self.xvis = 0;
+    self.tick = function() {self.xvis--;}
+    self.click = function(evt) { self.xvis = 100; };
   }
   var Bible = function(pane)
   {
@@ -208,7 +219,14 @@ var B_FindHelmetPane = function(scene)
     self.y = 20;
     self.w = 200;
     self.h = 150;
-    self.draw = function(canv) { canv.context.drawImage(bible_img,self.x,self.y,self.w,self.h); }
+    self.draw = function(canv)
+    {
+      canv.context.drawImage(bible_img,self.x,self.y,self.w,self.h);
+      if(self.xvis > 0)canv.context.drawImage(x_img,self.x,self.y,self.w,self.h);
+    }
+    self.xvis = 0;
+    self.tick = function() {self.xvis--;}
+    self.click = function(evt) { self.xvis = 100; };
   }
   var Bowl = function(pane)
   {
@@ -217,7 +235,14 @@ var B_FindHelmetPane = function(scene)
     self.y = 360;
     self.w = 200;
     self.h = 150;
-    self.draw = function(canv) { canv.context.drawImage(bowl_img,self.x,self.y,self.w,self.h); }
+    self.draw = function(canv)
+    {
+      canv.context.drawImage(bowl_img,self.x,self.y,self.w,self.h);
+      if(self.xvis > 0)canv.context.drawImage(x_img,self.x,self.y,self.w,self.h);
+    }
+    self.xvis = 0;
+    self.tick = function() {self.xvis--;}
+    self.click = function(evt) { self.xvis = 100; };
   }
   var Hamster = function(pane)
   {
@@ -226,7 +251,14 @@ var B_FindHelmetPane = function(scene)
     self.y = 340;
     self.w = 100;
     self.h = 75;
-    self.draw = function(canv) { canv.context.drawImage(hamster_img,self.x,self.y,self.w,self.h); }
+    self.draw = function(canv)
+    {
+      canv.context.drawImage(hamster_img,self.x,self.y,self.w,self.h);
+      if(self.xvis > 0)canv.context.drawImage(x_img,self.x,self.y,self.w,self.h);
+    }
+    self.xvis = 0;
+    self.tick = function() {self.xvis--;}
+    self.click = function(evt) { self.xvis = 100; };
   }
   var Pizza = function(pane)
   {
@@ -234,8 +266,15 @@ var B_FindHelmetPane = function(scene)
     self.x = 220;
     self.y = 75;
     self.w = 200;
-    self.h = 200;
-    self.draw = function(canv) { canv.context.drawImage(pizza_img,self.x,self.y,self.w,self.h); }
+    self.h = 100;
+    self.draw = function(canv)
+    {
+      canv.context.drawImage(pizza_img,self.x,self.y,self.w,self.h+100);
+      if(self.xvis > 0)canv.context.drawImage(x_img,self.x,self.y,self.w,self.h);
+    }
+    self.xvis = 0;
+    self.tick = function() {self.xvis--;}
+    self.click = function(evt) { self.xvis = 100; };
   }
   var Salt = function(pane)
   {
@@ -244,7 +283,14 @@ var B_FindHelmetPane = function(scene)
     self.y = 200;
     self.w = 75;
     self.h = 100;
-    self.draw = function(canv) { canv.context.drawImage(salt_img,self.x,self.y,self.w,self.h); }
+    self.draw = function(canv)
+    {
+      canv.context.drawImage(salt_img,self.x,self.y,self.w,self.h);
+      if(self.xvis > 0)canv.context.drawImage(x_img,self.x,self.y,self.w,self.h);
+    }
+    self.xvis = 0;
+    self.tick = function() {self.xvis--;}
+    self.click = function(evt) { self.xvis = 100; };
   }
   var Mask = function(pane)
   {
@@ -253,7 +299,14 @@ var B_FindHelmetPane = function(scene)
     self.y = 520;
     self.w = 200;
     self.h = 100;
-    self.draw = function(canv) { canv.context.drawImage(mask_img,self.x,self.y,self.w,self.h); }
+    self.draw = function(canv)
+    {
+      canv.context.drawImage(mask_img,self.x,self.y,self.w,self.h);
+      if(self.xvis > 0)canv.context.drawImage(x_img,self.x,self.y,self.w,self.h);
+    }
+    self.xvis = 0;
+    self.tick = function() {self.xvis--;}
+    self.click = function(evt) { self.xvis = 100; };
   }
 
 
@@ -299,6 +352,20 @@ var B_FindHelmetPane = function(scene)
     scene.drawer.register(piz);
     scene.drawer.register(sal);
     scene.drawer.register(mas);
+    scene.ticker.register(ace);
+    scene.ticker.register(bib);
+    scene.ticker.register(bow);
+    scene.ticker.register(ham);
+    scene.ticker.register(piz);
+    scene.ticker.register(sal);
+    scene.ticker.register(mas);
+    scene.clicker.register(ace);
+    scene.clicker.register(bib);
+    scene.clicker.register(bow);
+    scene.clicker.register(ham);
+    scene.clicker.register(piz);
+    scene.clicker.register(sal);
+    scene.clicker.register(mas);
     scene.drawer.register(intro);
     scene.ticker.register(intro);
     scene.drawer.register(outro);
@@ -323,6 +390,20 @@ var B_FindHelmetPane = function(scene)
     scene.drawer.unregister(piz);
     scene.drawer.unregister(sal);
     scene.drawer.unregister(mas);
+    scene.ticker.unregister(ace);
+    scene.ticker.unregister(bib);
+    scene.ticker.unregister(bow);
+    scene.ticker.unregister(ham);
+    scene.ticker.unregister(piz);
+    scene.ticker.unregister(sal);
+    scene.ticker.unregister(mas);
+    scene.clicker.unregister(ace);
+    scene.clicker.unregister(bib);
+    scene.clicker.unregister(bow);
+    scene.clicker.unregister(ham);
+    scene.clicker.unregister(piz);
+    scene.clicker.unregister(sal);
+    scene.clicker.unregister(mas);
     scene.drawer.unregister(intro);
     scene.ticker.unregister(intro);
     scene.drawer.unregister(outro);
