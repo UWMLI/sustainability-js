@@ -112,6 +112,8 @@ var B_FindHelmetPane = function(scene)
   var finished = false;
   var won = false;
 
+  var unhappy_man_img = scene.assetter.asset("bike_helmet_man_unhappy.png");
+  var happy_man_img = scene.assetter.asset("bike_helmet_man_happy.png");
   var ace_img = scene.assetter.asset("bike_ace.png");
   var bible_img = scene.assetter.asset("bike_bible.png");
   var bowl_img = scene.assetter.asset("bike_bowl.png");
@@ -144,6 +146,19 @@ var B_FindHelmetPane = function(scene)
     }
   }
 
+  var Man = function(pane)
+  {
+    var self = this;
+    self.x = 350;
+    self.y = 400;
+    self.w = 400;
+    self.h = 675;
+    self.draw = function(canv)
+    {
+      if(!won) canv.context.drawImage(unhappy_man_img,self.x,self.y,self.w,self.h);
+      else     canv.context.drawImage(happy_man_img,self.x,self.y,self.w,self.h);
+    }
+  }
   var Helmet = function(pane)
   {
     var self = this;
@@ -220,6 +235,7 @@ var B_FindHelmetPane = function(scene)
 
 
 
+  var man;
   var hel;
   var ace;
   var bib;
@@ -238,6 +254,7 @@ var B_FindHelmetPane = function(scene)
     won = false;
     self.mode = 0;
 
+    man = new Man(self);
     hel = new Helmet(self);
     ace = new Ace(self);
     bib = new Bible(self);
@@ -248,6 +265,7 @@ var B_FindHelmetPane = function(scene)
     mas = new Mask(self);
     intro = new Intro(self);
 
+    scene.drawer.register(man);
     scene.clicker.register(hel);
     scene.drawer.register(hel);
     scene.drawer.register(ace);
@@ -269,6 +287,7 @@ var B_FindHelmetPane = function(scene)
   }
   self.end = function()
   {
+    scene.drawer.unregister(man);
     scene.clicker.unregister(hel);
     scene.drawer.unregister(hel);
     scene.drawer.unregister(ace);

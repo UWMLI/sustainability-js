@@ -57,6 +57,8 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/bike_gas.png");
     img_srcs.push("assets/bike_excuse_card.png");
       //helmet
+    img_srcs.push("assets/bike_helmet_man_happy.png");
+    img_srcs.push("assets/bike_helmet_man_unhappy.png");
     img_srcs.push("assets/bike_helmet.png");
     img_srcs.push("assets/bike_ace.png");
     img_srcs.push("assets/bike_bible.png");
