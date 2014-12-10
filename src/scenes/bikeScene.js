@@ -123,6 +123,7 @@ var B_FindHelmetPane = function(scene)
   var salt_img = scene.assetter.asset("bike_salt.png");
   var mask_img = scene.assetter.asset("bike_mask.png");
   var intro_text_img = scene.assetter.asset("bike_excuse_helmet.png");
+  var outro_text_img = scene.assetter.asset("bike_victory_helmet.png");
 
   var Intro = function(pane)
   {
@@ -143,6 +144,28 @@ var B_FindHelmetPane = function(scene)
       else return;
 
       canv.context.drawImage(intro_text_img, x, 100, 500, 500);
+    }
+  }
+
+  var Outro = function(pane)
+  {
+    var self = this;
+    self.outro_count = 0;
+    self.tick = function()
+    {
+      if(pane.mode != 2) return;
+      self.outro_count+=0.5;
+      if(self.outro_count > 100) pane.outroFinished();
+    }
+    self.draw = function(canv)
+    {
+      var x;
+      if(self.outro_count < 5)        x = -500+((self.outro_count/5)*500);
+      else if(self.outro_count < 95)  x = (((self.outro_count-5)/90)*100);
+      else if(self.outro_count < 100) x = 100+(((self.outro_count-95)/5)*500);
+      else return;
+
+      canv.context.drawImage(outro_text_img, x, 100, 500, 500);
     }
   }
 
@@ -245,6 +268,7 @@ var B_FindHelmetPane = function(scene)
   var sal;
   var mas;
   var intro;
+  var outro;
   var self = this;
   self.mode = 0; //0 = intro, 1 = play, 2 = outro
 
@@ -264,6 +288,7 @@ var B_FindHelmetPane = function(scene)
     sal = new Salt(self);
     mas = new Mask(self);
     intro = new Intro(self);
+    outro = new Outro(self);
 
     scene.drawer.register(man);
     scene.clicker.register(hel);
@@ -277,10 +302,12 @@ var B_FindHelmetPane = function(scene)
     scene.drawer.register(mas);
     scene.drawer.register(intro);
     scene.ticker.register(intro);
+    scene.drawer.register(outro);
+    scene.ticker.register(outro);
   }
   self.tick = function() //return 0 for continue, 1 for lose, 2 for win
   {
-    return finished+won;
+    if(finished) return finished+won;
   }
   self.draw = function(canv)
   {
@@ -299,17 +326,23 @@ var B_FindHelmetPane = function(scene)
     scene.drawer.unregister(mas);
     scene.drawer.unregister(intro);
     scene.ticker.unregister(intro);
+    scene.drawer.unregister(outro);
+    scene.ticker.unregister(outro);
   }
 
   self.introFinished = function()
   {
     self.mode = 1;
   }
+  self.outroFinished = function()
+  {
+    finished = true;
+  }
   self.helmetTouched = function()
   {
     if(self.mode != 1) return;
-    finished = true;
-    win = true;
+    won = true;
+    self.mode = 2;
   }
 };
 
@@ -321,6 +354,7 @@ var B_PumpTirePane = function(scene)
   var pump_base_img = scene.assetter.asset("bike_pump_base.png");
   var pump_handle_img = scene.assetter.asset("bike_pump_handle.png");
   var intro_text_img = scene.assetter.asset("bike_excuse_pump.png");
+  var outro_text_img = scene.assetter.asset("bike_victory_pump.png");
 
   var Intro = function(pane)
   {
@@ -341,6 +375,28 @@ var B_PumpTirePane = function(scene)
       else return;
 
       canv.context.drawImage(intro_text_img, x, 100, 500, 150);
+    }
+  }
+
+  var Outro = function(pane)
+  {
+    var self = this;
+    self.outro_count = 0;
+    self.tick = function()
+    {
+      if(pane.mode != 2) return;
+      self.outro_count+=0.5;
+      if(self.outro_count > 100) pane.outroFinished();
+    }
+    self.draw = function(canv)
+    {
+      var x;
+      if(self.outro_count < 5)        x = 680-((self.outro_count/5)*580);
+      else if(self.outro_count < 95)  x = 100-(((self.outro_count-5)/90)*250);
+      else if(self.outro_count < 100) x = -150+(((self.outro_count-95)/5)*500);
+      else return;
+
+      canv.context.drawImage(outro_text_img, x, 0, 800, 1008);
     }
   }
 
@@ -418,6 +474,7 @@ var B_PumpTirePane = function(scene)
 
   var p;
   var intro;
+  var outro;
   var self = this;
   self.mode = 0;
   self.begin = function()
@@ -427,21 +484,24 @@ var B_PumpTirePane = function(scene)
     self.mode = 0;
     p = new Pump(self);
     intro = new Intro(self);
+    outro = new Outro(self);
     scene.drawer.register(p);
     scene.dragger.register(p);
     scene.ticker.register(intro);
     scene.drawer.register(intro);
+    scene.ticker.register(outro);
+    scene.drawer.register(outro);
   }
   self.tick = function() //return 0 for continue, 1 for lose, 2 for win
   {
     //let scene handle ticking of doodles, any other ticks can go here
     if(p.halfCycles > 10)
     {
-      finished = true;
+      self.mode = 2;
       won = true;
     }
 
-    return finished+won; //#clever
+    if(finished) return finished+won;
   }
   self.draw = function()
   {
@@ -453,10 +513,16 @@ var B_PumpTirePane = function(scene)
     scene.clicker.unregister(p);
     scene.ticker.unregister(intro);
     scene.drawer.unregister(intro);
+    scene.ticker.unregister(outro);
+    scene.drawer.unregister(outro);
   }
   self.introFinished = function()
   {
     self.mode = 1;
+  }
+  self.outroFinished = function()
+  {
+    finished = true;
   }
 };
 
