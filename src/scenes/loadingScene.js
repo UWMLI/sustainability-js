@@ -45,10 +45,12 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/bike_smack.png");
     img_srcs.push("assets/bike_fail.png");
     img_srcs.push("assets/bike_excuse_keys.png");
+    img_srcs.push("assets/bike_victory_keys.png");
       //pump
     img_srcs.push("assets/bike_pump_base.png");
     img_srcs.push("assets/bike_pump_handle.png");
     img_srcs.push("assets/bike_excuse_pump.png");
+    img_srcs.push("assets/bike_victory_pump.png");
       //card
     img_srcs.push("assets/bike_card.png");
     img_srcs.push("assets/bike_dull_square.png");
@@ -56,6 +58,7 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/bike_bike.png");
     img_srcs.push("assets/bike_gas.png");
     img_srcs.push("assets/bike_excuse_card.png");
+    img_srcs.push("assets/bike_victory_card.png");
       //helmet
     img_srcs.push("assets/bike_helmet_man_happy.png");
     img_srcs.push("assets/bike_helmet_man_unhappy.png");
@@ -68,6 +71,7 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/bike_salt.png");
     img_srcs.push("assets/bike_mask.png");
     img_srcs.push("assets/bike_excuse_helmet.png");
+    img_srcs.push("assets/bike_victory_helmet.png");
     //misc
     img_srcs.push("assets/bike_bg.png");
     img_srcs.push("assets/man.png");

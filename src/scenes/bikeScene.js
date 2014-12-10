@@ -541,6 +541,7 @@ var B_GrabKeysPane = function(scene)
   var smack_img = scene.assetter.asset("bike_smack.png");
   var fail_img = scene.assetter.asset("bike_fail.png");
   var intro_text_img = scene.assetter.asset("bike_excuse_keys.png");
+  var outro_text_img = scene.assetter.asset("bike_victory_keys.png");
 
   var Intro = function(pane)
   {
@@ -564,6 +565,28 @@ var B_GrabKeysPane = function(scene)
     }
   }
 
+  var Outro = function(pane)
+  {
+    var self = this;
+    self.outro_count = 0;
+    self.tick = function()
+    {
+      if(pane.mode != 2) return;
+      self.outro_count+=0.5;
+      if(self.outro_count > 100) pane.outroFinished();
+    }
+    self.draw = function(canv)
+    {
+      var x;
+      if(self.outro_count < 5)        x = -500+((self.outro_count/5)*500);
+      else if(self.outro_count < 95)  x = (((self.outro_count-5)/90)*100);
+      else if(self.outro_count < 100) x = 100+(((self.outro_count-95)/5)*500);
+      else return;
+
+      canv.context.drawImage(outro_text_img, x, 100, 500, 500);
+    }
+  }
+
   var Hand = function(pane)
   {
     var self = this;
@@ -573,32 +596,19 @@ var B_GrabKeysPane = function(scene)
     self.h = 320;
 
     self.tapped = false;
-    self.tappedCountDown = 100;
-
     self.grabbed = false;
-    self.grabbedCountDown = 100;
 
     self.tick = function()
     {
       if(pane.mode != 1) return;
       if(self.tapped)
       {
-        //only alert parent after time for 'animation' has passed
-        self.tappedCountDown--;
-        if(self.tappedCountDown == 0)
-        {
-          pane.handTapped();
-        }
+        pane.handTapped();
       }
       else if(h.x < 20)
       {
         self.grabbed = true;
-        //only alert parent after time for 'animation' has passed
-        self.grabbedCountDown--;
-        if(self.grabbedCountDown == 0)
-        {
-          pane.handGrabbed();
-        }
+        pane.handGrabbed();
       }
       else self.x-=5; //move left
     }
@@ -624,6 +634,7 @@ var B_GrabKeysPane = function(scene)
 
   var h;
   var intro;
+  var outro;
   var self = this;
   self.mode = 0;
   self.begin = function()
@@ -634,16 +645,19 @@ var B_GrabKeysPane = function(scene)
 
     h = new Hand(self);
     intro = new Intro(self);
+    outro = new Outro(self);
     scene.ticker.register(h);
     scene.drawer.register(h);
     scene.clicker.register(h);
     scene.ticker.register(intro);
     scene.drawer.register(intro);
+    scene.ticker.register(outro);
+    scene.drawer.register(outro);
   }
   self.tick = function() //return 0 for continue, 1 for lose, 2 for win
   {
     //let scene handle ticking of doodles, any other ticks can go here
-    return finished+won; //#clever
+    if(finished) return finished+won; //#clever
   }
   self.draw = function()
   {
@@ -656,21 +670,27 @@ var B_GrabKeysPane = function(scene)
     scene.clicker.unregister(h);
     scene.ticker.unregister(intro);
     scene.drawer.unregister(intro);
+    scene.ticker.unregister(outro);
+    scene.drawer.unregister(outro);
   }
 
   self.handTapped = function()
   {
-    finished = true;
     won = true;
+    self.mode = 2;
   }
   self.handGrabbed = function()
   {
-    finished = true;
     won = false;
+    self.mode = 2;
   }
   self.introFinished = function()
   {
     self.mode = 1;
+  }
+  self.outroFinished = function()
+  {
+    finished = true;
   }
 };
 
@@ -686,6 +706,7 @@ var B_CardChoicePane = function(scene)
   var bike_img = scene.assetter.asset("bike_bike.png");
   var gas_img = scene.assetter.asset("bike_gas.png");
   var intro_text_img = scene.assetter.asset("bike_excuse_card.png");
+  var outro_text_img = scene.assetter.asset("bike_victory_card.png");
 
   var Intro = function(pane)
   {
@@ -706,6 +727,28 @@ var B_CardChoicePane = function(scene)
       else return;
 
       canv.context.drawImage(intro_text_img, x, 100, 500, 200);
+    }
+  }
+
+  var Outro = function(pane)
+  {
+    var self = this;
+    self.outro_count = 0;
+    self.tick = function()
+    {
+      if(pane.mode != 2) return;
+      self.outro_count+=0.5;
+      if(self.outro_count > 100) pane.outroFinished();
+    }
+    self.draw = function(canv)
+    {
+      var x;
+      if(self.outro_count < 5)        x = -500+((self.outro_count/5)*500);
+      else if(self.outro_count < 95)  x = (((self.outro_count-5)/90)*100);
+      else if(self.outro_count < 100) x = 100+(((self.outro_count-95)/5)*500);
+      else return;
+
+      canv.context.drawImage(outro_text_img, x, 100, 500, 200);
     }
   }
 
@@ -770,6 +813,7 @@ var B_CardChoicePane = function(scene)
   var b_box;
   var g_box;
   var intro;
+  var outro;
   var self = this;
   self.mode = 0;
   self.begin = function()
@@ -786,12 +830,15 @@ var B_CardChoicePane = function(scene)
     g_box.img = gas_img;
     g_box.x = 400;
     intro = new Intro(self);
+    outro = new Outro(self);
     scene.drawer.register(b_box);
     scene.drawer.register(g_box);
     scene.drawer.register(c);
     scene.dragger.register(c);
     scene.drawer.register(intro);
     scene.ticker.register(intro);
+    scene.drawer.register(outro);
+    scene.ticker.register(outro);
   }
   self.tick = function() //return 0 for continue, 1 for lose, 2 for win
   {
@@ -799,7 +846,7 @@ var B_CardChoicePane = function(scene)
     b_box.glow = b_box.collide(c);
     g_box.glow = g_box.collide(c);
 
-    return finished+won; //#clever
+    if(finished) return finished+won; //#clever
   }
   self.draw = function(canv)
   {
@@ -813,18 +860,20 @@ var B_CardChoicePane = function(scene)
     scene.dragger.unregister(c);
     scene.drawer.register(intro);
     scene.ticker.register(intro);
+    scene.drawer.register(outro);
+    scene.ticker.register(outro);
   }
 
   self.cardStoppedDrag = function()
   {
     if(b_box.collide(c) && !g_box.collide(c))
     {
-      finished = true;
+      self.mode = 2;
       win = true;
     }
     if(g_box.collide(c) && !b_box.collide(c))
     {
-      finished = true;
+      self.mode = 2;
       win = false;
     }
   }
@@ -832,6 +881,10 @@ var B_CardChoicePane = function(scene)
   self.introFinished = function()
   {
     self.mode = 1;
+  }
+  self.outroFinished = function()
+  {
+    finished = true;
   }
 };
 
