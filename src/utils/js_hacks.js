@@ -28,7 +28,7 @@ function doSetPosOnEvent(evt,physical_rect,theoretical_rect)
     evt.doX = evt.offsetX;
     evt.doY = evt.offsetY;
   }
-  else if(evt.touches != undefined)
+  else if(evt.touches != undefined && evt.touches[0] != undefined)
   {
     evt.doX = evt.touches[0].pageX - evt.touches[0].target.offsetLeft;
     evt.doY = evt.touches[0].pageY - evt.touches[0].target.offsetTop;
