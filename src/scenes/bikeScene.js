@@ -496,7 +496,7 @@ var B_PumpTirePane = function(scene)
     self.draw = function(canv)
     {
       canv.context.drawImage(bike_img, 300, 300, 800,450);
-      canv.context.drawImage(hose_img, 100, 400, 200,100);
+      canv.context.drawImage(hose_img, 120, 700, 345,100);
 
       var signx = 100;
       var signy = 50;
@@ -734,10 +734,12 @@ var B_GrabKeysPane = function(scene)
     }
     self.draw = function(canv) //handle drawing keys here too, because of swapping precidence
     {
+      var shakeX = ((Math.random()*2)-1)*5;
+      var shakeY = ((Math.random()*2)-1)*5;
       if(self.grabbed || self.tapped) //draw keys first
         canv.context.drawImage(keys_img,30,200,150,300);
 
-      if(self.tapped) canv.context.drawImage(hand_hit_img,self.x,self.y,self.w,self.h);
+      if(self.tapped) canv.context.drawImage(hand_hit_img,self.x+shakeX,self.y+shakeY,self.w,self.h);
       else if(self.grabbed) canv.context.drawImage(hand_closed_img,self.x,self.y,self.w,self.h);
       else canv.context.drawImage(hand_open_img,self.x,self.y,self.w,self.h);
 
