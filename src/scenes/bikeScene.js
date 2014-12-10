@@ -64,6 +64,16 @@ var BikeScene = function(game, stage)
     );
     */
 
+    var BG = function(img)
+    {
+      var self = this;
+      self.draw = function(canv)
+      {
+        canv.context.drawImage(img, 0, 0, canv.canvas.width,canv.canvas.height);
+      }
+    };
+    self.drawer.register(new BG(self.assetter.asset("bike_bg.png")));
+
     self.panes[self.currentPane].begin();
   };
 
@@ -311,7 +321,7 @@ var B_PumpTirePane = function(scene)
       else if(self.intro_count < 100) x = 100+(((self.intro_count-95)/5)*500);
       else return;
 
-      canv.context.drawImage(intro_text_img, x, 100, 500, 200);
+      canv.context.drawImage(intro_text_img, x, 100, 500, 150);
     }
   }
 
