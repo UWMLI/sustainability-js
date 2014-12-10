@@ -271,7 +271,6 @@ var B_FindHelmetPane = function(scene)
   var outro;
   var self = this;
   self.mode = 0; //0 = intro, 1 = play, 2 = outro
-
   self.begin = function()
   {
     finished = false;
@@ -353,6 +352,11 @@ var B_PumpTirePane = function(scene)
 
   var pump_base_img = scene.assetter.asset("bike_pump_base.png");
   var pump_handle_img = scene.assetter.asset("bike_pump_handle.png");
+  var bike_img = scene.assetter.asset("bike_bike_flat.png");
+  var hose_img = scene.assetter.asset("bike_hose.png");
+  var sign_img = scene.assetter.asset("bike_pump_sign.png");
+  var lights_1_img = scene.assetter.asset("bike_pump_sign_lights_1.png");
+  var lights_2_img = scene.assetter.asset("bike_pump_sign_lights_2.png");
   var intro_text_img = scene.assetter.asset("bike_excuse_pump.png");
   var outro_text_img = scene.assetter.asset("bike_victory_pump.png");
 
@@ -397,6 +401,29 @@ var B_PumpTirePane = function(scene)
       else return;
 
       canv.context.drawImage(outro_text_img, x, 0, 800, 1008);
+    }
+  }
+
+  var BG = function(pane)
+  {
+    var self = this;
+    var timer = 0;
+    self.tick = function()
+    {
+      timer += 1;
+    }
+    self.draw = function(canv)
+    {
+      canv.context.drawImage(bike_img, 300, 300, 800,450);
+      canv.context.drawImage(hose_img, 100, 400, 200,100);
+
+      var signx = 100;
+      var signy = 50;
+      var signw = 400;
+      var signh = 200;
+      canv.context.drawImage(sign_img, signx, signy, signw, signh);
+      if(timer%20 > 10) canv.context.drawImage(lights_1_img, signx, signy, signw-10, signh-10);
+      else              canv.context.drawImage(lights_2_img, signx, signy, signw-10, signh-10);
     }
   }
 
@@ -473,6 +500,7 @@ var B_PumpTirePane = function(scene)
   }
 
   var p;
+  var bg;
   var intro;
   var outro;
   var self = this;
@@ -482,9 +510,13 @@ var B_PumpTirePane = function(scene)
     finished = false;
     won = false;
     self.mode = 0;
+
     p = new Pump(self);
+    bg = new BG(self);
     intro = new Intro(self);
     outro = new Outro(self);
+    scene.drawer.register(bg);
+    scene.ticker.register(bg);
     scene.drawer.register(p);
     scene.dragger.register(p);
     scene.ticker.register(intro);
@@ -509,6 +541,8 @@ var B_PumpTirePane = function(scene)
   }
   self.end = function()
   {
+    scene.drawer.unregister(bg);
+    scene.ticker.unregister(bg);
     scene.drawer.unregister(p);
     scene.clicker.unregister(p);
     scene.ticker.unregister(intro);
@@ -858,10 +892,10 @@ var B_CardChoicePane = function(scene)
     scene.drawer.unregister(b_box);
     scene.drawer.unregister(g_box);
     scene.dragger.unregister(c);
-    scene.drawer.register(intro);
-    scene.ticker.register(intro);
-    scene.drawer.register(outro);
-    scene.ticker.register(outro);
+    scene.drawer.unregister(intro);
+    scene.ticker.unregister(intro);
+    scene.drawer.unregister(outro);
+    scene.ticker.unregister(outro);
   }
 
   self.cardStoppedDrag = function()

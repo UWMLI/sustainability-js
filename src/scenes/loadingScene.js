@@ -49,6 +49,11 @@ var LoadingScene = function(game, stage)
       //pump
     img_srcs.push("assets/bike_pump_base.png");
     img_srcs.push("assets/bike_pump_handle.png");
+    img_srcs.push("assets/bike_bike_flat.png");
+    img_srcs.push("assets/bike_hose.png");
+    img_srcs.push("assets/bike_pump_sign.png");
+    img_srcs.push("assets/bike_pump_sign_lights_1.png");
+    img_srcs.push("assets/bike_pump_sign_lights_2.png");
     img_srcs.push("assets/bike_excuse_pump.png");
     img_srcs.push("assets/bike_victory_pump.png");
       //card
