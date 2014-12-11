@@ -78,31 +78,59 @@ var WindowScene = function(game, stage)
   {
   };
 
-  self.dayTick = function()
+  self.dayTick = function() { self.scoreTick(1); }
+  self.nightTick = function() { self.scoreTick(2); }
+  self.scoreTick = function(vstate)
   {
     var w;
+    var tickScore = 0;
     self.reticle.glow();
     for(var i = 0; i < self.windows.length; i++)
     {
       w = self.windows[i];
-      if(w.state == 1) { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"+1"+String.fromCharCode(176),"#00FF00",i/100)); self.score++; }
-      else             { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"-1"+String.fromCharCode(176),"#FF0000",i/100)); self.score--; }
+      if(w.state == vstate) { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"+1"+String.fromCharCode(176),"#00FF00",i/100)); tickScore++; }
+      else                  { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"-1"+String.fromCharCode(176),"#FF0000",i/100)); tickScore--; }
     }
-  }
+    var text;
+    var color;
+    if(tickScore == -self.windows.length) text = "WHAT";    color = "#FF0000";
+    if(tickScore < 0)                     text = "NO";      color = "#FFFF00";
+    if(tickScore < 10)                    text = "OK";      color = "#FFFFFF";
+    if(tickScore < 15)                    text = "GOOD";    color = "#00FFFF";
+    if(tickScore < 20)                    text = "AWESOME"; color = "#0000FF";
+    if(tickScore == 20)                   text = "PERFECT"; color = "#FFFFFF";
 
-  self.nightTick = function()
-  {
-    var w;
-    self.reticle.glow();
-    for(var i = 0; i < self.windows.length; i++)
-    {
-      w = self.windows[i];
-      if(w.state == 2) { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"+1"+String.fromCharCode(176),"#00FF00",i/100)); self.score++; }
-      else             { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"-1"+String.fromCharCode(176),"#FF0000",i/100)); self.score--; }
-    }
+    self.particler.register(new WI_FeedParticle(text, color));
+    self.score += tickScore;
   }
 
 };
+
+var WI_FeedParticle = function(text, color)
+{
+  var self = this;
+  self.x = 100;
+  self.sy = 600;
+  self.y = 600;
+  self.ey = 200;
+  self.text = text;
+  self.t = 0;
+  self.c = color;
+  self.tick = function()
+  {
+    self.t += 0.01;
+    self.y = self.y+(self.ey-self.y)/50;
+    return self.t < 1;
+  }
+  self.draw = function(canv)
+  {
+    canv.context.globalAlpha = 1-(self.t*self.t*self.t);
+    canv.context.font = "100px Georgia";
+    canv.context.fillStyle = self.c;
+    canv.context.fillText(self.text,self.x-25,self.y);
+    canv.context.globalAlpha = 1.0;
+  }
+}
 
 var WI_ScoreParticle = function(x,y,delta,color,delay)
 {
@@ -123,9 +151,11 @@ var WI_ScoreParticle = function(x,y,delta,color,delay)
   self.draw = function(canv)
   {
     if(self.t < 0) return;
+    canv.context.globalAlpha = 1-(self.t*self.t*self.t);
     canv.context.font = "30px Georgia";
     canv.context.fillStyle = self.c;
     canv.context.fillText(self.d,self.x-25,self.y);
+    canv.context.globalAlpha = 1.0;
   }
 }
 
