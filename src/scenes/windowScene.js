@@ -88,17 +88,17 @@ var WindowScene = function(game, stage)
     for(var i = 0; i < self.windows.length; i++)
     {
       w = self.windows[i];
-      if(w.state == vstate) { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"+1"+String.fromCharCode(176),"#00FF00",i/100)); tickScore++; }
-      else                  { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"-1"+String.fromCharCode(176),"#FF0000",i/100)); tickScore--; }
+      if(w.state == vstate) { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"+1","#00FF00",i/100)); tickScore++; }
+      else                  { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"-1","#FF0000",i/100)); tickScore--; }
     }
     var text;
     var color;
-    if     (tickScore == -self.windows.length) { text = "WHAT";    color = "#FF0000"; }
-    else if(tickScore < 0)                     { text = "NO";      color = "#FF0000"; }
-    else if(tickScore < 10)                    { text = "OK";      color = "#FFFFFF"; }
-    else if(tickScore < 15)                    { text = "GOOD";    color = "#00FFFF"; }
-    else if(tickScore < 20)                    { text = "AWESOME"; color = "#00FF00"; }
-    else if(tickScore == 20)                   { text = "PERFECT"; color = "#FFFFFF"; }
+    if     (tickScore == -self.windows.length) { text = "TERRIBLE"; color = "#FF0000"; }
+    else if(tickScore < 0)                     { text = "BAD";      color = "#FF0000"; }
+    else if(tickScore < 10)                    { text = "OK";       color = "#FFFFFF"; }
+    else if(tickScore < 15)                    { text = "GOOD";     color = "#00FFFF"; }
+    else if(tickScore < 20)                    { text = "AWESOME";  color = "#00FF00"; }
+    else if(tickScore == 20)                   { text = "PERFECT";  color = "#FFFFFF"; }
 
     self.particler.register(new WI_FeedParticle(text, color));
     self.score += tickScore;
