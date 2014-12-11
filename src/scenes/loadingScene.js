@@ -36,6 +36,8 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/win_open.png");
     img_srcs.push("assets/win_sky.png");
     img_srcs.push("assets/win_sun.png");
+    img_srcs.push("assets/reticle.png");
+    img_srcs.push("assets/reticle_glow.png");
     //bike
       //keys
     img_srcs.push("assets/bike_hand_open.png");

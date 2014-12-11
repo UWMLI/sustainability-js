@@ -9,13 +9,18 @@ var WindowScene = function(game, stage)
   self.presser;
   self.drawer;
   self.assetter;
+  self.particler;
 
   self.sky;
+  self.reticle;
   self.building;
+  self.jerk;
   self.windows;
 
   self.numFloors = 5;
   self.numRooms = 4;
+
+  self.score;
 
   self.ready = function()
   {
@@ -24,9 +29,12 @@ var WindowScene = function(game, stage)
     self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
     self.assetter = new Assetter({});
+    self.particler = new Particler({});
 
     self.sky = new WI_Sky(self);
+    self.reticle = new WI_Reticle(self);
     self.building = new WI_Building(self);
+    self.jerk = new WI_Jerk(self);
     self.windows = [];
 
     for(var i = 0; i < self.numRooms; i++)
@@ -35,12 +43,19 @@ var WindowScene = function(game, stage)
 
     self.drawer.register(self.sky);
     self.ticker.register(self.sky);
+    self.drawer.register(self.reticle);
+    self.ticker.register(self.reticle);
     self.drawer.register(self.building);
+    self.ticker.register(self.jerk);
     for(var i = 0; i < self.windows.length; i++)
     {
       self.presser.register(self.windows[i]);
       self.drawer.register(self.windows[i]);
     }
+    self.drawer.register(self.particler);
+    self.ticker.register(self.particler);
+
+    self.score = 0;
   };
 
   self.tick = function()
@@ -52,13 +67,96 @@ var WindowScene = function(game, stage)
   self.draw = function()
   {
     self.drawer.flush();
+    stage.drawCanv.context.font = "30px Georgia";
+    if(self.score < 0)       stage.drawCanv.context.fillStyle = "#FF0000";
+    else if(self.score == 0) stage.drawCanv.context.fillStyle = "#FFFFFF";
+    else if(self.score > 0)  stage.drawCanv.context.fillStyle = "#00FF00";
+    stage.drawCanv.context.fillText(self.score,20,30);
   };
 
   self.cleanup = function()
   {
   };
 
+  self.dayTick = function()
+  {
+    var w;
+    self.reticle.glow();
+    for(var i = 0; i < self.windows.length; i++)
+    {
+      w = self.windows[i];
+      if(w.state == 1) { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"+1"+String.fromCharCode(176),"#00FF00",i/100)); self.score++; }
+      else             { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"-1"+String.fromCharCode(176),"#FF0000",i/100)); self.score--; }
+    }
+  }
+
+  self.nightTick = function()
+  {
+    var w;
+    self.reticle.glow();
+    for(var i = 0; i < self.windows.length; i++)
+    {
+      w = self.windows[i];
+      if(w.state == 2) { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"+1"+String.fromCharCode(176),"#00FF00",i/100)); self.score++; }
+      else             { self.particler.register(new WI_ScoreParticle(w.x+(w.w/2),w.y+(w.h/2),"-1"+String.fromCharCode(176),"#FF0000",i/100)); self.score--; }
+    }
+  }
+
 };
+
+var WI_ScoreParticle = function(x,y,delta,color,delay)
+{
+  var self = this;
+  self.x = x;
+  self.sy = y;
+  self.y = y;
+  self.ey = y-50;
+  self.t = -delay;
+  self.d = delta;
+  self.c = color;
+  self.tick = function()
+  {
+    self.t += 0.01;
+    self.y = self.y+(self.ey-self.y)/50;
+    return self.t < 1;
+  }
+  self.draw = function(canv)
+  {
+    if(self.t < 0) return;
+    canv.context.font = "30px Georgia";
+    canv.context.fillStyle = self.c;
+    canv.context.fillText(self.d,self.x-25,self.y);
+  }
+}
+
+var WI_Reticle = function(game)
+{
+  var self = this;
+  var ret = game.assetter.asset("reticle.png");
+  var ret_glow = game.assetter.asset("reticle_glow.png");
+
+  self.t = 0;
+  self.glow = function()
+  {
+    self.t = 50;
+  }
+  self.tick = function()
+  {
+    self.t--;
+  }
+  self.draw = function(canv)
+  {
+    canv.context.drawImage(ret, 230, -40, 200, 200);
+    if(self.t > 0)
+    {
+      canv.context.globalAlpha = self.t/50;
+      canv.context.drawImage(ret_glow, 230, -40, 200, 200);
+      canv.context.drawImage(ret_glow, 230, -40, 200, 200);
+      canv.context.drawImage(ret_glow, 230, -40, 200, 200);
+      canv.context.globalAlpha = 1.0;
+    }
+  }
+}
 
 var WI_Sky = function(game)
 {
@@ -79,6 +177,8 @@ var WI_Sky = function(game)
   self.tick = function()
   {
     self.t++;
+    if(self.t%1000 == 250) game.dayTick();
+    if(self.t%1000 == 750) game.nightTick();
   }
   var sin;
   var cos;
@@ -109,6 +209,22 @@ var WI_Building = function(game)
   self.draw = function(canv)
   {
     canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+  }
+}
+
+var WI_Jerk = function(game)
+{
+  var self = this;
+
+  self.t = 100;
+  self.tick = function()
+  {
+    self.t--;
+    if(self.t < 0)
+    {
+      self.t = 20 + (Math.random()*200);
+      game.windows[Math.floor(Math.random()*game.windows.length)].press();
+    }
   }
 }
 
