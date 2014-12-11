@@ -93,12 +93,12 @@ var WindowScene = function(game, stage)
     }
     var text;
     var color;
-    if     (tickScore == -self.windows.length) text = "WHAT";    color = "#FF0000";
-    else if(tickScore < 0)                     text = "NO";      color = "#FFFF00";
-    else if(tickScore < 10)                    text = "OK";      color = "#FFFFFF";
-    else if(tickScore < 15)                    text = "GOOD";    color = "#00FFFF";
-    else if(tickScore < 20)                    text = "AWESOME"; color = "#0000FF";
-    else if(tickScore == 20)                   text = "PERFECT"; color = "#FFFFFF";
+    if     (tickScore == -self.windows.length) { text = "WHAT";    color = "#FF0000"; }
+    else if(tickScore < 0)                     { text = "NO";      color = "#00FF00"; }
+    else if(tickScore < 10)                    { text = "OK";      color = "#FFFFFF"; }
+    else if(tickScore < 15)                    { text = "GOOD";    color = "#00FFFF"; }
+    else if(tickScore < 20)                    { text = "AWESOME"; color = "#00FF00"; }
+    else if(tickScore == 20)                   { text = "PERFECT"; color = "#FFFFFF"; }
 
     self.particler.register(new WI_FeedParticle(text, color));
     self.score += tickScore;
