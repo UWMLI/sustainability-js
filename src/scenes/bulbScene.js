@@ -16,15 +16,11 @@ var BulbScene = function(game, stage)
   self.drawer;
   self.assetter;
 
+  self.house;
   self.nodes;
   self.player;
   self.bulbs;
   self.janitors;
-
-  self.house_x = 100;
-  self.house_y = 100;
-  self.house_h = self.stage.drawCanv.canvas.height-200;
-  self.house_w = self.stage.drawCanv.canvas.width-200;
 
   self.numFloors = 5;
   self.bulbsPerFloor = 5;
@@ -36,6 +32,7 @@ var BulbScene = function(game, stage)
     self.drawer = new Drawer({source:stage.drawCanv});
     self.assetter = new Assetter({});
 
+    self.house = new BU_House(self);
     self.nodes = [];
     self.bulbs = [];
     for(var i = 0; i < self.numFloors; i++)
@@ -44,6 +41,10 @@ var BulbScene = function(game, stage)
       {
         self.nodes[(i*(self.bulbsPerFloor+1))+j] = new BU_Node(self,j,i);
         self.bulbs[(i* self.bulbsPerFloor)   +j] = new BU_Bulb(self,self.node(j,i));
+        var r = Math.floor(Math.random()*5);
+        if(r == 0) self.bulb(j,i).setType("NONE");
+        if(r == 1) self.bulb(j,i).setType("BURNT_BAD");
+        else       self.bulb(j,i).setType("BAD");
       }
       self.nodes[(i*(self.bulbsPerFloor+1))+self.bulbsPerFloor] = new BU_Node(self,self.bulbsPerFloor,i); //create extra node (for elevator)
     }
@@ -54,6 +55,7 @@ var BulbScene = function(game, stage)
     self.janitors.push(new BU_Dude(self, 0, "BAD"));
     self.janitors.push(new BU_Dude(self, self.numFloors-1, "BAD"));
 
+    self.drawer.register(self.house);
     for(var i = 0; i < self.bulbs.length; i++)
     {
       self.clicker.register(self.bulbs[i]);
@@ -95,8 +97,8 @@ var BulbScene = function(game, stage)
   }
   self.nodeNearest = function(pix_x,pix_y) //fetch by pixel position
   {
-    var x = Math.floor((pix_x-self.house_x)/(self.house_w/(self.bulbsPerFloor+1)));
-    var y = Math.floor((pix_y-self.house_y)/(self.house_h/self.numFloors));
+    var x = Math.floor((pix_x-self.house.x-self.house.x_padding)/(self.house.w/(self.bulbsPerFloor+1)));
+    var y = Math.floor((pix_y-self.house.y-self.house.y_padding)/(self.house.h/self.numFloors));
     if(x > self.bulbsPerFloor) x = self.bulbsPerFloor;
     return self.node(x,y);
   }
@@ -131,9 +133,26 @@ var BulbScene = function(game, stage)
 
   self.bulbClicked = function(bulb)
   {
-    self.player.goalNode = bulb.node;
+    if(self.player.state == 0 || self.player.state == 1)
+      self.player.goalNode = bulb.node;
   }
 };
+
+var BU_House = function(game)
+{
+  var self = this;
+  self.x = 100;
+  self.y = 100;
+  self.h = game.stage.drawCanv.canvas.height-200;
+  self.w = game.stage.drawCanv.canvas.width-200;
+  self.x_padding = 50;
+  self.y_padding = 50;
+  self.draw = function(canv)
+  {
+    canv.context.strokeStyle = "#00FF00";
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+  }
+}
 
 //standardize grid positions
 var BU_Node = function(game,x,y)
@@ -143,10 +162,8 @@ var BU_Node = function(game,x,y)
   self.n_x = x;
   self.n_y = y;
 
-  self.x = game.house_x+(x*(game.house_w/(game.bulbsPerFloor+1)));
-  self.y = game.house_y+(y*(game.house_h/game.numFloors));
-  self.w = 10;
-  self.h = 10;
+  self.x = game.house.x+game.house.x_padding+(x*(game.house.w/(game.bulbsPerFloor+1)));
+  self.y = game.house.y+game.house.y_padding+(y*(game.house.h/game.numFloors));
 }
 
 var BU_Dude = function(game, floor, bulb)
@@ -219,8 +236,8 @@ var BU_Bulb = function(game,node)
   self.ticksTilTick = self.ticksPerTick;
 
   self.node = node;
-  self.w = 20;
-  self.h = 20;
+  self.w = 50;
+  self.h = 50;
   self.x = self.node.x-(self.w/2);
   self.y = self.node.y-(self.h/2);
 
