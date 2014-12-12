@@ -86,13 +86,23 @@ var BulbScene = function(game, stage)
 
   var ispent = 0;
   var theyspent = 0;
+  var iemit = 0;
+  var theyemit = 0;
+  self.trunc = function(v,t)
+  {
+    return Math.round(v*t)/t;
+  }
   self.draw = function()
   {
     self.drawer.flush();
     self.stage.drawCanv.context.font = "30px Georgia";
     self.stage.drawCanv.context.fillStyle = "#000000";
-    self.stage.drawCanv.context.fillText("You spent:$"+Math.round(ispent*100)/100,25,25);
-    self.stage.drawCanv.context.fillText("They spent:$"+Math.round(theyspent*100)/100,300,25);
+    self.stage.drawCanv.context.fillText("You spent:$"+self.trunc(ispent,100),25,25);
+    self.stage.drawCanv.context.fillText("They spent:$"+self.trunc(theyspent,100),300,25);
+    self.stage.drawCanv.context.fillText("You emit:"+self.trunc(iemit/1000,1000)+" lumens",25,55);
+    self.stage.drawCanv.context.fillText("They emit:"+self.trunc(theyemit/1000,1000)+" lumens",300,55);
+    self.stage.drawCanv.context.fillText("Efficiency:"+self.trunc(ispent/iemit,100)+" $/l",25,85);
+    self.stage.drawCanv.context.fillText("Efficiency:"+self.trunc(theyspent/theyemit,100)+" $/l",300,85);
   };
 
   self.cleanup = function()
@@ -164,6 +174,12 @@ var BulbScene = function(game, stage)
     if(bulb.type == "BAD")  theyspent += (bulb.energyPer*dollarsPerEnergy);
     if(bulb.type == "GOOD") ispent += (bulb.energyPer*dollarsPerEnergy);
     self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/2),"$"+(bulb.energyPer*dollarsPerEnergy),20,"#000000",(bulb.node.n_x+bulb.node.n_y)/20));
+  }
+
+  self.emitLight = function(bulb)
+  {
+    if(bulb.type == "BAD")  theyemit += bulb.light;
+    if(bulb.type == "GOOD") iemit += bulb.light;
   }
 };
 
@@ -271,6 +287,8 @@ var BU_Bulb = function(game,node)
 
   self.ticksPerTick = 100;
   self.ticksTilTick = self.ticksPerTick;
+  self.ticksPerPurchase = 4;
+  self.ticksTilPurchase = self.ticksPerPurchase;
 
   self.node = node;
   self.w = 50;
@@ -362,11 +380,18 @@ var BU_Bulb = function(game,node)
     {
       self.ticksTilTick = self.ticksPerTick;
       self.energy -= self.energyPer;
-      if(self.energy > 0)
+      self.ticksTilPurchase--;
+      if(self.ticksTilPurchase <= 0)
       {
-        game.purchaseEnergy(self);
+        if(self.energy > 0)
+        {
+          game.purchaseEnergy(self);
+        }
+        self.ticksTilPurchase = self.ticksPerPurchase;
       }
-      else if(self.maxEnergy > 0) self.setType("BURNT_"+self.type);
+      if(self.energy <= 0 && self.maxEnergy > 0) self.setType("BURNT_"+self.type);
+      if(self.type == "GOOD" || self.type == "BAD")
+        game.emitLight(self);
     }
   }
 
