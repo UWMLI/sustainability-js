@@ -23,6 +23,13 @@ var BulbScene = function(game, stage)
   self.bulbs;
   self.janitors;
 
+  self.theySpendGraph;
+  self.iSpendGraph;
+  self.iEmitGraph;
+  self.theyEmitGraph;
+  self.iEfficiencyGraph;
+  self.theyEfficiencyGraph;
+
   self.numFloors = 5;
   self.bulbsPerFloor = 5;
 
@@ -55,6 +62,15 @@ var BulbScene = function(game, stage)
     self.janitors.push(new BU_Dude(self, 0, "BAD"));
     self.janitors.push(new BU_Dude(self, self.numFloors-1, "BAD"));
 
+    self.graph = new BU_Graph(20,20,500,500,self);
+
+    self.theySpendGraph = new BU_Graph(20,20,500,500,self);
+    self.iSpendGraph = new BU_Graph(20,20,500,500,self);
+    self.iEmitGraph = new BU_Graph(20,20,500,500,self);
+    self.theyEmitGraph = new BU_Graph(20,20,500,500,self);
+    self.iEfficiencyGraph = new BU_Graph(20,20,500,500,self);
+    self.theyEfficiencyGraph = new BU_Graph(20,20,500,500,self);
+
     self.drawer.register(self.house);
     for(var i = 0; i < self.bulbs.length; i++)
     {
@@ -71,6 +87,13 @@ var BulbScene = function(game, stage)
     self.drawer.register(self.player);
     self.drawer.register(self.particler);
     self.ticker.register(self.particler);
+
+    self.drawer.register(self.theySpendGraph);
+    self.drawer.register(self.iSpendGraph);
+    self.drawer.register(self.iEmitGraph);
+    self.drawer.register(self.theyEmitGraph);
+    self.drawer.register(self.iEfficiencyGraph);
+    self.drawer.register(self.theyEfficiencyGraph);
   };
 
   self.tick = function()
@@ -103,6 +126,13 @@ var BulbScene = function(game, stage)
     self.stage.drawCanv.context.fillText("They emit:"+self.trunc(theyemit/1000,1000)+" lumens",300,55);
     self.stage.drawCanv.context.fillText("Efficiency:"+self.trunc(ispent/iemit,100)+" $/l",25,85);
     self.stage.drawCanv.context.fillText("Efficiency:"+self.trunc(theyspent/theyemit,100)+" $/l",300,85);
+
+    self.theySpendGraph.register(ispent);
+    self.iSpendGraph.register(theyspent);
+    self.iEmitGraph.register(iemit);
+    self.theyEmitGraph.register(theyemit);
+    self.iEfficiencyGraph.register(ispent/iemit);
+    self.theyEfficiencyGraph.register(theyspent/theyemit);
   };
 
   self.cleanup = function()
@@ -442,6 +472,39 @@ var BU_PriceParticle = function(x,y,text,size,color,delay)
     canv.context.fillStyle = self.c;
     canv.context.fillText(self.text,self.x-25,self.y);
     canv.context.globalAlpha = 1.0;
+  }
+}
+
+var BU_Graph = function(x,y,w,h,game)
+{
+  var self = this;
+
+  self.x = x;
+  self.y = y;
+  self.w = w;
+  self.h = h;
+
+  var pts = [];
+  var high = 1.0;
+  var low = 1.0;
+  self.register = function(pt)
+  {
+    if(pt > high) high = pt;
+    if(pt < low) low = pt;
+    pts.push(pt);
+  }
+
+  self.draw = function(canv)
+  {
+    if(pts.length == 0) return;
+    canv.context.lineWidth = 5;
+    canv.context.fillRect(self.x,self.y+20,((self.maxChangeTimer-self.changeTimer)/self.maxChangeTimer)*self.w,10);
+    canv.context.beginPath();
+    canv.context.moveTo(self.x,self.y+self.h);
+    for(var i = 0; i < pts.length; i++)
+      canv.context.lineTo(self.x+(i/pts.length)*self.w, self.y+self.h-((pts[i]-low)/(high-low))*self.h);
+    canv.context.stroke();
+    canv.context.closePath();
   }
 }
 
