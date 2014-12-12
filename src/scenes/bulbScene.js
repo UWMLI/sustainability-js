@@ -15,6 +15,7 @@ var BulbScene = function(game, stage)
   self.clicker;
   self.drawer;
   self.assetter;
+  self.particler;
 
   self.house;
   self.nodes;
@@ -31,6 +32,7 @@ var BulbScene = function(game, stage)
     self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
     self.assetter = new Assetter({});
+    self.particler = new Particler({});
 
     self.house = new BU_House(self);
     self.nodes = [];
@@ -41,10 +43,8 @@ var BulbScene = function(game, stage)
       {
         self.nodes[(i*(self.bulbsPerFloor+1))+j] = new BU_Node(self,j,i);
         self.bulbs[(i* self.bulbsPerFloor)   +j] = new BU_Bulb(self,self.node(j,i));
-        var r = Math.floor(Math.random()*5);
-        if(r == 0) self.bulb(j,i).setType("NONE");
-        if(r == 1) self.bulb(j,i).setType("BURNT_BAD");
-        else       self.bulb(j,i).setType("BAD");
+        self.bulb(j,i).setType("BAD");
+        self.bulb(j,i).energy = Math.round(Math.random()*100);
       }
       self.nodes[(i*(self.bulbsPerFloor+1))+self.bulbsPerFloor] = new BU_Node(self,self.bulbsPerFloor,i); //create extra node (for elevator)
     }
@@ -69,6 +69,8 @@ var BulbScene = function(game, stage)
     }
     self.ticker.register(self.player);
     self.drawer.register(self.player);
+    self.drawer.register(self.particler);
+    self.ticker.register(self.particler);
   };
 
   self.tick = function()
@@ -82,9 +84,15 @@ var BulbScene = function(game, stage)
     }
   };
 
+  var ispent = 0;
+  var theyspent = 0;
   self.draw = function()
   {
     self.drawer.flush();
+    self.stage.drawCanv.context.font = "30px Georgia";
+    self.stage.drawCanv.context.fillStyle = "#000000";
+    self.stage.drawCanv.context.fillText("You spent:$"+ispent,25,25);
+    self.stage.drawCanv.context.fillText("They spent:$"+theyspent,400,25);
   };
 
   self.cleanup = function()
@@ -136,6 +144,27 @@ var BulbScene = function(game, stage)
     if(self.player.state == 0 || self.player.state == 1)
       self.player.goalNode = bulb.node;
   }
+
+  self.bulbChanged = function(bulb)
+  {
+    //don't register particle here- sometimes change bulb programatically (init)
+    //self.particler.register(new BU_PriceParticle(bulb.x,bulb.y,"$"+bulb.dollarsPer,"#000000",0));
+  }
+
+  self.purchaseBulb = function(bulb)
+  {
+    if(bulb.type == "BAD") theyspent += bulb.dollarsPer;
+    if(bulb.type == "GOOD") ispent += bulb.dollarsPer;
+    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/2),"$"+bulb.dollarsPer,30,"#000000",0));
+  }
+
+  var dollarsPerEnergy = 0.01;
+  self.purchaseEnergy = function(bulb)
+  {
+    if(bulb.type == "BAD")  theyspent += (bulb.energyPer*dollarsPerEnergy);
+    if(bulb.type == "GOOD") ispent += (bulb.energyPer*dollarsPerEnergy);
+    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/2),"$"+(bulb.energyPer*dollarsPerEnergy),20,"#000000",(bulb.node.n_x+bulb.node.n_y)/20));
+  }
 };
 
 var BU_House = function(game)
@@ -179,6 +208,8 @@ var BU_Dude = function(game, floor, bulb)
   self.img = game.assetter.asset("man.png");
 
   self.state = 0; //0 = waiting; 1 = walking; 2 = changing
+  self.changeTimer = 0;
+  self.maxChangeTimer = 200;
 
   var epsillon = 1; //<- ridiculous
   self.eq = function(a,b) { return Math.abs(a-b) < epsillon; }
@@ -215,6 +246,7 @@ var BU_Dude = function(game, floor, bulb)
       if(self.changeTimer <= 0)
       {
         game.bulbAt(self.goalNode).setType(bulb);
+        game.purchaseBulb(game.bulbAt(self.goalNode));
         self.state = 0;
       }
     }
@@ -225,6 +257,11 @@ var BU_Dude = function(game, floor, bulb)
     canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
     canv.context.strokeStyle = "#00FF00";
     canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    if(self.state == 2) //changing
+    {
+      canv.context.fillStyle = "#00FF00";
+      canv.context.fillRect(self.x,self.y+20,((self.maxChangeTimer-self.changeTimer)/self.maxChangeTimer)*self.w,10);
+    }
   }
 }
 
@@ -244,10 +281,11 @@ var BU_Bulb = function(game,node)
   self.img = game.assetter.asset("man.png");
 
   self.type = "NONE";
-  self.dollarPer = 0.0;
+  self.dollarsPer = 0.0;
   self.energyPer = 0.0;
   self.light = 0.0;
-  self.energy = 100.0; //never run out
+  self.maxEnergy = 0; //prevent divide-by-0
+  self.energy = self.maxEnergy;
 
   self.setType = function(type)
   {
@@ -255,54 +293,61 @@ var BU_Bulb = function(game,node)
     {
       case "BAD":
         self.type = type;
-        self.dollarPer = 0.25;
-        self.energyPer = 5.0;
+        self.dollarsPer = 3;
+        self.energyPer = 3.0;
         self.light = 0.25;
-        self.energy = 100.0;
-        self.img = game.assetter.asset("man.png");
-        break;
-      case "BURNT_BAD":
-        self.type = type;
-        self.dollarPer = 0.0;
-        self.energyPer = 0.0;
-        self.light = 0.0;
-        self.energy = 100.0;
+        self.maxEnergy = 100.0;
+        self.energy = self.maxEnergy;
         self.img = game.assetter.asset("man.png");
         break;
       case "GOOD":
         self.type = type;
-        self.dollarPer = 0.15;
-        self.energyPer = 3.0;
+        self.dollarsPer = 15;
+        self.energyPer = 0.2; // 1/3-1/30 less energy (1/15)
         self.light = 0.35;
-        self.energy = 100.0;
+        self.maxEnergy = 1500.0; //lasts 50x longer
+        self.energy = self.maxEnergy;
+        self.img = game.assetter.asset("man.png");
+        break;
+      case "BURNT_BAD":
+        self.type = type;
+        self.dollarsPer = 0.0;
+        self.energyPer = 0.0;
+        self.light = 0.0;
+        self.maxEnergy = 0;
+        self.energy = self.maxEnergy;
         self.img = game.assetter.asset("man.png");
         break;
       case "BURNT_GOOD":
         self.type = type;
-        self.dollarPer = 0.0;
+        self.dollarsPer = 0.0;
         self.energyPer = 0.0;
         self.light = 0.0;
-        self.energy = 100.0;
+        self.maxEnergy = 0;
+        self.energy = self.maxEnergy;
         self.img = game.assetter.asset("man.png");
         break;
       case "CHANGING":
         self.type = type;
-        self.dollarPer = 0.0;
+        self.dollarsPer = 0.0;
         self.energyPer = 0.0;
         self.light = 0.0;
-        self.energy = 100.0;
+        self.maxEnergy = 0;
+        self.energy = self.maxEnergy;
         self.img = game.assetter.asset("man.png");
         break;
       case "NONE":
       default:
         self.type = type;
-        self.dollarPer = 0.0;
+        self.dollarsPer = 0.0;
         self.energyPer = 0.0;
         self.light = 0.0;
-        self.energy = 100.0;
+        self.maxEnergy = 0;
+        self.energy = self.maxEnergy;
         self.img = game.assetter.asset("man.png");
         break;
     }
+    game.bulbChanged(self);
   }
 
   self.click = function()
@@ -317,7 +362,11 @@ var BU_Bulb = function(game,node)
     {
       self.ticksTilTick = self.ticksPerTick;
       self.energy -= self.energyPer;
-      if(self.energy <= 0) self.setType("BURNT_"+self.type);
+      if(self.energy > 0)
+      {
+        game.purchaseEnergy(self);
+      }
+      else if(self.maxEnergy > 0) self.setType("BURNT_"+self.type);
     }
   }
 
@@ -334,6 +383,42 @@ var BU_Bulb = function(game,node)
       case "BURNT_BAD":  canv.context.strokeStyle = "#550000"; break;
     }
     canv.context.strokeRect(self.x,self.y,self.w,self.h);
+
+    if(self.type == "GOOD" || self.type == "BAD")
+    {
+      canv.context.fillStyle = "#00FF00";
+      canv.context.fillRect(self.x,self.y+((1-(self.energy/self.maxEnergy))*self.h),10,(self.energy/self.maxEnergy)*self.h);
+    }
   }
 }
+
+var BU_PriceParticle = function(x,y,text,size,color,delay)
+{
+  var self = this;
+  self.x = x;
+  self.sy = y;
+  self.y = y;
+  self.ey = y-50;
+  self.t = -delay;
+  self.text = text;
+  self.size = size;
+  self.c = color;
+  self.tick = function()
+  {
+    self.t += 0.01;
+    self.y = self.y+(self.ey-self.y)/50;
+    return self.t < 1;
+  }
+  self.draw = function(canv)
+  {
+    if(self.t < 0) return;
+    canv.context.globalAlpha = 1-(self.t*self.t*self.t);
+    canv.context.font = self.size+"px Georgia";
+    canv.context.fillStyle = self.c;
+    canv.context.fillText(self.text,self.x-25,self.y);
+    canv.context.globalAlpha = 1.0;
+  }
+}
+
+
 
