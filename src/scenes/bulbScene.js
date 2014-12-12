@@ -91,8 +91,8 @@ var BulbScene = function(game, stage)
     self.drawer.flush();
     self.stage.drawCanv.context.font = "30px Georgia";
     self.stage.drawCanv.context.fillStyle = "#000000";
-    self.stage.drawCanv.context.fillText("You spent:$"+ispent,25,25);
-    self.stage.drawCanv.context.fillText("They spent:$"+theyspent,400,25);
+    self.stage.drawCanv.context.fillText("You spent:$"+Math.round(ispent*100)/100,25,25);
+    self.stage.drawCanv.context.fillText("They spent:$"+Math.round(theyspent*100)/100,300,25);
   };
 
   self.cleanup = function()
