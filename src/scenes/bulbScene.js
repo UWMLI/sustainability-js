@@ -97,6 +97,7 @@ var BulbScene = function(game, stage)
   {
     var x = Math.floor((pix_x-self.house_x)/(self.house_w/(self.bulbsPerFloor+1)));
     var y = Math.floor((pix_y-self.house_y)/(self.house_h/self.numFloors));
+    if(x > self.bulbsPerFloor) x = self.bulbsPerFloor;
     return self.node(x,y);
   }
   self.bulb = function(x,y)
@@ -172,7 +173,7 @@ var BU_Dude = function(game, floor, bulb)
     {
       if(self.floor != self.goalNode.n_y) //not on goal floor
       {
-        if(self.less(self.x-(self.w/2), game.node(game.bulbsPerFloor,self.floor).x)) self.x++; //left of elevator
+        if(self.less(self.x+(self.w/2), game.node(game.bulbsPerFloor,self.floor).x)) self.x++; //left of elevator
         else { self.floor = self.goalNode.n_y; self.y = self.goalNode.y-(self.h/2); } //at elevator
       }
       else //on goal floor
