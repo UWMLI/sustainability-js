@@ -1,6 +1,7 @@
 var SweaterScene = function(game, stage)
 {
   var self = this;
+  self.stage = stage;
 
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
@@ -9,6 +10,7 @@ var SweaterScene = function(game, stage)
   self.drawer;
   self.assetter;
 
+  self.house;
   self.player;
   self.buttons;
   self.enemies;
@@ -26,6 +28,7 @@ var SweaterScene = function(game, stage)
     self.drawer = new Drawer({source:stage.drawCanv});
     self.assetter = new Assetter({});
 
+    self.house = new SW_House(self);
     self.player = new SW_Player(self);
     self.buttons = [];
     self.enemies = [];
@@ -34,11 +37,12 @@ var SweaterScene = function(game, stage)
     self.enemyFactory = new SW_EnemyFactory(self);
     self.sweaterFactory = new SW_SweaterFactory(self);
 
-    self.buttons.push(new Clickable({"x":0,"y":100,"w":100,"h":100,"click":function(){self.player.setFloor(4);}}));
-    self.buttons.push(new Clickable({"x":0,"y":200,"w":100,"h":100,"click":function(){self.player.setFloor(3);}}));
-    self.buttons.push(new Clickable({"x":0,"y":300,"w":100,"h":100,"click":function(){self.player.setFloor(2);}}));
-    self.buttons.push(new Clickable({"x":0,"y":400,"w":100,"h":100,"click":function(){self.player.setFloor(1);}}));
-    self.buttons.push(new Clickable({"x":0,"y":500,"w":100,"h":100,"click":function(){self.player.setFloor(0);}}));
+    //verbose, I know
+    self.buttons.push(new Clickable({"x":self.house.x,"y":self.house.y+(self.house.h/self.numFloors)*0,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(4);}}));
+    self.buttons.push(new Clickable({"x":self.house.x,"y":self.house.y+(self.house.h/self.numFloors)*1,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(3);}}));
+    self.buttons.push(new Clickable({"x":self.house.x,"y":self.house.y+(self.house.h/self.numFloors)*2,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(2);}}));
+    self.buttons.push(new Clickable({"x":self.house.x,"y":self.house.y+(self.house.h/self.numFloors)*3,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(1);}}));
+    self.buttons.push(new Clickable({"x":self.house.x,"y":self.house.y+(self.house.h/self.numFloors)*4,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(0);}}));
     for(var i = 0; i < self.buttons.length; i++)
     {
       self.clicker.register(self.buttons[i]);
@@ -67,6 +71,15 @@ var SweaterScene = function(game, stage)
   };
 };
 
+var SW_House = function(game)
+{
+  var self = this;
+  self.x = 50;
+  self.y = 50;
+  self.w = game.stage.drawCanv.canvas.width;
+  self.h = game.stage.drawCanv.canvas.height-200;
+}
+
 var SW_Player = function(game)
 {
   var self = this;
@@ -75,8 +88,8 @@ var SW_Player = function(game)
 
   self.setFloor = function(floor)
   {
-    if(floor == self.floor) game.sweaterFactory.produce();
     self.floor = floor;
+    game.sweaterFactory.produce();
   }
 
   self.tick = function()
@@ -86,7 +99,7 @@ var SW_Player = function(game)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,10,(game.numFloors-self.floor)*100);
+    canv.context.drawImage(self.img,game.house.x,game.house.y+(game.house.h/game.numFloors)*((game.numFloors-1)-self.floor));
   }
 }
 
@@ -98,7 +111,6 @@ var SW_EnemyFactory = function(game)
   {
     if(Math.random() < 0.01)
     {
-      
       var e = new SW_Enemy(game,Math.floor(Math.random()*game.numFloors));
       game.enemies.push(e);
       game.ticker.register(e);
@@ -113,15 +125,17 @@ var SW_Enemy = function(game, floor)
 
   self.floor = floor;
   self.x = 1000;
-  self.y = (game.numFloors-self.floor)*100;
+  self.y = game.house.y+(game.house.h/game.numFloors)*((game.numFloors-1)-self.floor);
   self.w = 50;
   self.h = 50;
+
+  self.speed = 8;
 
   self.img = game.assetter.asset("man.png");
 
   self.tick = function()
   {
-    self.x--;
+    self.x -= self.speed;
     if(self.x < -20) self.kill();
   }
 
@@ -157,16 +171,18 @@ var SW_Sweater = function(game, floor)
   var self = this;
 
   self.floor = floor;
-  self.x = 0;
-  self.y = (game.numFloors-self.floor)*100;
+  self.x = 90;
+  self.y = game.house.y+(game.house.h/game.numFloors)*((game.numFloors-1)-self.floor)+20;
   self.w = 50;
   self.h = 50;
+
+  self.speed = 8;
 
   self.img = game.assetter.asset("man.png");
 
   self.tick = function()
   {
-    self.x++;
+    self.x += self.speed;
     if(self.x > 1000) self.kill();
 
     //collision resolution. could/should go in a collision handler. #umad
