@@ -546,7 +546,7 @@ var BU_Bulb = function(game,node)
         self.dollarsPer = 15;
         self.energyPer = 0.2; // 1/3-1/30 less energy (1/15)
         self.light = 0.35;
-        self.maxEnergy = 1500.0; //lasts 50x longer
+        self.maxEnergy = 300.0; //lasts ~50x longer
         self.energy = self.maxEnergy;
         self.img = game.assetter.asset("man.png");
         break;
