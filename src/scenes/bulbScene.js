@@ -106,17 +106,24 @@ var BulbScene = function(game, stage)
         self.janitors[i].goalNode = self.bestGoalFromNode(self.nodeNearest(self.janitors[i].x+(self.janitors[i].w/2),self.janitors[i].y+(self.janitors[i].h/2)));
     }
 
-    self.theySpendGraph.register(ispent);
-    self.iSpendGraph.register(theyspent);
-    self.iEmitGraph.register(iemit);
-    self.theyEmitGraph.register(theyemit);
+    ilights = 0;
+    theylights = 0;
+    for(var i = 0; i < self.bulbs.length; i++)
+    {
+      if(self.bulbs[i].type == "GOOD") ilights++;
+      else if(self.bulbs[i].type == "BAD") theylights++;
+    }
+    self.iSpendGraph.register(ispent);
+    self.theySpendGraph.register(theyspent);
+    self.iEmitGraph.register(ilights/self.bulbs.length);
+    self.theyEmitGraph.register(theylights/self.bulbs.length);
     self.iEfficiencyGraph.register(ispent/iemit);
     self.theyEfficiencyGraph.register(theyspent/theyemit);
 
     if(self.theySpendGraph.high > self.iSpendGraph.high) self.iSpendGraph.high = self.theySpendGraph.high;
     else                                                 self.theySpendGraph.high = self.iSpendGraph.high;
-    if(self.theyEmitGraph.high > self.iEmitGraph.high) self.iEmitGraph.high = self.theyEmitGraph.high;
-    else                                               self.theyEmitGraph.high = self.iEmitGraph.high;
+    self.iEmitGraph.high = 1.0;
+    self.theyEmitGraph.high = 1.0;
     if(self.theyEfficiencyGraph.high > self.iEfficiencyGraph.high) self.iEfficiencyGraph.high = self.theyEfficiencyGraph.high;
     else                                                           self.theyEfficiencyGraph.high = self.iEfficiencyGraph.high;
   };
@@ -125,6 +132,8 @@ var BulbScene = function(game, stage)
   var theyspent = 0;
   var iemit = 0;
   var theyemit = 0;
+  var ilights = 0;
+  var theylights = 0;
   self.trunc = function(v,t)
   {
     return Math.round(v*t)/t;
@@ -134,12 +143,23 @@ var BulbScene = function(game, stage)
     self.drawer.flush();
     self.stage.drawCanv.context.font = "30px Georgia";
     self.stage.drawCanv.context.fillStyle = "#000000";
-    self.stage.drawCanv.context.fillText("You spent:$"+self.trunc(ispent,100),25,25);
-    self.stage.drawCanv.context.fillText("They spent:$"+self.trunc(theyspent,100),300,25);
-    self.stage.drawCanv.context.fillText("You emit:"+self.trunc(iemit/1000,1000)+" lumens",25,55);
-    self.stage.drawCanv.context.fillText("They emit:"+self.trunc(theyemit/1000,1000)+" lumens",300,55);
-    self.stage.drawCanv.context.fillText("Efficiency:"+self.trunc(ispent/iemit,100)+" $/l",25,85);
-    self.stage.drawCanv.context.fillText("Efficiency:"+self.trunc(theyspent/theyemit,100)+" $/l",300,85);
+    self.stage.drawCanv.context.fillText("Spending:",                  100,50);
+    self.stage.drawCanv.context.fillStyle = "#00FF00";
+    self.stage.drawCanv.context.fillText("$"+self.trunc(ispent,100),   250,50);
+    self.stage.drawCanv.context.fillStyle = "#FF0000";
+    self.stage.drawCanv.context.fillText("$"+self.trunc(theyspent,100),400,50);
+    self.stage.drawCanv.context.fillStyle = "#000000";
+    self.stage.drawCanv.context.fillText("Light:",                                100,90);
+    self.stage.drawCanv.context.fillStyle = "#00FF00";
+    self.stage.drawCanv.context.fillText(self.trunc((ilights/self.bulbs.length)*100,100)+"%",   250,90);
+    self.stage.drawCanv.context.fillStyle = "#FF0000";
+    self.stage.drawCanv.context.fillText(self.trunc((theylights/self.bulbs.length)*100,100)+"%",400,90);
+    self.stage.drawCanv.context.fillStyle = "#000000";
+    self.stage.drawCanv.context.fillText("Efficiency:",                            100,130);
+    self.stage.drawCanv.context.fillStyle = "#00FF00";
+    self.stage.drawCanv.context.fillText(self.trunc(ispent/iemit,100)+" $/l",      250,130);
+    self.stage.drawCanv.context.fillStyle = "#FF0000";
+    self.stage.drawCanv.context.fillText(self.trunc(theyspent/theyemit,100)+" $/l",400,130);
   };
 
   self.setDrawMode = function(mode)
@@ -290,8 +310,8 @@ var BU_House = function(game)
 {
   var self = this;
   self.x = 100;
-  self.y = 100;
-  self.h = game.stage.drawCanv.canvas.height-300;
+  self.y = 150;
+  self.h = game.stage.drawCanv.canvas.height-350;
   self.w = game.stage.drawCanv.canvas.width-200;
   self.x_padding = 50;
   self.y_padding = 50;
