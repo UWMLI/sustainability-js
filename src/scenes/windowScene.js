@@ -286,5 +286,6 @@ var WI_Window = function(game, room, floor)
   {
     self.state = (self.state+1)%states.length;
   }
+  self.unpress = function() {}
 }
 

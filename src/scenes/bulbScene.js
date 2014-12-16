@@ -9,15 +9,21 @@ var BulbScene = function(game, stage)
   var self = this;
   self.stage = stage;
 
+  self.drawMode = "MAIN";
+
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.ticker;
   self.clicker;
+  self.presser;
   self.drawer;
   self.assetter;
   self.particler;
 
   self.house;
+  self.spentButton;
+  self.litButton;
+  self.efficiencyButton;
   self.nodes;
   self.player;
   self.bulbs;
@@ -37,11 +43,15 @@ var BulbScene = function(game, stage)
   {
     self.ticker = new Ticker({});
     self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
     self.assetter = new Assetter({});
     self.particler = new Particler({});
 
     self.house = new BU_House(self);
+    self.spentButton = new SpentButton(self);
+    self.litButton = new LitButton(self);
+    self.efficiencyButton = new EfficiencyButton(self);
     self.nodes = [];
     self.bulbs = [];
     for(var i = 0; i < self.numFloors; i++)
@@ -62,47 +72,53 @@ var BulbScene = function(game, stage)
     self.janitors.push(new BU_Dude(self, 0, "BAD"));
     self.janitors.push(new BU_Dude(self, self.numFloors-1, "BAD"));
 
-    self.theySpendGraph      = new BU_CircGraph(20,20,500,500,"#FF0000",self);
-    self.iSpendGraph         = new BU_CircGraph(20,20,500,500,"#00FF00",self);
-    self.iEmitGraph          = new BU_CircGraph(20,20,500,500,"#0000FF",self);
-    self.theyEmitGraph       = new BU_CircGraph(20,20,500,500,"#FFFF00",self);
-    self.iEfficiencyGraph    = new BU_CircGraph(20,20,500,500,"#00FFFF",self);
-    self.theyEfficiencyGraph = new BU_CircGraph(20,20,500,500,"#FF00FF",self);
+    self.iSpendGraph         = new BU_CircGraph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#00FF00",self);
+    self.theySpendGraph      = new BU_CircGraph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#FF0000",self);
+    self.iEmitGraph          = new BU_CircGraph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#00FF00",self);
+    self.theyEmitGraph       = new BU_CircGraph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#FF0000",self);
+    self.iEfficiencyGraph    = new BU_CircGraph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#00FF00",self);
+    self.theyEfficiencyGraph = new BU_CircGraph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#FF0000",self);
 
-    self.drawer.register(self.house);
+    self.setDrawMode("MAIN");
     for(var i = 0; i < self.bulbs.length; i++)
     {
       self.clicker.register(self.bulbs[i]);
       self.ticker.register(self.bulbs[i]);
-      self.drawer.register(self.bulbs[i]);
     }
     for(var i = 0; i < self.janitors.length; i++)
-    {
       self.ticker.register(self.janitors[i]);
-      self.drawer.register(self.janitors[i]);
-    }
     self.ticker.register(self.player);
-    self.drawer.register(self.player);
-    self.drawer.register(self.particler);
     self.ticker.register(self.particler);
 
-    self.drawer.register(self.theySpendGraph);
-    self.drawer.register(self.iSpendGraph);
-    self.drawer.register(self.iEmitGraph);
-    self.drawer.register(self.theyEmitGraph);
-    self.drawer.register(self.iEfficiencyGraph);
-    self.drawer.register(self.theyEfficiencyGraph);
+    self.presser.register(self.spentButton);
+    self.presser.register(self.litButton);
+    self.presser.register(self.efficiencyButton);
   };
 
   self.tick = function()
   {
     self.clicker.flush();
+    self.presser.flush();
     self.ticker.flush();
     for(var i = 0; i < self.janitors.length; i++)
     {
       if(self.janitors[i].state != 2)
         self.janitors[i].goalNode = self.bestGoalFromNode(self.nodeNearest(self.janitors[i].x+(self.janitors[i].w/2),self.janitors[i].y+(self.janitors[i].h/2)));
     }
+
+    self.theySpendGraph.register(ispent);
+    self.iSpendGraph.register(theyspent);
+    self.iEmitGraph.register(iemit);
+    self.theyEmitGraph.register(theyemit);
+    self.iEfficiencyGraph.register(ispent/iemit);
+    self.theyEfficiencyGraph.register(theyspent/theyemit);
+
+    if(self.theySpendGraph.high > self.iSpendGraph.high) self.iSpendGraph.high = self.theySpendGraph.high;
+    else                                                 self.theySpendGraph.high = self.iSpendGraph.high;
+    if(self.theyEmitGraph.high > self.iEmitGraph.high) self.iEmitGraph.high = self.theyEmitGraph.high;
+    else                                               self.theyEmitGraph.high = self.iEmitGraph.high;
+    if(self.theyEfficiencyGraph.high > self.iEfficiencyGraph.high) self.iEfficiencyGraph.high = self.theyEfficiencyGraph.high;
+    else                                                           self.theyEfficiencyGraph.high = self.iEfficiencyGraph.high;
   };
 
   var ispent = 0;
@@ -124,21 +140,73 @@ var BulbScene = function(game, stage)
     self.stage.drawCanv.context.fillText("They emit:"+self.trunc(theyemit/1000,1000)+" lumens",300,55);
     self.stage.drawCanv.context.fillText("Efficiency:"+self.trunc(ispent/iemit,100)+" $/l",25,85);
     self.stage.drawCanv.context.fillText("Efficiency:"+self.trunc(theyspent/theyemit,100)+" $/l",300,85);
-
-    self.theySpendGraph.register(ispent);
-    self.iSpendGraph.register(theyspent);
-    self.iEmitGraph.register(iemit);
-    self.theyEmitGraph.register(theyemit);
-    self.iEfficiencyGraph.register(ispent/iemit);
-    self.theyEfficiencyGraph.register(theyspent/theyemit);
-
-    if(self.theySpendGraph.high > self.iSpendGraph.high) self.iSpendGraph.high = self.theySpendGraph.high
-    else                                       self.theySpendGraph.high = self.iSpendGraph.high
-    if(self.theyEmitGraph.high > self.iEmitGraph.high) self.iEmitGraph.high = self.theyEmitGraph.high
-    else                                     self.theyEmitGraph.high = self.iEmitGraph.high
-    if(self.theyEfficiencyGraph.high > self.iEfficiencyGraph.high) self.iEfficiencyGraph.high = self.theyEfficiencyGraph.high
-    else                                                 self.theyEfficiencyGraph.high = self.iEfficiencyGraph.high
   };
+
+  self.setDrawMode = function(mode)
+  {
+    self.drawMode = mode;
+
+    //unregister everything
+    self.drawer.unregister(self.house);
+    for(var i = 0; i < self.bulbs.length; i++)
+      self.drawer.unregister(self.bulbs[i]);
+    for(var i = 0; i < self.janitors.length; i++)
+      self.drawer.unregister(self.janitors[i]);
+    self.drawer.unregister(self.player);
+    self.drawer.unregister(self.particler);
+    self.drawer.unregister(self.theySpendGraph);
+    self.drawer.unregister(self.iSpendGraph);
+    self.drawer.unregister(self.iEmitGraph);
+    self.drawer.unregister(self.theyEmitGraph);
+    self.drawer.unregister(self.iEfficiencyGraph);
+    self.drawer.unregister(self.theyEfficiencyGraph);
+    self.drawer.unregister(self.spentButton);
+    self.drawer.unregister(self.litButton);
+    self.drawer.unregister(self.efficiencyButton);
+
+    if(mode == "MAIN")
+    {
+      self.drawer.register(self.house);
+      for(var i = 0; i < self.bulbs.length; i++)
+        self.drawer.register(self.bulbs[i]);
+      for(var i = 0; i < self.janitors.length; i++)
+        self.drawer.register(self.janitors[i]);
+
+      self.drawer.register(self.player);
+      self.drawer.register(self.particler);
+
+      self.drawer.register(self.spentButton);
+      self.drawer.register(self.litButton);
+      self.drawer.register(self.efficiencyButton);
+    }
+    else if(mode == "SPEND")
+    {
+      self.drawer.register(self.theySpendGraph);
+      self.drawer.register(self.iSpendGraph);
+
+      self.drawer.register(self.spentButton);
+      self.drawer.register(self.litButton);
+      self.drawer.register(self.efficiencyButton);
+    }
+    else if(mode == "EMIT")
+    {
+      self.drawer.register(self.iEmitGraph);
+      self.drawer.register(self.theyEmitGraph);
+
+      self.drawer.register(self.spentButton);
+      self.drawer.register(self.litButton);
+      self.drawer.register(self.efficiencyButton);
+    }
+    else if(mode == "EFFICIENCY")
+    {
+      self.drawer.register(self.iEfficiencyGraph);
+      self.drawer.register(self.theyEfficiencyGraph);
+
+      self.drawer.register(self.spentButton);
+      self.drawer.register(self.litButton);
+      self.drawer.register(self.efficiencyButton);
+    }
+  }
 
   self.cleanup = function()
   {
@@ -223,16 +291,101 @@ var BU_House = function(game)
   var self = this;
   self.x = 100;
   self.y = 100;
-  self.h = game.stage.drawCanv.canvas.height-200;
+  self.h = game.stage.drawCanv.canvas.height-300;
   self.w = game.stage.drawCanv.canvas.width-200;
   self.x_padding = 50;
   self.y_padding = 50;
   self.draw = function(canv)
   {
+    canv.context.lineWidth = 5;
     canv.context.strokeStyle = "#00FF00";
     canv.context.strokeRect(self.x,self.y,self.w,self.h);
   }
 }
+
+var SpentButton = function(game)
+{
+  var self = this;
+  self.x = 100;
+  self.y = game.stage.drawCanv.canvas.height-150;
+  self.w = 100;
+  self.h = 100;
+
+  self.draw = function(canv)
+  {
+    canv.context.lineWidth = 5;
+    canv.context.strokeStyle = "#00FF00";
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    canv.context.fillStyle = "#00FF00";
+    canv.context.font = "20px Georgia";
+    canv.context.fillText("$",self.x-25,self.y);
+  }
+
+  self.press = function(evt)
+  {
+    game.setDrawMode("SPEND");
+  }
+  self.unpress = function(evt)
+  {
+    game.setDrawMode("MAIN");
+  }
+}
+var LitButton = function(game)
+{
+  var self = this;
+  self.x = (game.stage.drawCanv.canvas.width/2)-50;
+  self.y = game.stage.drawCanv.canvas.height-150;
+  self.w = 100;
+  self.h = 100;
+
+  self.draw = function(canv)
+  {
+    canv.context.lineWidth = 5;
+    canv.context.strokeStyle = "#00FF00";
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    canv.context.fillStyle = "#00FF00";
+    canv.context.font = "20px Georgia";
+    canv.context.fillText("^",self.x-25,self.y);
+  }
+
+  self.press = function(evt)
+  {
+    game.setDrawMode("EMIT");
+  }
+  self.unpress = function(evt)
+  {
+    game.setDrawMode("MAIN");
+  }
+}
+var EfficiencyButton = function(game)
+{
+  var self = this;
+  self.x = game.stage.drawCanv.canvas.width-200;
+  self.y = game.stage.drawCanv.canvas.height-150;
+  self.w = 100;
+  self.h = 100;
+
+  self.draw = function(canv)
+  {
+    canv.context.lineWidth = 5;
+    canv.context.fillStyle = "#00FF00";
+    canv.context.strokeStyle = "#00FF00";
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    canv.context.font = "20px Georgia";
+    canv.context.fillText("%",self.x-25,self.y);
+  }
+
+  self.press = function(evt)
+  {
+    game.setDrawMode("EFFICIENCY");
+  }
+  self.unpress = function(evt)
+  {
+    game.setDrawMode("MAIN");
+  }
+}
+
+
 
 //standardize grid positions
 var BU_Node = function(game,x,y)
@@ -306,7 +459,9 @@ var BU_Dude = function(game, floor, bulb)
   self.draw = function(canv)
   {
     canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
-    canv.context.strokeStyle = "#00FF00";
+    canv.context.lineWidth = 5;
+    if(bulb == "GOOD") canv.context.strokeStyle = "#00FF00";
+    else               canv.context.strokeStyle = "#FF0000";
     canv.context.strokeRect(self.x,self.y,self.w,self.h);
     if(self.state == 2) //changing
     {
@@ -433,6 +588,7 @@ var BU_Bulb = function(game,node)
   self.draw = function(canv)
   {
     canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+    canv.context.lineWidth = 5;
     switch(self.type)
     {
       case "NONE":       canv.context.strokeStyle = "#FFFFFF"; break;
@@ -514,8 +670,8 @@ var BU_Graph = function(x,y,w,h,color,game)
   self.draw = function(canv)
   {
     if(totalPts == 0) return;
-    canv.context.strokeStyle = self.color;
     canv.context.lineWidth = 5;
+    canv.context.strokeStyle = self.color;
     canv.context.fillRect(self.x,self.y+20,((self.maxChangeTimer-self.changeTimer)/self.maxChangeTimer)*self.w,10);
     canv.context.beginPath();
     canv.context.moveTo(self.x,self.y+self.h);
@@ -555,6 +711,10 @@ var BU_CircGraph = function(x,y,w,h,color,game)
     if(pt > self.high) self.high = pt;
     if(pt < self.low) self.low = pt;
 
+    self.high = pts[0];
+    for(var i = 1; i < nPts; i++)
+      if(pts[i] > self.high) self.high = pts[i];
+
     if(nPts < 1000)
     {
       pts.push(pt);
@@ -562,10 +722,6 @@ var BU_CircGraph = function(x,y,w,h,color,game)
     }
     else
     {
-      self.high = pts[0];
-      for(var i = 1; i < 100; i++)
-        if(pts[i] > self.high) self.high = pts[i];
-
       pts[start] = pt;
       start = (start+1)%nPts;
     }
@@ -574,8 +730,8 @@ var BU_CircGraph = function(x,y,w,h,color,game)
   self.draw = function(canv)
   {
     if(nPts == 0) return;
-    canv.context.strokeStyle = self.color;
     canv.context.lineWidth = 5;
+    canv.context.strokeStyle = self.color;
     canv.context.fillRect(self.x,self.y+20,((self.maxChangeTimer-self.changeTimer)/self.maxChangeTimer)*self.w,10);
     canv.context.beginPath();
     canv.context.moveTo(self.x,self.y+self.h);
@@ -583,6 +739,8 @@ var BU_CircGraph = function(x,y,w,h,color,game)
     for(var i = 0; i < nPts; i++)
       canv.context.lineTo(self.x+(i/nPts)*self.w, self.y+self.h-((pts[(start+i)%1000]-self.low)/(self.high-self.low))*self.h);
     canv.context.stroke();
+    canv.context.strokeStyle = "#000000";
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
     canv.context.closePath();
   }
 }

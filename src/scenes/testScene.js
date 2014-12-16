@@ -101,6 +101,7 @@ var TestScene = function(game, stage)
     w:20,
     h:20,
     press:function(evt){dbugger.log("presstest:"+evt.doX+","+evt.doY);},
+    unpress:function(evt){dbugger.log("unpresstest:"+evt.doX+","+evt.doY);},
     draw:function(canv){canv.context.strokeStyle="#00FF00";canv.context.strokeRect(this.x,this.y,this.w,this.h);}
   };
   spacer.space_v(presstest);
