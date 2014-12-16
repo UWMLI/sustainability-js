@@ -62,14 +62,12 @@ var BulbScene = function(game, stage)
     self.janitors.push(new BU_Dude(self, 0, "BAD"));
     self.janitors.push(new BU_Dude(self, self.numFloors-1, "BAD"));
 
-    self.graph = new BU_Graph(20,20,500,500,self);
-
-    self.theySpendGraph = new BU_Graph(20,20,500,500,self);
-    self.iSpendGraph = new BU_Graph(20,20,500,500,self);
-    self.iEmitGraph = new BU_Graph(20,20,500,500,self);
-    self.theyEmitGraph = new BU_Graph(20,20,500,500,self);
-    self.iEfficiencyGraph = new BU_Graph(20,20,500,500,self);
-    self.theyEfficiencyGraph = new BU_Graph(20,20,500,500,self);
+    self.theySpendGraph      = new BU_CircGraph(20,20,500,500,"#FF0000",self);
+    self.iSpendGraph         = new BU_CircGraph(20,20,500,500,"#00FF00",self);
+    self.iEmitGraph          = new BU_CircGraph(20,20,500,500,"#0000FF",self);
+    self.theyEmitGraph       = new BU_CircGraph(20,20,500,500,"#FFFF00",self);
+    self.iEfficiencyGraph    = new BU_CircGraph(20,20,500,500,"#00FFFF",self);
+    self.theyEfficiencyGraph = new BU_CircGraph(20,20,500,500,"#FF00FF",self);
 
     self.drawer.register(self.house);
     for(var i = 0; i < self.bulbs.length; i++)
@@ -133,6 +131,13 @@ var BulbScene = function(game, stage)
     self.theyEmitGraph.register(theyemit);
     self.iEfficiencyGraph.register(ispent/iemit);
     self.theyEfficiencyGraph.register(theyspent/theyemit);
+
+    if(self.theySpendGraph.high > self.iSpendGraph.high) self.iSpendGraph.high = self.theySpendGraph.high
+    else                                       self.theySpendGraph.high = self.iSpendGraph.high
+    if(self.theyEmitGraph.high > self.iEmitGraph.high) self.iEmitGraph.high = self.theyEmitGraph.high
+    else                                     self.theyEmitGraph.high = self.iEmitGraph.high
+    if(self.theyEfficiencyGraph.high > self.iEfficiencyGraph.high) self.iEfficiencyGraph.high = self.theyEfficiencyGraph.high
+    else                                                 self.theyEfficiencyGraph.high = self.iEfficiencyGraph.high
   };
 
   self.cleanup = function()
@@ -475,7 +480,7 @@ var BU_PriceParticle = function(x,y,text,size,color,delay)
   }
 }
 
-var BU_Graph = function(x,y,w,h,game)
+var BU_Graph = function(x,y,w,h,color,game)
 {
   var self = this;
 
@@ -483,26 +488,100 @@ var BU_Graph = function(x,y,w,h,game)
   self.y = y;
   self.w = w;
   self.h = h;
+  self.color = color;
 
   var pts = [];
-  var high = 1.0;
-  var low = 1.0;
+  var ptLens = [];
+  var totalPts = 0;
+  self.high = 1.0;
+  self.low = 1.0;
+
   self.register = function(pt)
   {
-    if(pt > high) high = pt;
-    if(pt < low) low = pt;
-    pts.push(pt);
+    if(isNaN(pt) || !isFinite(pt)) pt = 0;
+    if(pt > self.high) self.high = pt;
+    if(pt < self.low) self.low = pt;
+
+    if(pt == pts[pts.length-1]) ptLens[ptLens.length-1]++;
+    else
+    {
+      pts.push(pt);
+      ptLens.push(1);
+    }
+    totalPts++;
   }
 
   self.draw = function(canv)
   {
-    if(pts.length == 0) return;
+    if(totalPts == 0) return;
+    canv.context.strokeStyle = self.color;
     canv.context.lineWidth = 5;
     canv.context.fillRect(self.x,self.y+20,((self.maxChangeTimer-self.changeTimer)/self.maxChangeTimer)*self.w,10);
     canv.context.beginPath();
     canv.context.moveTo(self.x,self.y+self.h);
-    for(var i = 0; i < pts.length; i++)
-      canv.context.lineTo(self.x+(i/pts.length)*self.w, self.y+self.h-((pts[i]-low)/(high-low))*self.h);
+    var ptsIn = 0;
+    for(var i = 0; i < totalPts; i++)
+    {
+      canv.context.lineTo(self.x+(ptsIn/totalPts)*self.w, self.y+self.h-((pts[i]-self.low)/(self.high-self.low))*self.h);
+      ptsIn += ptLens[i]-1;
+      if(ptLens[i] > 1) canv.context.lineTo(self.x+(ptsIn/totalPts)*self.w, self.y+self.h-((pts[i]-self.low)/(self.high-self.low))*self.h);
+      ptsIn++;
+    }
+    canv.context.stroke();
+    canv.context.closePath();
+  }
+}
+
+var BU_CircGraph = function(x,y,w,h,color,game)
+{
+  var self = this;
+
+  self.x = x;
+  self.y = y;
+  self.w = w;
+  self.h = h;
+  self.color = color;
+
+  var pts = [];
+  var nPts = 0;
+  var start = 0;
+  self.high = 1.0;
+  self.low = 1.0;
+
+  self.register = function(pt)
+  {
+    if(isNaN(pt) || !isFinite(pt)) pt = 0;
+
+    if(pt > self.high) self.high = pt;
+    if(pt < self.low) self.low = pt;
+
+    if(nPts < 1000)
+    {
+      pts.push(pt);
+      nPts++;
+    }
+    else
+    {
+      self.high = pts[0];
+      for(var i = 1; i < 100; i++)
+        if(pts[i] > self.high) self.high = pts[i];
+
+      pts[start] = pt;
+      start = (start+1)%nPts;
+    }
+  }
+
+  self.draw = function(canv)
+  {
+    if(nPts == 0) return;
+    canv.context.strokeStyle = self.color;
+    canv.context.lineWidth = 5;
+    canv.context.fillRect(self.x,self.y+20,((self.maxChangeTimer-self.changeTimer)/self.maxChangeTimer)*self.w,10);
+    canv.context.beginPath();
+    canv.context.moveTo(self.x,self.y+self.h);
+    var ptsIn = 0;
+    for(var i = 0; i < nPts; i++)
+      canv.context.lineTo(self.x+(i/nPts)*self.w, self.y+self.h-((pts[(start+i)%1000]-self.low)/(self.high-self.low))*self.h);
     canv.context.stroke();
     canv.context.closePath();
   }
