@@ -13,6 +13,8 @@ var BarrelScene = function(game, stage)
   self.particler;
   self.assetter;
 
+  self.mapView;
+
   self.rain;  self.num_rain;
   self.barrels;
   self.map;
@@ -29,6 +31,8 @@ var BarrelScene = function(game, stage)
     self.particler = new Particler({});
     self.assetter = new Assetter({});
 
+    self.mapView = new RB_MapView(self);
+
     self.barrelsFound = 0;
 
     //pre-fill out arrays
@@ -39,8 +43,8 @@ var BarrelScene = function(game, stage)
 
     self.barrels = [];
     var bar = new RB_Barrel(self,0,0); //BS variable because js doesn't have static props
-    var randx = function(){ return Math.random()*((self.stage.drawCanv.canvas.width*2)-bar.w); }
-    var randy = function(){ return Math.random()*((self.stage.drawCanv.canvas.height*2)-bar.h); }
+    var randx = function(){ return Math.random()*((self.mapView.w*2)+self.mapView.x-bar.w); }
+    var randy = function(){ return Math.random()*((self.mapView.h*2)+self.mapView.y-bar.h); }
     for(var i = 0; i < 50; i++)
       self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
     self.map = new RB_Map(self);
@@ -54,30 +58,29 @@ var BarrelScene = function(game, stage)
 
     self.drawer.register(self.particler);
     self.ticker.register(self.particler);
+
+    self.drawer.register(self.mapView); //strategically must place after map, before overlays
   };
 
   self.tick = function()
   {
-    self.clicker.flush();
-    self.dragger.flush();
-    self.ticker.flush();
     if(!stopGen)
     {
       for(var i = 0; i < 20; i++)
       {
         self.rain[self.num_rain].refresh();
+        self.particler.register(self.rain[self.num_rain]);
         self.num_rain++;
       }
     }
-    for(var i = 0; i < self.num_rain; i++)
-      self.rain[i].tick();
+    self.clicker.flush();
+    self.dragger.flush();
+    self.ticker.flush();
   };
 
   self.draw = function()
   {
     self.drawer.flush();
-    for(var i = 0; i < self.num_rain; i++)
-      self.rain[i].draw(stage.drawCanv);
 
     stage.drawCanv.context.font = "30px Georgia";
     stage.drawCanv.context.fillStyle = "#000000";
@@ -100,6 +103,26 @@ var BarrelScene = function(game, stage)
   }
 };
 
+var RB_MapView = function(game)
+{
+  var self = this;
+  self.x = 50;
+  self.y = 50;
+  self.w = game.stage.drawCanv.canvas.width-100;
+  self.h = game.stage.drawCanv.canvas.height-400;
+
+  self.draw = function(canv)
+  {
+    canv.context.fillStyle = "#FFFFFF";
+    canv.context.fillRect(0,0,game.stage.drawCanv.canvas.width,self.y);
+    canv.context.fillRect(0,0,self.x,game.stage.drawCanv.canvas.height);
+    canv.context.fillRect(0,self.y+self.h,game.stage.drawCanv.canvas.width,(game.stage.drawCanv.canvas.height-self.h)-self.y);
+    canv.context.fillRect(self.x+self.w,0,(game.stage.drawCanv.canvas.width-self.w)-self.x,game.stage.drawCanv.canvas.height);
+    canv.context.strokeStyle = "#000000";
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+  }
+}
+
 var RB_Map = function(game)
 {
   var self = this;
@@ -112,8 +135,8 @@ var RB_Map = function(game)
   self.deltaY = 0;
   self.x = 0;
   self.y = 0;
-  self.w = game.stage.drawCanv.canvas.width*2;
-  self.h = game.stage.drawCanv.canvas.height*2;
+  self.w = game.mapView.w*2;
+  self.h = game.mapView.h*2;
 
   self.tick = function()
   {
@@ -129,10 +152,10 @@ var RB_Map = function(game)
   {
     self.deltaX = (evt.doX-(self.w/2)+self.offX)-self.x;
     self.deltaY = (evt.doY-(self.h/2)+self.offY)-self.y;
-    if(self.x + self.deltaX > 0) self.deltaX = 0-self.x;
-    if(self.x + self.deltaX < 0-(self.w-game.stage.drawCanv.canvas.width)) self.deltaX = -(self.w-game.stage.drawCanv.canvas.width)-self.x;
-    if(self.y + self.deltaY > 0) self.deltaY = 0-self.y;
-    if(self.y + self.deltaY < 0-(self.h-game.stage.drawCanv.canvas.height)) self.deltaY = -(self.h-game.stage.drawCanv.canvas.height)-self.y;
+    if(self.x + self.deltaX > game.mapView.x)                         self.deltaX = game.mapView.x-self.x;
+    if(self.x + self.deltaX < game.mapView.x-(self.w-game.mapView.w)) self.deltaX = game.mapView.x-(self.w-game.mapView.w)-self.x;
+    if(self.y + self.deltaY > game.mapView.y)                         self.deltaY = game.mapView.y-self.y;
+    if(self.y + self.deltaY < game.mapView.y-(self.h-game.mapView.h)) self.deltaY = game.mapView.y-(self.h-game.mapView.h)-self.y;
     self.x += self.deltaX;
     self.y += self.deltaY;
     for(var i = 0; i < game.barrels.length; i++)
@@ -166,12 +189,8 @@ var RB_Rain = function(game)
   {
     self.dx = 2;
     self.dy = 10;
-    self.x = (Math.random()*
-      (game.stage.drawCanv.canvas.height+
-      (self.dx/self.dy)*
-      game.stage.drawCanv.canvas.height))-((self.dx/self.dy)*
-      game.stage.drawCanv.canvas.height);
-    self.y = -10+Math.random();
+    self.x = (Math.random()*game.mapView.w)+game.mapView.x;
+    self.y = game.mapView.y-10+Math.random();
     self.r = (Math.random()/2)+1;
     self.dx *= self.r;
     self.dy *= self.r;
@@ -183,11 +202,13 @@ var RB_Rain = function(game)
     self.x += self.dx;
     self.y += self.dy;
 
-    if(self.y > game.stage.drawCanv.canvas.height) game.rainFull(self);
-    while(self.x < 0) self.x += game.stage.drawCanv.canvas.height;
-    while(self.x > game.stage.drawCanv.canvas.height) self.x -= game.stage.drawCanv.canvas.height;
-    while(self.y < 0) self.y += game.stage.drawCanv.canvas.height;
-    while(self.y > game.stage.drawCanv.canvas.height) self.y -= game.stage.drawCanv.canvas.height;
+    if(self.y > game.mapView.y+game.mapView.h) game.rainFull(self);
+    while(self.x < game.mapView.x)                     self.x += game.mapView.w;
+    while(self.x > game.mapView.x+game.mapView.w)  self.x -= game.mapView.w;
+    while(self.y < game.mapView.y)                     self.y += game.mapView.h;
+    while(self.y > game.mapView.y+game.mapView.h) self.y -= game.mapView.h;
+
+    return true; //never expire (just auto-loop)
   }
 
   self.draw = function(canv)
@@ -231,35 +252,35 @@ var RB_Barrel = function(game, args)
   {
     canv.context.lineWidth = 5;
     canv.context.strokeStyle = "#FF0000";
-    if(!self.placed && self.x < 0-self.w)
+    if(!self.placed && self.x < game.mapView.x-self.w)
     {
       canv.context.beginPath();
-      canv.context.moveTo(10,self.y);
-      canv.context.lineTo(20,self.y);
+      canv.context.moveTo(game.mapView.x+10,self.y);
+      canv.context.lineTo(game.mapView.x+20,self.y);
       canv.context.stroke();
       canv.context.closePath();
     }
-    else if(!self.placed && self.x > game.stage.drawCanv.canvas.width)
+    else if(!self.placed && self.x > game.mapView.x+game.mapView.w)
     {
       canv.context.beginPath();
-      canv.context.moveTo(game.stage.drawCanv.canvas.width-10,self.y);
-      canv.context.lineTo(game.stage.drawCanv.canvas.width-20,self.y);
+      canv.context.moveTo(game.mapView.x+game.mapView.w-10,self.y);
+      canv.context.lineTo(game.mapView.x+game.mapView.w-20,self.y);
       canv.context.stroke();
       canv.context.closePath();
     }
-    else if(!self.placed && self.y < 0-self.h)
+    else if(!self.placed && self.y < game.mapView.y-self.h)
     {
       canv.context.beginPath();
-      canv.context.moveTo(self.x,10);
-      canv.context.lineTo(self.x,20);
+      canv.context.moveTo(self.x,game.mapView.y+10);
+      canv.context.lineTo(self.x,game.mapView.y+20);
       canv.context.stroke();
       canv.context.closePath();
     }
-    else if(!self.placed && self.y > game.stage.drawCanv.canvas.height)
+    else if(!self.placed && self.y > game.mapView.y+game.mapView.h)
     {
       canv.context.beginPath();
-      canv.context.moveTo(self.x,game.stage.drawCanv.canvas.height-10);
-      canv.context.lineTo(self.x,game.stage.drawCanv.canvas.height-20);
+      canv.context.moveTo(self.x,game.mapView.y+game.mapView.h-10);
+      canv.context.lineTo(self.x,game.mapView.y+game.mapView.h-20);
       canv.context.stroke();
       canv.context.closePath();
     }
