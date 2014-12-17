@@ -10,7 +10,7 @@ var BarrelScene = function(game, stage)
   self.clicker;
   self.dragger;
   self.drawer;
-  //self.particler;
+  self.particler;
   self.assetter;
 
   self.rain;  self.num_rain;
@@ -26,7 +26,7 @@ var BarrelScene = function(game, stage)
     self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
-    //self.particler = new Particler({});
+    self.particler = new Particler({});
     self.assetter = new Assetter({});
 
     self.barrelsFound = 0;
@@ -52,8 +52,8 @@ var BarrelScene = function(game, stage)
     self.dragger.register(self.map);
     self.drawer.register(self.map);
 
-    //self.drawer.register(self.particler);
-    //self.ticker.register(self.particler);
+    self.drawer.register(self.particler);
+    self.ticker.register(self.particler);
   };
 
   self.tick = function()
@@ -61,11 +61,13 @@ var BarrelScene = function(game, stage)
     self.clicker.flush();
     self.dragger.flush();
     self.ticker.flush();
-    for(var i = 0; i < 20; i++)
+    if(!stopGen)
     {
-      self.rain[self.num_rain].refresh();
-      //self.particler.register(self.rain[self.num_rain]);
-      self.num_rain++;
+      for(var i = 0; i < 20; i++)
+      {
+        self.rain[self.num_rain].refresh();
+        self.num_rain++;
+      }
     }
     for(var i = 0; i < self.num_rain; i++)
       self.rain[i].tick();
@@ -91,19 +93,10 @@ var BarrelScene = function(game, stage)
     self.barrelsFound++;
   }
 
-  var tmpDrop;
-  self.retireDrop = function(drop)
+  var stopGen = false;
+  self.rainFull = function(drop)
   {
-    for(var i = 0; i < self.num_rain; i++)
-    {
-      if(self.rain[i] === drop)
-      {
-        tmpDrop = self.rain[i];
-        self.rain[i] = self.rain[self.num_rain-1];
-        self.rain[self.num_rain-1] = tmpDrop;
-        self.num_rain--;
-      }
-    }
+    stopGen = true;
   }
 };
 
@@ -147,6 +140,11 @@ var RB_Map = function(game)
       game.barrels[i].x += self.deltaX;
       game.barrels[i].y += self.deltaY;
     }
+    for(var i = 0; i < game.rain.length; i++)
+    {
+      game.rain[i].x += self.deltaX;
+      game.rain[i].y += self.deltaY;
+    }
   };
   self.dragFinish = function()
   {
@@ -185,12 +183,11 @@ var RB_Rain = function(game)
     self.x += self.dx;
     self.y += self.dy;
 
-    if(self.y > game.stage.drawCanv.canvas.height)
-    {
-      game.retireDrop(self);
-      return false;
-    }
-    return true;
+    if(self.y > game.stage.drawCanv.canvas.height) game.rainFull(self);
+    while(self.x < 0) self.x += game.stage.drawCanv.canvas.height;
+    while(self.x > game.stage.drawCanv.canvas.height) self.x -= game.stage.drawCanv.canvas.height;
+    while(self.y < 0) self.y += game.stage.drawCanv.canvas.height;
+    while(self.y > game.stage.drawCanv.canvas.height) self.y -= game.stage.drawCanv.canvas.height;
   }
 
   self.draw = function(canv)
