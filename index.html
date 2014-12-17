@@ -84,13 +84,13 @@ function stackLoaded()
 
     switch(m.gameType)
     {
+      case "bike":     g.setMainScene(BikeScene);     break;
+      case "window":   g.setMainScene(WindowScene);   break;
+      case "bulb":     g.setMainScene(BulbScene);     break;
       case "sweater":  g.setMainScene(SweaterScene);  break;
       case "barrel":   g.setMainScene(BarrelScene);   break;
       case "wheel":    g.setMainScene(WheelScene);    break;
-      case "bulb":     g.setMainScene(BulbScene);     break;
-      case "window":   g.setMainScene(WindowScene);   break;
       case "pavement": g.setMainScene(PavementScene); break;
-      case "bike":     g.setMainScene(BikeScene);     break;
       default:         g.setMainScene(WindowScene);   break;
     }
     g.begin();

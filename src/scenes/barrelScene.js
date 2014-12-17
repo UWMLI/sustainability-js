@@ -25,8 +25,8 @@ var BarrelScene = function(game, stage)
     self.assetter = new Assetter({});
 
     self.barrels = [];
-    var randx = function(){ return Math.random()*self.stage.drawCanv.canvas.width; }
-    var randy = function(){ return Math.random()*self.stage.drawCanv.canvas.height; }
+    var randx = function(){ return Math.random()*self.stage.drawCanv.canvas.width*2; }
+    var randy = function(){ return Math.random()*self.stage.drawCanv.canvas.height*2; }
     self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
     self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
     self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
@@ -72,8 +72,8 @@ var RB_Map = function(game)
   self.deltaY = 0;
   self.x = 0;
   self.y = 0;
-  self.w = game.stage.drawCanv.canvas.width;
-  self.h = game.stage.drawCanv.canvas.height;
+  self.w = game.stage.drawCanv.canvas.width*2;
+  self.h = game.stage.drawCanv.canvas.height*2;
 
   self.tick = function()
   {
@@ -89,6 +89,10 @@ var RB_Map = function(game)
   {
     self.deltaX = (evt.doX-(self.w/2)+self.offX)-self.x;
     self.deltaY = (evt.doY-(self.h/2)+self.offY)-self.y;
+    if(self.x + self.deltaX > 0) self.deltaX = 0-self.x;
+    if(self.x + self.deltaX < 0-(self.w-game.stage.drawCanv.canvas.width)) self.deltaX = -(self.w-game.stage.drawCanv.canvas.width)-self.x;
+    if(self.y + self.deltaY > 0) self.deltaY = 0-self.y;
+    if(self.y + self.deltaY < 0-(self.h-game.stage.drawCanv.canvas.height)) self.deltaY = -(self.h-game.stage.drawCanv.canvas.height)-self.y;
     self.x += self.deltaX;
     self.y += self.deltaY;
     for(var i = 0; i < game.barrels.length; i++)
