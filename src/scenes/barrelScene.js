@@ -107,9 +107,9 @@ var RB_Map = function(game)
   self.dragFinish = function()
   {
   };
-
   self.draw = function(canv)
   {
+    canv.context.lineWidth = 1;
     canv.context.strokeStyle = "#00FF00";
     canv.context.strokeRect(self.x,self.y,self.w,self.h);
     //game.dbugger.log("("+self.x+","+self.y+","+self.w+","+self.h+")");
@@ -137,6 +137,7 @@ var RB_Rain = function(game)
   }
   self.draw = function(canv)
   {
+    canv.context.lineWidth = 1;
     canv.context.strokeStyle = "#0000FF";
     canv.context.beginPath();
     canv.context.moveTo(self.x,self.y);
@@ -169,10 +170,48 @@ var RB_Barrel = function(game, args)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
-    if(self.placed) canv.context.strokeStyle = "#00FF00";
-    else            canv.context.strokeStyle = "#FF0000";
-    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    canv.context.lineWidth = 5;
+    canv.context.strokeStyle = "#FF0000";
+    if(!self.placed && self.x < 0-self.w)
+    {
+      canv.context.beginPath();
+      canv.context.moveTo(10,self.y);
+      canv.context.lineTo(20,self.y);
+      canv.context.stroke();
+      canv.context.closePath();
+    }
+    else if(!self.placed && self.x > game.stage.drawCanv.canvas.width)
+    {
+      canv.context.beginPath();
+      canv.context.moveTo(game.stage.drawCanv.canvas.width-10,self.y);
+      canv.context.lineTo(game.stage.drawCanv.canvas.width-20,self.y);
+      canv.context.stroke();
+      canv.context.closePath();
+    }
+    else if(!self.placed && self.y < 0-self.h)
+    {
+      canv.context.beginPath();
+      canv.context.moveTo(self.x,10);
+      canv.context.lineTo(self.x,20);
+      canv.context.stroke();
+      canv.context.closePath();
+    }
+    else if(!self.placed && self.y > game.stage.drawCanv.canvas.height)
+    {
+      canv.context.beginPath();
+      canv.context.moveTo(self.x,game.stage.drawCanv.canvas.height-10);
+      canv.context.lineTo(self.x,game.stage.drawCanv.canvas.height-20);
+      canv.context.stroke();
+      canv.context.closePath();
+    }
+    else //in visible range
+    {
+      canv.context.lineWidth = 1;
+      canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+      if(self.placed) canv.context.strokeStyle = "#00FF00";
+      else            canv.context.strokeStyle = "#FF0000";
+      canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    }
   }
 
   self.kill = function()
