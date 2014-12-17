@@ -156,6 +156,7 @@ var RB_Barrel = function(game, args)
   self.h = 30;
 
   self.img = game.assetter.asset("man.png");
+  self.placed = false;
 
   self.tick = function()
   {
@@ -163,12 +164,15 @@ var RB_Barrel = function(game, args)
 
   self.click = function(evt)
   {
-    console.log(self);
+    self.placed = true;
   }
 
   self.draw = function(canv)
   {
     canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+    if(self.placed) canv.context.strokeStyle = "#00FF00";
+    else            canv.context.strokeStyle = "#FF0000";
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
   }
 
   self.kill = function()
