@@ -10,6 +10,7 @@ var BarrelScene = function(game, stage)
   self.clicker;
   self.dragger;
   self.drawer;
+  self.particler;
   self.assetter;
 
   self.barrels;
@@ -22,16 +23,14 @@ var BarrelScene = function(game, stage)
     self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
+    self.particler = new Particler({});
     self.assetter = new Assetter({});
 
     self.barrels = [];
     var randx = function(){ return Math.random()*self.stage.drawCanv.canvas.width*2; }
     var randy = function(){ return Math.random()*self.stage.drawCanv.canvas.height*2; }
-    self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
-    self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
-    self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
-    self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
-    self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
+    for(var i = 0; i < 50; i++)
+      self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
     self.map = new RB_Map(self);
     for(var i = 0; i < self.barrels.length; i++)
     {
@@ -41,6 +40,8 @@ var BarrelScene = function(game, stage)
     self.dragger.register(self.map);
     self.drawer.register(self.map);
 
+    self.drawer.register(self.particler);
+    self.ticker.register(self.particler);
   };
 
   self.tick = function()
@@ -48,6 +49,8 @@ var BarrelScene = function(game, stage)
     self.clicker.flush();
     self.dragger.flush();
     self.ticker.flush();
+    for(var i = 0; i < 20; i++)
+      self.particler.register(new RB_Rain(self));
   };
 
   self.draw = function()
@@ -109,7 +112,37 @@ var RB_Map = function(game)
   {
     canv.context.strokeStyle = "#00FF00";
     canv.context.strokeRect(self.x,self.y,self.w,self.h);
-    game.dbugger.log("("+self.x+","+self.y+","+self.w+","+self.h+")");
+    //game.dbugger.log("("+self.x+","+self.y+","+self.w+","+self.h+")");
+  }
+}
+
+var RB_Rain = function(game)
+{
+  var self = this;
+
+  self.dx = 2;
+  self.dy = 10;
+  self.x = (Math.random()*(game.stage.drawCanv.canvas.height+(self.dx/self.dy)*game.stage.drawCanv.canvas.height))-((self.dx/self.dy)*game.stage.drawCanv.canvas.height);
+  self.y = -10+Math.random();
+  self.r = (Math.random()/2)+1;
+  self.dx *= self.r;
+  self.dy *= self.r;
+
+  self.tick = function()
+  {
+    self.x += self.dx;
+    self.y += self.dy;
+
+    return self.y < game.stage.drawCanv.canvas.height;
+  }
+  self.draw = function(canv)
+  {
+    canv.context.strokeStyle = "#0000FF";
+    canv.context.beginPath();
+    canv.context.moveTo(self.x,self.y);
+    canv.context.lineTo(self.x+self.dx,self.y+self.dy);
+    canv.context.stroke();
+    canv.context.closePath();
   }
 }
 
