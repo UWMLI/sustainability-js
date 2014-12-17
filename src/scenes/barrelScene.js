@@ -13,6 +13,8 @@ var BarrelScene = function(game, stage)
   self.particler;
   self.assetter;
 
+  self.rain_active;  self.num_rain_active;
+  self.rain_retired; self.num_rain_retired;
   self.barrels;
   self.map;
 
@@ -25,6 +27,15 @@ var BarrelScene = function(game, stage)
     self.drawer = new Drawer({source:stage.drawCanv});
     self.particler = new Particler({});
     self.assetter = new Assetter({});
+
+    //pre-fill out arrays
+    var rains = 10000;
+    self.rain_active = [];
+    self.rain_retired = [];
+    for(var i = 0; i < rains; i++) self.rain_active[i] = new RB_Rain(self);
+    for(var i = 0; i < rains; i++) self.rain_retired[i] = self.rain_active[i];
+    self.num_rain_retired = rains;
+    self.num_rain_active = 0;
 
     self.barrels = [];
     var randx = function(){ return Math.random()*self.stage.drawCanv.canvas.width*2; }
@@ -50,7 +61,13 @@ var BarrelScene = function(game, stage)
     self.dragger.flush();
     self.ticker.flush();
     for(var i = 0; i < 20; i++)
-      self.particler.register(new RB_Rain(self));
+    {
+      self.rain_active[self.num_rain_active] = self.rain_retired[self.num_rain_retired-1];
+      self.rain_active[self.num_rain_active].refresh();
+      self.particler.register(self.rain_active[self.num_rain_active]);
+      self.num_rain_retired--;
+      self.num_rain_active++;
+    }
   };
 
   self.draw = function()
@@ -61,6 +78,19 @@ var BarrelScene = function(game, stage)
   self.cleanup = function()
   {
   };
+
+  var tmpDrop;
+  self.retireDrop = function(drop)
+  {
+    for(var i = 0; i < self.num_rain_active; i++)
+    {
+      if(self.rain_active[i] === drop)
+      {
+        self.rain_retired[self.num_rain_retired++] = drop;
+        self.rain_active[i] = self.rain_active[self.num_rain_active--];
+      }
+    }
+  }
 };
 
 var RB_Map = function(game)
@@ -128,13 +158,30 @@ var RB_Rain = function(game)
   self.dx *= self.r;
   self.dy *= self.r;
 
+  self.refresh = function()
+  {
+    self.dx = 2;
+    self.dy = 10;
+    self.x = (Math.random()*(game.stage.drawCanv.canvas.height+(self.dx/self.dy)*game.stage.drawCanv.canvas.height))-((self.dx/self.dy)*game.stage.drawCanv.canvas.height);
+    self.y = -10+Math.random();
+    self.r = (Math.random()/2)+1;
+    self.dx *= self.r;
+    self.dy *= self.r;
+  }
+
   self.tick = function()
   {
     self.x += self.dx;
     self.y += self.dy;
 
-    return self.y < game.stage.drawCanv.canvas.height;
+    if(self.y > game.stage.drawCanv.canvas.height)
+    {
+      game.retireDrop(self);
+      return false;
+    }
+    return true;
   }
+
   self.draw = function(canv)
   {
     canv.context.lineWidth = 1;
