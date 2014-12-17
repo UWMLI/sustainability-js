@@ -17,6 +17,8 @@ var BarrelScene = function(game, stage)
   self.barrels;
   self.map;
 
+  self.barrelsFound;
+
   self.ready = function()
   {
     self.dbugger = new Debugger({source:document.getElementById("debug_div")});
@@ -27,15 +29,18 @@ var BarrelScene = function(game, stage)
     //self.particler = new Particler({});
     self.assetter = new Assetter({});
 
+    self.barrelsFound = 0;
+
     //pre-fill out arrays
-    var rains = 10000;
+    var rains = 10000; //make sure big enough to support all rains
     self.rain = [];
     for(var i = 0; i < rains; i++) self.rain[i] = new RB_Rain(self);
     self.num_rain = 0;
 
     self.barrels = [];
-    var randx = function(){ return Math.random()*self.stage.drawCanv.canvas.width*2; }
-    var randy = function(){ return Math.random()*self.stage.drawCanv.canvas.height*2; }
+    var bar = new RB_Barrel(self,0,0); //BS variable because js doesn't have static props
+    var randx = function(){ return Math.random()*((self.stage.drawCanv.canvas.width*2)-bar.w); }
+    var randy = function(){ return Math.random()*((self.stage.drawCanv.canvas.height*2)-bar.h); }
     for(var i = 0; i < 50; i++)
       self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
     self.map = new RB_Map(self);
@@ -71,11 +76,20 @@ var BarrelScene = function(game, stage)
     self.drawer.flush();
     for(var i = 0; i < self.num_rain; i++)
       self.rain[i].draw(stage.drawCanv);
+
+    stage.drawCanv.context.font = "30px Georgia";
+    stage.drawCanv.context.fillStyle = "#000000";
+    stage.drawCanv.context.fillText(self.barrelsFound+"/"+self.barrels.length+" barrels placed",30,30);
   };
 
   self.cleanup = function()
   {
   };
+
+  self.barrelPlaced = function()
+  {
+    self.barrelsFound++;
+  }
 
   var tmpDrop;
   self.retireDrop = function(drop)
@@ -85,8 +99,8 @@ var BarrelScene = function(game, stage)
       if(self.rain[i] === drop)
       {
         tmpDrop = self.rain[i];
-        self.rain[i] = self.rain[self.num_rain];
-        self.rain[self.num_rain] = tmpDrop;
+        self.rain[i] = self.rain[self.num_rain-1];
+        self.rain[self.num_rain-1] = tmpDrop;
         self.num_rain--;
       }
     }
@@ -197,8 +211,8 @@ var RB_Barrel = function(game, args)
 
   self.x = args.x ? args.x : 0;
   self.y = args.y ? args.y : 0;
-  self.w = 30;
-  self.h = 30;
+  self.w = 50;
+  self.h = 50;
 
   self.img = game.assetter.asset("man.png");
   self.placed = false;
@@ -209,7 +223,11 @@ var RB_Barrel = function(game, args)
 
   self.click = function(evt)
   {
-    self.placed = true;
+    if(!self.placed)
+    {
+      self.placed = true;
+      game.barrelPlaced(self);
+    }
   }
 
   self.draw = function(canv)
@@ -250,7 +268,6 @@ var RB_Barrel = function(game, args)
     }
     else //in visible range
     {
-      canv.context.lineWidth = 1;
       canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
       if(self.placed) canv.context.strokeStyle = "#00FF00";
       else            canv.context.strokeStyle = "#FF0000";
