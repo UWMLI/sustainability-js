@@ -10,10 +10,10 @@ var BarrelScene = function(game, stage)
   self.clicker;
   self.dragger;
   self.drawer;
-  self.particler;
+  //self.particler;
   self.assetter;
 
-  self.rain_active;  self.num_rain_active;
+  self.rain;  self.num_rain;
   self.barrels;
   self.map;
 
@@ -24,14 +24,14 @@ var BarrelScene = function(game, stage)
     self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
-    self.particler = new Particler({});
+    //self.particler = new Particler({});
     self.assetter = new Assetter({});
 
     //pre-fill out arrays
     var rains = 10000;
-    self.rain_active = [];
-    for(var i = 0; i < rains; i++) self.rain_active[i] = new RB_Rain(self);
-    self.num_rain_active = 0;
+    self.rain = [];
+    for(var i = 0; i < rains; i++) self.rain[i] = new RB_Rain(self);
+    self.num_rain = 0;
 
     self.barrels = [];
     var randx = function(){ return Math.random()*self.stage.drawCanv.canvas.width*2; }
@@ -47,8 +47,8 @@ var BarrelScene = function(game, stage)
     self.dragger.register(self.map);
     self.drawer.register(self.map);
 
-    self.drawer.register(self.particler);
-    self.ticker.register(self.particler);
+    //self.drawer.register(self.particler);
+    //self.ticker.register(self.particler);
   };
 
   self.tick = function()
@@ -58,15 +58,19 @@ var BarrelScene = function(game, stage)
     self.ticker.flush();
     for(var i = 0; i < 20; i++)
     {
-      self.rain_active[self.num_rain_active].refresh();
-      self.particler.register(self.rain_active[self.num_rain_active]);
-      self.num_rain_active++;
+      self.rain[self.num_rain].refresh();
+      //self.particler.register(self.rain[self.num_rain]);
+      self.num_rain++;
     }
+    for(var i = 0; i < self.num_rain; i++)
+      self.rain[i].tick();
   };
 
   self.draw = function()
   {
     self.drawer.flush();
+    for(var i = 0; i < self.num_rain; i++)
+      self.rain[i].draw(stage.drawCanv);
   };
 
   self.cleanup = function()
@@ -76,14 +80,14 @@ var BarrelScene = function(game, stage)
   var tmpDrop;
   self.retireDrop = function(drop)
   {
-    for(var i = 0; i < self.num_rain_active; i++)
+    for(var i = 0; i < self.num_rain; i++)
     {
-      if(self.rain_active[i] === drop)
+      if(self.rain[i] === drop)
       {
-        tmpDrop = self.rain_active[i];
-        self.rain_active[i] = self.rain_active[self.num_rain_active];
-        self.rain_active[self.num_rain_active] = tmpDrop;
-        self.num_rain_active--;
+        tmpDrop = self.rain[i];
+        self.rain[i] = self.rain[self.num_rain];
+        self.rain[self.num_rain] = tmpDrop;
+        self.num_rain--;
       }
     }
   }
