@@ -45,11 +45,12 @@ var SweaterScene = function(game, stage)
     self.sweaterFactory = new SW_SweaterFactory(self);
 
     //verbose, I know
-    self.buttons.push(new Clickable({"x":self.house.x,"y":self.house.y+(self.house.h/self.numFloors)*0,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(4);}}));
-    self.buttons.push(new Clickable({"x":self.house.x,"y":self.house.y+(self.house.h/self.numFloors)*1,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(3);}}));
-    self.buttons.push(new Clickable({"x":self.house.x,"y":self.house.y+(self.house.h/self.numFloors)*2,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(2);}}));
-    self.buttons.push(new Clickable({"x":self.house.x,"y":self.house.y+(self.house.h/self.numFloors)*3,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(1);}}));
-    self.buttons.push(new Clickable({"x":self.house.x,"y":self.house.y+(self.house.h/self.numFloors)*4,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(0);}}));
+    //x = 0 rather than self.house.x because we want to allow click at left side of screen
+    self.buttons.push(new Clickable({"x":0,"y":self.house.y+(self.house.h/self.numFloors)*0,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(4);}}));
+    self.buttons.push(new Clickable({"x":0,"y":self.house.y+(self.house.h/self.numFloors)*1,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(3);}}));
+    self.buttons.push(new Clickable({"x":0,"y":self.house.y+(self.house.h/self.numFloors)*2,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(2);}}));
+    self.buttons.push(new Clickable({"x":0,"y":self.house.y+(self.house.h/self.numFloors)*3,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(1);}}));
+    self.buttons.push(new Clickable({"x":0,"y":self.house.y+(self.house.h/self.numFloors)*4,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(0);}}));
     for(var i = 0; i < self.buttons.length; i++)
     {
       self.clicker.register(self.buttons[i]);
