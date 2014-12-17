@@ -52,10 +52,9 @@ var SweaterScene = function(game, stage)
     self.buttons.push(new Clickable({"x":0,"y":self.house.y+(self.house.h/self.numFloors)*3,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(1);}}));
     self.buttons.push(new Clickable({"x":0,"y":self.house.y+(self.house.h/self.numFloors)*4,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(0);}}));
     for(var i = 0; i < self.buttons.length; i++)
-    {
       self.clicker.register(self.buttons[i]);
-      self.drawer.register(self.buttons[i]);
-    }
+
+    self.drawer.register(self.house);
 
     self.ticker.register(self.player);
     self.drawer.register(self.player);
@@ -98,6 +97,13 @@ var SW_House = function(game)
   self.y = 200;
   self.w = game.stage.drawCanv.canvas.width;
   self.h = game.stage.drawCanv.canvas.height-400;
+
+  self.draw = function(canv)
+  {
+    canv.context.strokeStyle = "#000000";
+    for(var i = 0; i < game.numFloors; i++)
+      canv.context.strokeRect(self.x, self.y+(i*(self.h/game.numFloors)), self.w, self.h/game.numFloors);
+  }
 }
 
 var SW_Player = function(game)
