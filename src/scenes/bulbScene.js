@@ -498,7 +498,8 @@ var BU_Dude = function(game, floor, bulb)
     canv.context.strokeRect(self.x,self.y,self.w,self.h);
     if(self.state == 2) //changing
     {
-      canv.context.fillStyle = "#00FF00";
+      if(bulb == "GOOD") canv.context.fillStyle = "#00FF00";
+      else               canv.context.fillStyle = "#FF0000";
       canv.context.fillRect(self.x,self.y+20,((self.maxChangeTimer-self.changeTimer)/self.maxChangeTimer)*self.w,10);
     }
   }
