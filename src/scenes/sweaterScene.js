@@ -8,6 +8,7 @@ var SweaterScene = function(game, stage)
   self.ticker;
   self.clicker;
   self.drawer;
+  self.particler;
   self.assetter;
 
   self.house;
@@ -22,7 +23,7 @@ var SweaterScene = function(game, stage)
   self.numFloors = 5;
 
   self.sweatersThrown  = []; for(var i = 0; i < self.numFloors; i++) self.sweatersThrown[i]  = 0;
-  self.enemiesAttacked = []; for(var i = 0; i < self.numFloors; i++) self.enemiesAttacked[i]      = 0;
+  self.enemiesAttacked = []; for(var i = 0; i < self.numFloors; i++) self.enemiesAttacked[i] = 0;
   self.enemiesDefeated = []; for(var i = 0; i < self.numFloors; i++) self.enemiesDefeated[i] = 0;
   self.enemiesWon      = []; for(var i = 0; i < self.numFloors; i++) self.enemiesWon[i]      = 0;
 
@@ -31,6 +32,7 @@ var SweaterScene = function(game, stage)
     self.ticker = new Ticker({});
     self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
+    self.particler = new Particler({});
     self.assetter = new Assetter({});
 
     self.house = new SW_House(self);
@@ -58,6 +60,8 @@ var SweaterScene = function(game, stage)
     self.drawer.register(self.player);
 
     self.ticker.register(self.enemyFactory);
+    self.ticker.register(self.particler);
+    self.drawer.register(self.particler);
   };
 
   self.tick = function()
@@ -69,6 +73,11 @@ var SweaterScene = function(game, stage)
   self.draw = function()
   {
     self.drawer.flush();
+    stage.drawCanv.context.font = "60px Georgia";
+    stage.drawCanv.context.fillStyle = "#FF0000"
+    var base = 66;
+    for(var i = 0; i < self.enemiesWon.length; i++) base+=self.enemiesWon[i];
+    stage.drawCanv.context.fillText(base+"",300,900);
   };
 
   self.cleanup = function()
@@ -77,9 +86,8 @@ var SweaterScene = function(game, stage)
 
   self.sweaterProduced = function(floor) { self.sweatersThrown[floor]++; }
   self.enemyProduced   = function(floor) { self.enemiesAttacked[floor]++; }
-  self.enemyVictory    = function(floor) { self.enemiesWon[floor]++; }
+  self.enemyVictory    = function(floor) { self.enemiesWon[floor]++; self.particler.register(new SW_FailParticle(self,floor)); self.particler.register(new SW_FailParticle(self,-1)); }
   self.enemyFail       = function(floor) { self.enemiesDefeated[floor]++; }
-
 };
 
 var SW_House = function(game)
@@ -185,7 +193,6 @@ var SW_Enemy = function(game, floor)
   }
 }
 
-
 var SW_SweaterFactory = function(game)
 {
   var self = this;
@@ -242,6 +249,46 @@ var SW_Sweater = function(game, floor)
     game.sweaters.splice(game.sweaters.indexOf(self),1);
     game.ticker.unregister(self);
     game.drawer.unregister(self);
+  }
+}
+
+var SW_FailParticle = function(game,floor)
+{
+  var self = this;
+  function yForFloor(floor) { return game.house.y+(game.house.h/game.numFloors)*((game.numFloors-1)-self.floor); }
+
+  self.floor = floor;
+  if(floor == -1) //configure for main temp
+  {
+    self.x = 400;
+    self.sy = 900;
+    self.y = self.sy;
+    self.ey = self.sy-50;
+  }
+  else
+  {
+    self.x = 100;
+    self.sy = yForFloor(floor)+20;
+    self.y = self.sy;
+    self.ey = self.sy-50;
+  }
+
+  self.t = 0;
+
+  self.tick = function()
+  {
+    self.t += 0.01;
+    self.y = self.y+(self.ey-self.y)/50;
+    return self.t < 1;
+  }
+  self.draw = function(canv)
+  {
+    if(self.t < 0) return;
+    canv.context.globalAlpha = 1-(self.t*self.t*self.t);
+    canv.context.font = "30px Georgia";
+    canv.context.fillStyle = "#FF0000"
+    canv.context.fillText("+1",self.x-25,self.y);
+    canv.context.globalAlpha = 1.0;
   }
 }
 
