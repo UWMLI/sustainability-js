@@ -14,7 +14,6 @@ var BarrelScene = function(game, stage)
   self.assetter;
 
   self.rain_active;  self.num_rain_active;
-  self.rain_retired; self.num_rain_retired;
   self.barrels;
   self.map;
 
@@ -31,10 +30,7 @@ var BarrelScene = function(game, stage)
     //pre-fill out arrays
     var rains = 10000;
     self.rain_active = [];
-    self.rain_retired = [];
     for(var i = 0; i < rains; i++) self.rain_active[i] = new RB_Rain(self);
-    for(var i = 0; i < rains; i++) self.rain_retired[i] = self.rain_active[i];
-    self.num_rain_retired = rains;
     self.num_rain_active = 0;
 
     self.barrels = [];
@@ -62,10 +58,8 @@ var BarrelScene = function(game, stage)
     self.ticker.flush();
     for(var i = 0; i < 20; i++)
     {
-      self.rain_active[self.num_rain_active] = self.rain_retired[self.num_rain_retired-1];
       self.rain_active[self.num_rain_active].refresh();
       self.particler.register(self.rain_active[self.num_rain_active]);
-      self.num_rain_retired--;
       self.num_rain_active++;
     }
   };
@@ -86,8 +80,10 @@ var BarrelScene = function(game, stage)
     {
       if(self.rain_active[i] === drop)
       {
-        self.rain_retired[self.num_rain_retired++] = drop;
-        self.rain_active[i] = self.rain_active[self.num_rain_active--];
+        tmpDrop = self.rain_active[i];
+        self.rain_active[i] = self.rain_active[self.num_rain_active];
+        self.rain_active[self.num_rain_active] = tmpDrop;
+        self.num_rain_active--;
       }
     }
   }
@@ -150,24 +146,21 @@ var RB_Rain = function(game)
 {
   var self = this;
 
-  self.dx = 2;
-  self.dy = 10;
-  self.x = (Math.random()*(game.stage.drawCanv.canvas.height+(self.dx/self.dy)*game.stage.drawCanv.canvas.height))-((self.dx/self.dy)*game.stage.drawCanv.canvas.height);
-  self.y = -10+Math.random();
-  self.r = (Math.random()/2)+1;
-  self.dx *= self.r;
-  self.dy *= self.r;
-
   self.refresh = function()
   {
     self.dx = 2;
     self.dy = 10;
-    self.x = (Math.random()*(game.stage.drawCanv.canvas.height+(self.dx/self.dy)*game.stage.drawCanv.canvas.height))-((self.dx/self.dy)*game.stage.drawCanv.canvas.height);
+    self.x = (Math.random()*
+      (game.stage.drawCanv.canvas.height+
+      (self.dx/self.dy)*
+      game.stage.drawCanv.canvas.height))-((self.dx/self.dy)*
+      game.stage.drawCanv.canvas.height);
     self.y = -10+Math.random();
     self.r = (Math.random()/2)+1;
     self.dx *= self.r;
     self.dy *= self.r;
   }
+  self.refresh();
 
   self.tick = function()
   {
