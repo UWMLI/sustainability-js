@@ -21,6 +21,11 @@ var SweaterScene = function(game, stage)
 
   self.numFloors = 5;
 
+  self.sweatersThrown  = []; for(var i = 0; i < self.numFloors; i++) self.sweatersThrown[i]  = 0;
+  self.enemiesAttacked = []; for(var i = 0; i < self.numFloors; i++) self.enemiesAttacked[i]      = 0;
+  self.enemiesDefeated = []; for(var i = 0; i < self.numFloors; i++) self.enemiesDefeated[i] = 0;
+  self.enemiesWon      = []; for(var i = 0; i < self.numFloors; i++) self.enemiesWon[i]      = 0;
+
   self.ready = function()
   {
     self.ticker = new Ticker({});
@@ -69,37 +74,59 @@ var SweaterScene = function(game, stage)
   self.cleanup = function()
   {
   };
+
+  self.sweaterProduced = function(floor) { self.sweatersThrown[floor]++; }
+  self.enemyProduced   = function(floor) { self.enemiesAttacked[floor]++; }
+  self.enemyVictory    = function(floor) { self.enemiesWon[floor]++; }
+  self.enemyFail       = function(floor) { self.enemiesDefeated[floor]++; }
+
 };
 
 var SW_House = function(game)
 {
   var self = this;
-  self.x = 50;
-  self.y = 50;
+  self.x = 100;
+  self.y = 200;
   self.w = game.stage.drawCanv.canvas.width;
-  self.h = game.stage.drawCanv.canvas.height-200;
+  self.h = game.stage.drawCanv.canvas.height-400;
 }
 
 var SW_Player = function(game)
 {
   var self = this;
   self.floor = 0;
+  //helper func
+  function yForFloor(floor) { return game.house.y+(game.house.h/game.numFloors)*((game.numFloors-1)-self.floor); }
+
+  self.x = game.house.x;
+  self.y = yForFloor(0);
+  self.w = 100;
+  self.h = 100;
+
   self.img = game.assetter.asset("man.png");
+  self.charge = 100;
 
   self.setFloor = function(floor)
   {
     self.floor = floor;
-    game.sweaterFactory.produce();
+    if(self.charge >= 100)
+    {
+      game.sweaterFactory.produce();
+      self.charge = 0;
+    }
   }
 
   self.tick = function()
   {
-
+    self.charge += 4;
+    if(self.charge > 100) self.charge = 100;
   }
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,game.house.x,game.house.y+(game.house.h/game.numFloors)*((game.numFloors-1)-self.floor));
+    canv.context.drawImage(self.img,self.x,yForFloor(self.floor),self.w,self.h);
+    canv.context.fillStyle = "#00FF00";
+    canv.context.fillRect(self.x,yForFloor(self.floor)+self.h-((self.charge/100)*self.h),20,(self.charge/100)*self.h);
   }
 }
 
@@ -111,7 +138,9 @@ var SW_EnemyFactory = function(game)
   {
     if(Math.random() < 0.01)
     {
-      var e = new SW_Enemy(game,Math.floor(Math.random()*game.numFloors));
+      var floor = Math.floor(Math.random()*game.numFloors);
+      game.enemyProduced(floor);
+      var e = new SW_Enemy(game,floor);
       game.enemies.push(e);
       game.ticker.register(e);
       game.drawer.register(e);
@@ -136,7 +165,11 @@ var SW_Enemy = function(game, floor)
   self.tick = function()
   {
     self.x -= self.speed;
-    if(self.x < -20) self.kill();
+    if(self.x < 100)
+    {
+      game.enemyVictory(self.floor);
+      self.kill();
+    }
   }
 
   self.draw = function(canv)
@@ -159,6 +192,7 @@ var SW_SweaterFactory = function(game)
 
   self.produce = function()
   {
+    game.sweaterProduced(game.player.floor);
     var s = new SW_Sweater(game,game.player.floor);
     game.sweaters.push(s);
     game.ticker.register(s);
@@ -190,6 +224,7 @@ var SW_Sweater = function(game, floor)
     {
       if(self.floor == game.enemies[i].floor && self.x + (self.w/2) > game.enemies[i].x && self.x + (self.w/2) < game.enemies[i].x + game.enemies[i].w)
       {
+        game.enemyFail(self.floor);
         game.enemies[i].kill();
         self.kill();
         break;
