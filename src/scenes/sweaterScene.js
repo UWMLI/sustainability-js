@@ -166,23 +166,40 @@ var SW_Enemy = function(game, floor)
   self.w = 50;
   self.h = 50;
 
+  self.reversed = false;
   self.speed = 8;
 
   self.img = game.assetter.asset("man.png");
 
   self.tick = function()
   {
-    self.x -= self.speed;
-    if(self.x < 100)
+    if(!self.reversed)
     {
-      game.enemyVictory(self.floor);
-      self.kill();
+      self.x -= self.speed;
+      if(self.x < 100)
+      {
+        game.enemyVictory(self.floor);
+        self.kill();
+      }
+    }
+    else
+    {
+      self.x += self.speed/2;
+      if(self.x > 700) self.kill();
     }
   }
 
   self.draw = function(canv)
   {
     canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+    if(self.reversed) canv.context.strokeStyle = "#FF0000";
+    else              canv.context.strokeStyle = "#0000FF";
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+  }
+
+  self.reverse = function()
+  {
+    self.reversed = true;
   }
 
   self.kill = function()
@@ -232,7 +249,7 @@ var SW_Sweater = function(game, floor)
       if(self.floor == game.enemies[i].floor && self.x + (self.w/2) > game.enemies[i].x && self.x + (self.w/2) < game.enemies[i].x + game.enemies[i].w)
       {
         game.enemyFail(self.floor);
-        game.enemies[i].kill();
+        game.enemies[i].reverse();
         self.kill();
         break;
       }
