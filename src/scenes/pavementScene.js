@@ -12,6 +12,7 @@ var PavementScene = function(game, stage)
   self.particler;
   self.assetter;
 
+  self.rain;
   self.cleanBG;
   self.dirtyBG;
 
@@ -24,6 +25,7 @@ var PavementScene = function(game, stage)
     self.particler = new Particler({});
     self.assetter = new Assetter({});
 
+    self.rain = [];
     self.cleanBG = new PV_Background(self);
     self.dirtyBG = new PV_ScratchableBackground(self);
 
@@ -41,7 +43,11 @@ var PavementScene = function(game, stage)
     if(!stopGen)
     {
       for(var i = 0; i < 5; i++)
-        self.particler.register(new PV_Rain(self));
+      {
+        self.rain.push(new PV_Rain(self));
+        self.drawer.register(self.rain[self.rain.length-1]);
+        self.ticker.register(self.rain[self.rain.length-1]);
+      }
     }
     self.dragger.flush();
     self.ticker.flush();
@@ -52,11 +58,21 @@ var PavementScene = function(game, stage)
   self.draw = function()
   {
     self.drawer.flush();
+    self.stage.drawCanv.context.font = "60px Georgia";
+    self.stage.drawCanv.context.fillStyle = "#000000";
+    self.stage.drawCanv.context.fillText(Math.round(percent*10000)/100+"%",0,self.stage.drawCanv.canvas.height-100);
   };
 
   self.cleanup = function()
   {
   };
+
+  var percent = 0;
+  self.percentFilled = function(p)
+  {
+    if(p > 1) p = 1;
+    percent = p;
+  }
 };
 
 var PV_Rain = function(game)
@@ -98,6 +114,51 @@ var PV_Rain = function(game)
     canv.context.lineTo(self.x+self.dx,self.y+self.dy);
     canv.context.stroke();
     canv.context.closePath();
+  }
+}
+
+var PV_EncouragementParticle = function(x,y,game)
+{
+  var self = this;
+
+  self.x = x;
+  self.sy = y;
+  self.y = y;
+  self.ey = y-20;
+
+  self.t = 0;
+
+  self.text = Math.floor(Math.random()*9);
+       if(self.text == 0) self.text = "cool!";
+  else if(self.text == 1) self.text = "great!";
+  else if(self.text == 2) self.text = "word!";
+  else if(self.text == 3) self.text = "rad!";
+  else if(self.text == 4) self.text = "sweet!";
+  else if(self.text == 5) self.text = "nice!";
+  else if(self.text == 6) self.text = "swell!";
+  else if(self.text == 7) self.text = "good!";
+  else if(self.text == 8) self.text = "wow!";
+
+  self.tick = function()
+  {
+    self.t += 0.01;
+    self.y = self.y+(self.ey-self.y)/50;
+    return self.t < 1;
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.globalAlpha = 1-(self.t*self.t*self.t);
+    canv.context.font = "60px Georgia";
+    canv.context.fillStyle = "#000000";
+    canv.context.fillText(self.text,self.x-52,self.y+2);
+    canv.context.fillText(self.text,self.x-48,self.y-2);
+    canv.context.fillText(self.text,self.x-48,self.y+2);
+    canv.context.fillText(self.text,self.x-52,self.y-2);
+    canv.context.font = "60px Georgia";
+    canv.context.fillStyle = "#FFFFFF";
+    canv.context.fillText(self.text,self.x-50,self.y);
+    canv.context.globalAlpha = 1.0;
   }
 }
 
@@ -143,12 +204,14 @@ var PV_ScratchableBackground = function(game)
     self.ticks++;
     if(self.ticks % self.qh == 0)
     {
-      if(self.filled > 1550) console.log("FILLED!");
+      game.percentFilled(self.filled/1250);
       self.ticks = 0;
       self.filled = 0;
     }
   }
 
+  var dragPartMaxCharge = 5;
+  var dragPartCharge = dragPartMaxCharge; //used to pump out particle every once in a while
   self.dragStart = function(evt)
   {
     //just draw circle
@@ -162,10 +225,18 @@ var PV_ScratchableBackground = function(game)
     self.countcanv.context.fill();
 
     self.lastPtX = evt.doX;
-    self.lastPtY = evt.doY; 
+    self.lastPtY = evt.doY;
   };
   self.drag = function(evt)
   {
+    //handle particle
+    dragPartCharge--;
+    if(dragPartCharge <= 0)
+    {
+      dragPartCharge = dragPartMaxCharge;
+      game.particler.register(new PV_EncouragementParticle(evt.doX,evt.doY,game));
+    }
+
     //draw line (for long frames)
     ////canv
     self.canv.context.beginPath();
