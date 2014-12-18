@@ -15,11 +15,14 @@ var BarrelScene = function(game, stage)
 
   self.mapView;
 
-  self.rain;  self.num_rain;
+  self.rain; //keep record of it for updating deltas during panning
+  self.runoff;
   self.barrels;
   self.map;
 
+  self.numBarrels;
   self.barrelsFound;
+  self.totalRunoff;
 
   self.ready = function()
   {
@@ -31,21 +34,20 @@ var BarrelScene = function(game, stage)
     self.particler = new Particler({});
     self.assetter = new Assetter({});
 
+    self.numBarrels = 50;
+    self.barrelsFound = 0;
+    self.totalRunoff = 0;
+
     self.mapView = new RB_MapView(self);
 
-    self.barrelsFound = 0;
-
-    //pre-fill out arrays
-    var rains = 10000; //make sure big enough to support all rains
     self.rain = [];
-    for(var i = 0; i < rains; i++) self.rain[i] = new RB_Rain(self);
-    self.num_rain = 0;
+    self.runoff = new RB_Runoff(self);
 
     self.barrels = [];
     var bar = new RB_Barrel(self,0,0); //BS variable because js doesn't have static props
     var randx = function(){ return (Math.random()*((self.mapView.w*2)-bar.w)); }
     var randy = function(){ return (Math.random()*((self.mapView.h*2)-bar.h)); }
-    for(var i = 0; i < 50; i++)
+    for(var i = 0; i < self.numBarrels; i++)
       self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
     self.map = new RB_Map(self);
     for(var i = 0; i < self.barrels.length; i++)
@@ -60,6 +62,9 @@ var BarrelScene = function(game, stage)
     self.ticker.register(self.particler);
 
     self.drawer.register(self.mapView); //strategically must place after map, before overlays
+
+    self.ticker.register(self.runoff);
+    self.drawer.register(self.runoff);
   };
 
   self.tick = function()
@@ -68,11 +73,11 @@ var BarrelScene = function(game, stage)
     {
       for(var i = 0; i < 20; i++)
       {
-        self.rain[self.num_rain].refresh();
-        self.particler.register(self.rain[self.num_rain]);
-        self.num_rain++;
+        self.rain.push(new RB_Rain(self));
+        self.particler.register(self.rain[self.rain.length-1]);
       }
     }
+    self.totalRunoff += ((self.numBarrels-self.barrelsFound)/self.numBarrels)*10;
     self.clicker.flush();
     self.dragger.flush();
     self.ticker.flush();
@@ -198,10 +203,10 @@ var RB_Rain = function(game)
     self.x += self.dx;
     self.y += self.dy;
 
-    if(self.y > game.mapView.y+game.mapView.h) game.rainFull(self);
-    while(self.x < game.mapView.x)                     self.x += game.mapView.w;
-    while(self.x > game.mapView.x+game.mapView.w)  self.x -= game.mapView.w;
-    while(self.y < game.mapView.y)                     self.y += game.mapView.h;
+    if(self.y > game.mapView.y+game.mapView.h)    game.rainFull(self);
+    while(self.x < game.mapView.x)                self.x += game.mapView.w;
+    while(self.x > game.mapView.x+game.mapView.w) self.x -= game.mapView.w;
+    while(self.y < game.mapView.y)                self.y += game.mapView.h;
     while(self.y > game.mapView.y+game.mapView.h) self.y -= game.mapView.h;
 
     return true; //never expire (just auto-loop)
@@ -216,6 +221,31 @@ var RB_Rain = function(game)
     canv.context.lineTo(self.x+self.dx,self.y+self.dy);
     canv.context.stroke();
     canv.context.closePath();
+  }
+}
+
+var RB_Runoff = function(game)
+{
+  var self = this;
+  self.stream_w = 1; //calculated on tick
+  self.stream_h = 100;
+  self.stream_max_w = 100;
+  self.pool_w = 500;
+  self.pool_h = 1; //calculated on tick
+  self.pool_max_h = 230;
+  self.draw = function(canv)
+  {
+    canv.context.fillStyle = "#0000FF";
+    canv.context.fillRect(canv.canvas.width/2-self.stream_w/2,game.mapView.y+game.mapView.h,self.stream_w,self.stream_h+self.pool_max_h);
+    canv.context.fillRect(canv.canvas.width/2-self.pool_w/2,game.mapView.y+game.mapView.h+self.stream_h+(self.pool_max_h-self.pool_h),self.pool_w,self.pool_h);
+    canv.context.strokeStyle = "#000000";
+    canv.context.strokeRect(0,game.mapView.y+game.mapView.h+self.stream_h,canv.canvas.width,1);
+  }
+
+  self.tick = function()
+  {
+    self.stream_w = ((game.numBarrels-game.barrelsFound)/game.numBarrels)*self.stream_max_w;
+    self.pool_h = (game.totalRunoff/10000)*self.pool_max_h;
   }
 }
 
