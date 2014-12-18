@@ -71,13 +71,14 @@ var BarrelScene = function(game, stage)
   {
     if(!stopGen)
     {
-      for(var i = 0; i < 20; i++)
+      for(var i = 0; i < 5; i++)
       {
         self.rain.push(new RB_Rain(self));
         self.particler.register(self.rain[self.rain.length-1]);
       }
     }
-    self.totalRunoff += ((self.numBarrels-self.barrelsFound)/self.numBarrels)*10;
+    self.totalRunoff += ((self.numBarrels-self.barrelsFound)/self.numBarrels)*20;
+    if(self.totalRunoff > 10000) self.totalRunoff = 10000;
     self.clicker.flush();
     self.dragger.flush();
     self.ticker.flush();
