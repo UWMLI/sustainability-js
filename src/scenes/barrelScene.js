@@ -77,7 +77,7 @@ var BarrelScene = function(game, stage)
         self.particler.register(self.rain[self.rain.length-1]);
       }
     }
-    self.totalRunoff += ((self.numBarrels-self.barrelsFound)/self.numBarrels)*20;
+    self.totalRunoff += ((self.numBarrels-self.barrelsFound)/self.numBarrels)*15;
     if(self.totalRunoff > 10000) self.totalRunoff = 10000;
     self.clicker.flush();
     self.dragger.flush();
@@ -256,8 +256,8 @@ var RB_Barrel = function(game, args)
 
   self.x = args.x ? args.x : 0;
   self.y = args.y ? args.y : 0;
-  self.w = 50;
-  self.h = 50;
+  self.w = 100;
+  self.h = 100;
 
   self.img = game.assetter.asset("man.png");
   self.placed = false;
@@ -313,10 +313,10 @@ var RB_Barrel = function(game, args)
     }
     else //in visible range
     {
-      canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+      canv.context.drawImage(self.img,self.x+self.w/4,self.y+self.h/4,self.w/2,self.h/2);
       if(self.placed) canv.context.strokeStyle = "#00FF00";
       else            canv.context.strokeStyle = "#FF0000";
-      canv.context.strokeRect(self.x,self.y,self.w,self.h);
+      canv.context.strokeRect(self.x+self.w/4,self.y+self.h/4,self.w/2,self.h/2);
     }
   }
 
