@@ -74,7 +74,8 @@ var BarrelScene = function(game, stage)
       for(var i = 0; i < 5; i++)
       {
         self.rain.push(new RB_Rain(self));
-        self.particler.register(self.rain[self.rain.length-1]);
+        self.ticker.register(self.rain[self.rain.length-1]);
+        self.drawer.register(self.rain[self.rain.length-1]);
       }
     }
     self.totalRunoff += ((self.numBarrels-self.barrelsFound)/self.numBarrels)*15;
@@ -97,9 +98,10 @@ var BarrelScene = function(game, stage)
   {
   };
 
-  self.barrelPlaced = function()
+  self.barrelPlaced = function(barrel)
   {
     self.barrelsFound++;
+    self.particler.register(new RB_BarrelParticle(barrel,self));
   }
 
   var stopGen = false;
@@ -327,4 +329,48 @@ var RB_Barrel = function(game, args)
     game.drawer.unregister(self);
   }
 }
+
+var RB_BarrelParticle = function(barrel,game)
+{
+  var self = this;
+
+  self.sy = 0;
+  self.y = 0;
+  self.ey = -20;
+
+  self.t = 0;
+
+  self.text = Math.floor(Math.random()*14);
+       if(self.text == 0) self.text = "cool!";
+  else if(self.text == 1) self.text = "great!";
+  else if(self.text == 2) self.text = "fantastic!";
+  else if(self.text == 3) self.text = "word!";
+  else if(self.text == 4) self.text = "rad!";
+  else if(self.text == 5) self.text = "sweet!";
+  else if(self.text == 6) self.text = "noice!";
+  else if(self.text == 7) self.text = "swell!";
+  else if(self.text == 8) self.text = "the bee's knees!";
+  else if(self.text == 9) self.text = "excellent!";
+  else if(self.text == 10) self.text = "pleasant!";
+  else if(self.text == 11) self.text = "good!";
+  else if(self.text == 12) self.text = "wow!";
+  else if(self.text == 13) self.text = "acceptable!";
+
+  self.tick = function()
+  {
+    self.t += 0.01;
+    self.y = self.y+(self.ey-self.y)/50;
+    return self.t < 1;
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.globalAlpha = 1-(self.t*self.t*self.t);
+    canv.context.font = "30px Georgia";
+    canv.context.fillStyle = "#000000";
+    canv.context.fillText(self.text,barrel.x+5,barrel.y+self.y+10);
+    canv.context.globalAlpha = 1.0;
+  }
+}
+
 
