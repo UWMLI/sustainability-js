@@ -141,7 +141,7 @@ var PV_EncouragementParticle = function(x,y,game)
 
   self.tick = function()
   {
-    self.t += 0.01;
+    self.t += 0.05;
     self.y = self.y+(self.ey-self.y)/50;
     return self.t < 1;
   }
