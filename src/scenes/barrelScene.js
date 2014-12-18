@@ -43,8 +43,8 @@ var BarrelScene = function(game, stage)
 
     self.barrels = [];
     var bar = new RB_Barrel(self,0,0); //BS variable because js doesn't have static props
-    var randx = function(){ return Math.random()*((self.mapView.w*2)+self.mapView.x-bar.w); }
-    var randy = function(){ return Math.random()*((self.mapView.h*2)+self.mapView.y-bar.h); }
+    var randx = function(){ return (Math.random()*((self.mapView.w*2)-bar.w)); }
+    var randy = function(){ return (Math.random()*((self.mapView.h*2)-bar.h)); }
     for(var i = 0; i < 50; i++)
       self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
     self.map = new RB_Map(self);
@@ -174,10 +174,6 @@ var RB_Map = function(game)
   };
   self.draw = function(canv)
   {
-    canv.context.lineWidth = 1;
-    canv.context.strokeStyle = "#00FF00";
-    canv.context.strokeRect(self.x,self.y,self.w,self.h);
-    //game.dbugger.log("("+self.x+","+self.y+","+self.w+","+self.h+")");
   }
 }
 
