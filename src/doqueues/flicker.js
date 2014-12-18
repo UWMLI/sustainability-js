@@ -71,7 +71,7 @@ var Flicker = function(init)
   }
 }
 
-//example flickable- just needs x,y,w,h,r and flickStart, flicking, and flick callback
+//example flickable- NOTE- Has a lot of infrastructure. should probably just copy/paste this object
 var Flickable = function(args)
 {
   var self = this;
