@@ -67,6 +67,7 @@ var BarrelScene = function(game, stage)
     self.drawer.register(self.runoff);
   };
 
+  var stopGen = false;
   self.tick = function()
   {
     if(!stopGen)
@@ -104,7 +105,6 @@ var BarrelScene = function(game, stage)
     self.particler.register(new RB_BarrelParticle(barrel,self));
   }
 
-  var stopGen = false;
   self.rainFull = function(drop)
   {
     stopGen = true;

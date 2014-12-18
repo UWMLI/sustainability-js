@@ -9,6 +9,7 @@ var PavementScene = function(game, stage)
   self.ticker;
   self.dragger;
   self.drawer;
+  self.particler;
   self.assetter;
 
   self.cleanBG;
@@ -20,6 +21,7 @@ var PavementScene = function(game, stage)
     self.ticker = new Ticker({});
     self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
+    self.particler = new Particler({});
     self.assetter = new Assetter({});
 
     self.cleanBG = new PV_Background(self);
@@ -29,13 +31,23 @@ var PavementScene = function(game, stage)
     self.drawer.register(self.dirtyBG);
     self.dragger.register(self.dirtyBG);
     self.ticker.register(self.dirtyBG);
+    self.drawer.register(self.particler);
+    self.ticker.register(self.particler);
   };
 
+  var stopGen = false;
   self.tick = function()
   {
+    if(!stopGen)
+    {
+      for(var i = 0; i < 5; i++)
+        self.particler.register(new PV_Rain(self));
+    }
     self.dragger.flush();
     self.ticker.flush();
   };
+
+  self.rainFull = function() { stopGen = true; }
 
   self.draw = function()
   {
@@ -47,6 +59,48 @@ var PavementScene = function(game, stage)
   };
 };
 
+var PV_Rain = function(game)
+{
+  var self = this;
+
+  self.refresh = function()
+  {
+    self.dx = 2;
+    self.dy = 10;
+    self.x = Math.random()*game.stage.drawCanv.canvas.width;
+    self.y = -10+Math.random();
+    self.r = (Math.random()/2)+1;
+    self.dx *= self.r;
+    self.dy *= self.r;
+  }
+  self.refresh();
+
+  self.tick = function()
+  {
+    self.x += self.dx;
+    self.y += self.dy;
+
+    if(self.y > game.stage.drawCanv.canvas.height-200)     game.rainFull(self);
+    while(self.x < 0)                                      self.x += game.stage.drawCanv.canvas.width;
+    while(self.x > game.stage.drawCanv.canvas.width)       self.x -= game.stage.drawCanv.canvas.width;
+    while(self.y < 0)                                      self.y += game.stage.drawCanv.canvas.height-200;
+    while(self.y > game.stage.drawCanv.canvas.height-200)  self.y -= game.stage.drawCanv.canvas.height-200;
+
+    return true; //never expire (just auto-loop)
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.lineWidth = 5;
+    canv.context.strokeStyle = "#0000FF";
+    canv.context.beginPath();
+    canv.context.moveTo(self.x,self.y);
+    canv.context.lineTo(self.x+self.dx,self.y+self.dy);
+    canv.context.stroke();
+    canv.context.closePath();
+  }
+}
+
 var PV_ScratchableBackground = function(game)
 {
   var self = this;
@@ -54,7 +108,7 @@ var PV_ScratchableBackground = function(game)
   self.x = 0;
   self.y = 0;
   self.w = game.stage.drawCanv.canvas.width;
-  self.h = game.stage.drawCanv.canvas.height;
+  self.h = game.stage.drawCanv.canvas.height-200;
 
   self.canv = new Canv({width:self.w,height:self.h});
   self.img = game.assetter.asset("back2.png");
@@ -141,7 +195,7 @@ var PV_ScratchableBackground = function(game)
 
   self.draw = function(canv)
   {
-    self.canv.blitTo(canv);
+    canv.context.drawImage(self.canv.canvas, 0, 0, self.canv.canvas.width, self.canv.canvas.height, 0, 0, self.canv.canvas.width, self.canv.canvas.height);
   }
 }
 
@@ -153,7 +207,7 @@ var PV_Background = function(game)
   self.x = 0;
   self.y = 0;
   self.w = game.stage.drawCanv.canvas.width;
-  self.h = game.stage.drawCanv.canvas.height;
+  self.h = game.stage.drawCanv.canvas.height-200;
 
   self.img = game.assetter.asset("back1.png");
 
