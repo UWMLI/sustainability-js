@@ -8,6 +8,7 @@ var WheelScene = function(game, stage)
   self.ticker;
   self.flicker;
   self.presser;
+  self.dragger;
   self.drawer;
   self.assetter;
 
@@ -15,6 +16,7 @@ var WheelScene = function(game, stage)
   self.door;
   self.squirrels; self.numSquirrels; self.squirrelsFlicked;
   self.nests;     self.numNests;     self.nestsFlicked;
+  self.wheel;
 
   self.ready = function()
   {
@@ -22,11 +24,12 @@ var WheelScene = function(game, stage)
     self.ticker = new Ticker({});
     self.flicker = new Flicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
     self.assetter = new Assetter({});
 
     self.box = new WH_Box(self);
-    self.door = new WH_Door(self);
+    self.wheel = new WH_Wheel(self);
 
     var l = self.box.x;
     var r = self.box.x+self.box.w;
@@ -79,7 +82,10 @@ var WheelScene = function(game, stage)
       }
     }
 
+    self.door = new WH_Door(self);
+
     self.drawer.register(self.box);
+    self.drawer.register(self.wheel);
     for(var i = 0; i < self.numNests; i++)
     {
       self.drawer.register(self.nests[i]);
@@ -100,6 +106,7 @@ var WheelScene = function(game, stage)
   {
     self.flicker.flush();
     self.presser.flush();
+    self.dragger.flush();
     self.ticker.flush();
   };
 
@@ -134,7 +141,6 @@ var WheelScene = function(game, stage)
   self.task = -1;
   self.nextTask = function()
   {
-    console.log('next');
     self.task++;
 
     if(self.task == 0)
@@ -150,6 +156,10 @@ var WheelScene = function(game, stage)
     {
       for(var i = 0; i < self.numNests; i++)
         self.presser.register(self.nests[i]);
+    }
+    if(self.task == 3)
+    {
+      self.dragger.register(self.wheel);
     }
   }
 };
@@ -263,7 +273,7 @@ var WH_Squirrel = function(game)
   {
     self.flicked = true;
     self.vx = vec.x/10;
-    self.vy = vec.y/5;
+    self.vy = vec.y/5-10;
     game.squirrelFlicked();
   }
 }
@@ -321,3 +331,47 @@ var WH_Nest = function(game)
   }
 }
 
+var WH_Wheel = function(game)
+{
+  var self = this;
+
+  self.offX = 0;
+  self.offY = 0;
+  self.deltaX = 0;
+  self.deltaY = 0;
+
+  self.x = game.box.x+20;
+  self.y = game.box.y+20;
+  self.w = game.box.w-40;
+  self.h = game.box.h-40;
+
+  self.draw = function(canv)
+  {
+    canv.context.lineWidth = 2;
+    canv.context.strokeStyle = "#000000";
+    canv.context.beginPath();
+    canv.context.arc(self.x+self.w/2, self.y+self.h/2, (game.box.h-40)/2, 0, Math.PI*2, true); 
+    canv.context.stroke();
+    canv.context.closePath();
+  }
+
+  self.tick = function()
+  {
+  }
+
+  self.dragStart = function(evt)
+  {
+    self.offX = self.x+(self.w/2)-evt.doX;
+    self.offY = self.y+(self.h/2)-evt.doY;
+  };
+  self.drag = function(evt)
+  {
+    self.deltaX = (evt.doX-(self.w/2)+self.offX)-self.x;
+    self.deltaY = (evt.doY-(self.h/2)+self.offY)-self.y;
+    self.x += self.deltaX;
+    self.y += self.deltaY;
+  };
+  self.dragFinish = function()
+  {
+  };
+}
