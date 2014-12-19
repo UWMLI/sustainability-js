@@ -279,13 +279,23 @@ var WH_Nest = function(game)
   self.w = 20;
   self.h = 20;
 
+  self.offsx = ((Math.random()*2)-1)*5;
+  self.offsy = ((Math.random()*2)-1)*5;
+  self.offex = ((Math.random()*2)-1)*5;
+  self.offey = ((Math.random()*2)-1)*5;
+
   self.vx = 0;
   self.vy = 0;
 
   self.draw = function(canv)
   {
-    canv.context.fillStyle = "#000000";
-    canv.context.fillRect(self.x+self.w/2,self.y+self.h/2,self.w,self.h/4);
+    canv.context.lineWidth = 2;
+    canv.context.strokeStyle = "#773311";
+    canv.context.beginPath();
+    canv.context.moveTo(self.x+self.offsx,self.y+self.h/2+self.offsy);
+    canv.context.lineTo(self.x+self.w+self.offex,self.y+self.h/2+self.offey);
+    canv.context.stroke();
+    canv.context.closePath();
   }
 
   self.tick = function()
