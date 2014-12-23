@@ -12,12 +12,16 @@ var Drawer = function(init)
   self.register = function(drawable) { drawables.push(drawable); }
   self.unregister = function(drawable) { drawables.splice(drawables.indexOf(drawable),1); }
   self.clear = function() { drawables = []; }
+  self.attach = function() {} //will get auto-called on create
+  self.detach = function() {}
 
   self.flush = function()
   {
     for(var i = 0; i < drawables.length; i++)
       drawables[i].draw(self.source);
   }
+
+  self.attach();
 }
 
 //example drawable- just needs draw function

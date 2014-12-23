@@ -25,6 +25,21 @@ var Hoverer = function(init)
     if(nothovering.indexOv(hoverable)) nothovering.splice(nothovering.indexOf(hoverable),1);
   }
   self.clear = function() { hoverables = []; hovering = []; nothovering = []; }
+  self.attach = function() //will get auto-called on creation
+  {
+    if(platform == "PC")
+      self.source.addEventListener('mousemove', hover, false);
+    else if(platform == "MOBILE")
+      ; //no hover on mobile, dummy
+  }
+  self.detach = function()
+  {
+    if(platform == "PC")
+      self.source.removeEventListener('mousemove', hover);
+    else if(platform == "MOBILE")
+      ; //no hover on mobile, dummy
+  }
+
 
   function hover(evt)
   {
@@ -77,10 +92,7 @@ var Hoverer = function(init)
     nothoverEvtQueue = [];
   }
 
-  if(platform == "PC")
-    self.source.addEventListener('mousemove', hover, false);
-  else if(platform == "MOBILE")
-    ; //no hover on mobile, dummy
+  self.attach();
 }
 
 //example hoverable- just needs x,y,w,h, hover and unhover callback

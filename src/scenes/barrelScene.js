@@ -97,6 +97,21 @@ var BarrelScene = function(game, stage)
 
   self.cleanup = function()
   {
+    self.dbugger.clear();
+    self.ticker.clear();
+    self.clicker.clear();
+    self.dragger.clear();
+    self.drawer.clear();
+    self.particler.clear();
+    self.assetter.clear();
+
+    self.dbugger.detach();
+    self.ticker.detach();
+    self.clicker.detach();
+    self.dragger.detach();
+    self.drawer.detach();
+    self.particler.detach();
+    self.assetter.detach();
   };
 
   self.barrelPlaced = function(barrel)

@@ -117,6 +117,21 @@ var WheelScene = function(game, stage)
 
   self.cleanup = function()
   {
+    self.dbugger.clear();
+    self.ticker.clear();
+    self.flicker.clear();
+    self.presser.clear();
+    self.dragger.clear();
+    self.drawer.clear();
+    self.assetter.clear();
+
+    self.dbugger.detach();
+    self.ticker.detach();
+    self.flicker.detach();
+    self.presser.detach();
+    self.dragger.detach();
+    self.drawer.detach();
+    self.assetter.detach();
   };
 
   self.doorFlicked = function()

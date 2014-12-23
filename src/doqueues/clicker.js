@@ -16,6 +16,16 @@ var Clicker = function(init)
   self.register = function(clickable) { clickables.push(clickable); }
   self.unregister = function(clickable) { clickables.splice(clickables.indexOf(clickable),1); }
   self.clear = function() { clickables = []; }
+  self.attach = function() //will get auto-called at creation
+  {
+    if(platform == "PC")          self.source.addEventListener('mousedown', click, false);
+    else if(platform == "MOBILE") self.source.addEventListener('touchstart', click, false);
+  }
+  self.detach = function()
+  {
+    if(platform == "PC")          self.source.removeEventListener('mousedown', click);
+    else if(platform == "MOBILE") self.source.removeEventListener('touchstart', click);
+  }
 
   function click(evt)
   {
@@ -42,10 +52,7 @@ var Clicker = function(init)
     evtQueue = [];
   }
 
-  if(platform == "PC")
-    self.source.addEventListener('mousedown', click, false);
-  else if(platform == "MOBILE")
-    self.source.addEventListener('touchstart', click, false);
+  self.attach();
 }
 
 //example clickable- just needs x,y,w,h and click callback

@@ -76,6 +76,19 @@ var WindowScene = function(game, stage)
 
   self.cleanup = function()
   {
+    self.dbugger.clear();
+    self.ticker.clear();
+    self.presser.clear();
+    self.drawer.clear();
+    self.assetter.clear();
+    self.particler.clear();
+
+    self.dbugger.detach();
+    self.ticker.detach();
+    self.presser.detach();
+    self.drawer.detach();
+    self.assetter.detach();
+    self.particler.detach();
   };
 
   self.dayTick = function() { self.scoreTick(1); }

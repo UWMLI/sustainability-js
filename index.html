@@ -28,6 +28,8 @@
 
 <script type="text/javascript" src="src/scenes/nullScene.js"></script>
 <script type="text/javascript" src="src/scenes/loadingScene.js"></script>
+<script type="text/javascript" src="src/scenes/introScene.js"></script>
+<script type="text/javascript" src="src/scenes/mainScene.js"></script>
 <script type="text/javascript" src="src/scenes/sweaterScene.js"></script>
 <script type="text/javascript" src="src/scenes/barrelScene.js"></script>
 <script type="text/javascript" src="src/scenes/wheelScene.js"></script>
@@ -91,7 +93,7 @@ function stackLoaded()
       case "barrel":   g.setMainScene(BarrelScene);   break;
       case "pavement": g.setMainScene(PavementScene); break;
       case "wheel":    g.setMainScene(WheelScene);    break;
-      default:         g.setMainScene(WindowScene);   break;
+      default:         g.setMainScene(IntroScene);    break;
     }
     g.begin();
   });

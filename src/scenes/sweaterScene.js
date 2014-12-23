@@ -82,6 +82,17 @@ var SweaterScene = function(game, stage)
 
   self.cleanup = function()
   {
+    self.ticker.clear();
+    self.clicker.clear();
+    self.drawer.clear();
+    self.particler.clear();
+    self.assetter.clear();
+
+    self.ticker.detach();
+    self.clicker.detach();
+    self.drawer.detach();
+    self.particler.detach();
+    self.assetter.detach();
   };
 
   self.sweaterProduced = function(floor) { self.sweatersThrown[floor]++; }

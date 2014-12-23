@@ -28,7 +28,7 @@ var Game = function(init)
     theoretical_height:init.theoretical_height,
     container:init.container
   });
-  var scenes = [new NullScene(self, stage), new LoadingScene(self, stage), new WindowScene(self, stage)];
+  var scenes = [new NullScene(self, stage), new LoadingScene(self, stage), new IntroScene(self, stage)];
   var currentScene = 0;
 
   var physicalRect    = { x:0, y:0, w:self.physical_width,    h:self.physical_height};
@@ -60,5 +60,12 @@ var Game = function(init)
     currentScene++;
     scenes[currentScene].ready();
   };
+
+  self.setScene = function(Scene)
+  {
+    scenes[currentScene].cleanup();
+    scenes[currentScene] = new Scene(self, stage);
+    scenes[currentScene].ready();
+  }
 };
 

@@ -18,6 +18,37 @@ var Presser = function(init)
   self.register = function(pressable) { pressables.push(pressable); }
   self.unregister = function(pressable) { pressables.splice(pressables.indexOf(pressable),1); }
   self.clear = function() { pressables = []; }
+  self.attach = function() //will auto-call on creation
+  {
+    if(platform == "PC")
+    {
+      self.source.addEventListener('mousedown', begin, false);
+      self.source.addEventListener('mousemove', press, false);
+      self.source.addEventListener('mouseup',   end,   false);
+    }
+    else if(platform == "MOBILE")
+    {
+      self.source.addEventListener('touchstart', begin, false);
+      self.source.addEventListener('touchmove',  press, false);
+      self.source.addEventListener('touchend',   end,   false);
+    }
+  }
+  self.detach = function()
+  {
+    if(platform == "PC")
+    {
+      self.source.removeEventListener('mousedown', begin);
+      self.source.removeEventListener('mousemove', press);
+      self.source.removeEventListener('mouseup',   end);
+    }
+    else if(platform == "MOBILE")
+    {
+      self.source.removeEventListener('touchstart', begin);
+      self.source.removeEventListener('touchmove',  press);
+      self.source.removeEventListener('touchend',   end);
+    }
+  }
+
 
   function begin(evt)
   {
@@ -85,18 +116,7 @@ var Presser = function(init)
     evtQueue = [];
   }
 
-  if(platform == "PC")
-  {
-    self.source.addEventListener('mousedown', begin, false);
-    self.source.addEventListener('mousemove', press, false);
-    self.source.addEventListener('mouseup',   end,   false);
-  }
-  else if(platform == "MOBILE")
-  {
-    self.source.addEventListener('touchstart', begin, false);
-    self.source.addEventListener('touchmove',  press, false);
-    self.source.addEventListener('touchend',   end,   false);
-  }
+  self.attach();
 }
 
 //example pressable- just needs x,y,w,h and press callback

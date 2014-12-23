@@ -17,6 +17,36 @@ var Flicker = function(init)
   self.register = function(flickable) { flickables.push(flickable); }
   self.unregister = function(flickable) { flickables.splice(flickables.indexOf(flickable),1); }
   self.clear = function() { flickables = []; }
+  self.attach = function() //will get auto-called on creation
+  {
+    if(platform == "PC")
+    {
+      self.source.addEventListener('mousedown', begin, false);
+      self.source.addEventListener('mousemove', drag,  false);
+      self.source.addEventListener('mouseup',   end,   false);
+    }
+    else if(platform == "MOBILE")
+    {
+      self.source.addEventListener('touchstart', begin, false);
+      self.source.addEventListener('touchmove',  drag,  false);
+      self.source.addEventListener('touchend',   end,   false);
+    }
+  }
+  self.detach = function()
+  {
+    if(platform == "PC")
+    {
+      self.source.removeEventListener('mousedown', begin);
+      self.source.removeEventListener('mousemove', drag);
+      self.source.removeEventListener('mouseup',   end);
+    }
+    else if(platform == "MOBILE")
+    {
+      self.source.removeEventListener('touchstart', begin);
+      self.source.removeEventListener('touchmove',  drag);
+      self.source.removeEventListener('touchend',   end);
+    }
+  }
 
   function begin(evt)
   {
@@ -57,18 +87,7 @@ var Flicker = function(init)
     evtQueue = [];
   }
 
-  if(platform == "PC")
-  {
-    self.source.addEventListener('mousedown', begin, false);
-    self.source.addEventListener('mousemove', drag,  false);
-    self.source.addEventListener('mouseup',   end,   false);
-  }
-  else if(platform == "MOBILE")
-  {
-    self.source.addEventListener('touchstart', begin, false);
-    self.source.addEventListener('touchmove',  drag,  false);
-    self.source.addEventListener('touchend',   end,   false);
-  }
+  self.attach();
 }
 
 //example flickable- NOTE- Has a lot of infrastructure. should probably just copy/paste this object

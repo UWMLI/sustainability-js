@@ -173,26 +173,12 @@ var BulbScene = function(game, stage)
   {
     self.drawMode = mode;
 
-    //unregister everything
-    self.drawer.unregister(self.house);
-    for(var i = 0; i < self.bulbs.length; i++)
-      self.drawer.unregister(self.bulbs[i]);
-    for(var i = 0; i < self.janitors.length; i++)
-      self.drawer.unregister(self.janitors[i]);
-    self.drawer.unregister(self.player);
-    self.drawer.unregister(self.particler);
-    self.drawer.unregister(self.iSpendGraph);
-    self.drawer.unregister(self.theySpendGraph);
-    self.drawer.unregister(self.spendGraphMarkings);
-    self.drawer.unregister(self.iEmitGraph);
-    self.drawer.unregister(self.theyEmitGraph);
-    self.drawer.unregister(self.emitGraphMarkings);
-    self.drawer.unregister(self.iEfficiencyGraph);
-    self.drawer.unregister(self.theyEfficiencyGraph);
-    self.drawer.unregister(self.efficiencyGraphMarkings);
-    self.drawer.unregister(self.spentButton);
-    self.drawer.unregister(self.litButton);
-    self.drawer.unregister(self.efficiencyButton);
+    //self.ticker.clear(); //nothing stops ticking
+    self.clicker.clear();
+    //self.presser.clear(); //buttons always listen
+    self.drawer.clear();
+    self.assetter.clear();
+    self.particler.clear();
 
     if(mode == "MAIN")
     {
@@ -243,6 +229,19 @@ var BulbScene = function(game, stage)
 
   self.cleanup = function()
   {
+    self.ticker.clear();
+    self.clicker.clear();
+    self.presser.clear();
+    self.drawer.clear();
+    self.assetter.clear();
+    self.particler.clear();
+
+    self.ticker.detach();
+    self.clicker.detach();
+    self.presser.detach();
+    self.drawer.detach();
+    self.assetter.detach();
+    self.particler.detach();
   };
 
   self.node = function(x,y) //fetch by index

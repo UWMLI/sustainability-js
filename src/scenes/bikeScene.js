@@ -102,6 +102,21 @@ var BikeScene = function(game, stage)
 
   self.cleanup = function()
   {
+    self.dbugger.clear();
+    self.ticker.clear();
+    self.clicker.clear();
+    self.dragger.clear();
+    self.flicker.clear();
+    self.drawer.clear();
+    self.assetter.clear();
+
+    self.dbugger.detach();
+    self.ticker.detach();
+    self.clicker.detach();
+    self.dragger.detach();
+    self.flicker.detach();
+    self.drawer.detach();
+    self.assetter.detach();
   };
 };
 

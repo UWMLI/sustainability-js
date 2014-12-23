@@ -11,6 +11,8 @@ var Particler = function(init)
   self.register = function(particlable) { particlables.push(particlable); }
   self.unregister = function(particlable) { particlables.splice(particlables.indexOf(particlable),1); }
   self.clear = function() { particlables = []; }
+  self.attach = function() {} //will get auto-called on creation
+  self.detach = function() {}
 
   //doesn't have "flush" like other doqueues.
   //instead, has "tick" and "draw" that allows particler
@@ -25,6 +27,8 @@ var Particler = function(init)
     for(var i = 0; i < particlables.length; i++)
       particlables[i].draw(canv);
   }
+
+  self.attach();
 }
 
 //example particlable- needs tick that returns true for survival, false for death; and draw(canv)

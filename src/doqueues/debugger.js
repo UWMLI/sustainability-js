@@ -9,6 +9,18 @@ var Debugger = function(init)
   var self = this;
   doMapInitDefaults(self,init,default_init);
 
+  self.clear = function()
+  {
+    for(var i = 0; i < log.length; i++)
+    {
+      log[i] = "";
+      cells[i].innerHTML = "";
+    }
+    pos = 0;
+  }
+  self.attach = function() {} //will get auto-called at creation
+  self.detach = function() {}
+
   var log = []; //acts as circle buffer
   var cells = [];
   var pos = 0;
@@ -30,5 +42,7 @@ var Debugger = function(init)
         cells[i].innerHTML = log[(pos-1-i+self.history)%self.history];
     }
   }
+
+  self.attach();
 }
 

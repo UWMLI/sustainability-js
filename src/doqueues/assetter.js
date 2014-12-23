@@ -8,6 +8,10 @@ var Assetter = function(init)
   var self = this;
   doMapInitDefaults(self,init,default_init);
 
+  self.clear = function() { assets = []; }
+  self.attach = function() {} //will get auto-called on creation
+  self.detach = function() {}
+
   var assets = [];
   self.asset = function(file)
   {
@@ -19,5 +23,7 @@ var Assetter = function(init)
     }
     return assets[file];
   }
+
+  self.attach();
 }
 

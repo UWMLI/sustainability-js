@@ -17,6 +17,36 @@ var Dragger = function(init)
   self.register = function(draggable) { draggables.push(draggable); }
   self.unregister = function(draggable) { draggables.splice(draggables.indexOf(draggable),1); }
   self.clear = function() { draggables = []; }
+  self.attach = function() //will get auto-called on create
+  {
+    if(platform == "PC")
+    {
+      self.source.addEventListener('mousedown', begin, false);
+      self.source.addEventListener('mousemove', drag,  false);
+      self.source.addEventListener('mouseup',   end,   false);
+    }
+    else if(platform == "MOBILE")
+    {
+      self.source.addEventListener('touchstart', begin, false);
+      self.source.addEventListener('touchmove',  drag,  false);
+      self.source.addEventListener('touchend',   end,   false);
+    }
+  }
+  self.detach = function()
+  {
+    if(platform == "PC")
+    {
+      self.source.removeEventListener('mousedown', begin);
+      self.source.removeEventListener('mousemove', drag);
+      self.source.removeEventListener('mouseup',   end);
+    }
+    else if(platform == "MOBILE")
+    {
+      self.source.removeEventListener('touchstart', begin);
+      self.source.removeEventListener('touchmove',  drag);
+      self.source.removeEventListener('touchend',   end);
+    }
+  }
 
   function begin(evt)
   {
@@ -63,18 +93,7 @@ var Dragger = function(init)
     evtQueue = [];
   }
 
-  if(platform == "PC")
-  {
-    self.source.addEventListener('mousedown', begin, false);
-    self.source.addEventListener('mousemove', drag,  false);
-    self.source.addEventListener('mouseup',   end,   false);
-  }
-  else if(platform == "MOBILE")
-  {
-    self.source.addEventListener('touchstart', begin, false);
-    self.source.addEventListener('touchmove',  drag,  false);
-    self.source.addEventListener('touchend',   end,   false);
-  }
+  self.attach();
 }
 
 //example draggable- just needs x,y,w,h and dragStart, drag, and dragFinish callback
