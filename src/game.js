@@ -12,6 +12,7 @@ var Game = function(init)
   }
 
   var self = this;
+
   //odd chunk to prevent initdefaults form overriding rectmapping behavior if not specified
   if(init.hasOwnProperty('width')  && !init.hasOwnProperty('physical_width'))     init.physical_width  = init.width;
   if(init.hasOwnProperty('height') && !init.hasOwnProperty('physical_height'))    init.physical_height = init.height;
@@ -31,8 +32,37 @@ var Game = function(init)
   var scenes = [new NullScene(self, stage), new LoadingScene(self, stage), new IntroScene(self, stage)];
   var currentScene = 0;
 
-  var physicalRect    = { x:0, y:0, w:self.physical_width,    h:self.physical_height};
-  var theoreticalRect = { x:0, y:0, w:self.theoretical_width, h:self.theoretical_height};
+  var physicalRect    = { x:0, y:0, w:init.physical_width,    h:init.physical_height};
+  var theoreticalRect = { x:0, y:0, w:init.theoretical_width, h:init.theoretical_height};
+
+  /* 
+  DEBUG CODE
+  */
+  self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physicalRect,theoretical_rect:theoreticalRect});
+  self.drawer = new Drawer({source:stage.drawCanv});
+  var BB = function(game)
+  {
+    var self = this;
+    self.x = init.theoretical_width-100-20;
+    self.y = 20;
+    self.w = 100;
+    self.h = 100;
+
+    self.draw = function(canv)
+    {
+      canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    }
+    self.click = function()
+    {
+      game.setScene(MainScene);
+    }
+  }
+  self.backBtn = new BB(self);
+  /*
+  DEBUG CODE
+  */
+  self.clicker.register(self.backBtn);
+  self.drawer.register(self.backBtn);
 
   self.setMainScene = function(Scene)
   {
@@ -51,6 +81,8 @@ var Game = function(init)
     stage.clear();
     scenes[currentScene].tick();
     scenes[currentScene].draw();
+    self.clicker.flush();
+    self.drawer.flush();
     stage.draw(); //blits from offscreen canvas to on screen one
   };
 
