@@ -173,12 +173,7 @@ var BulbScene = function(game, stage)
   {
     self.drawMode = mode;
 
-    //self.ticker.clear(); //nothing stops ticking
-    self.clicker.clear();
-    //self.presser.clear(); //buttons always listen
     self.drawer.clear();
-    self.assetter.clear();
-    self.particler.clear();
 
     if(mode == "MAIN")
     {
