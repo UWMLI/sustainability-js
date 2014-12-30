@@ -34,13 +34,13 @@ var MainScene = function(game, stage)
     self.assetter = new Assetter({});
 
     self.map         = new MA_Map(self);                             self.drawer.register(self.map);         self.dragger.register(self.map)
-    self.bikeBtn     = new MA_Button(20, 20,200,20,"Bike",self);     self.drawer.register(self.bikeBtn);     self.clicker.register(self.bikeBtn);
-    self.windowBtn   = new MA_Button(20, 60,200,20,"Window",self);   self.drawer.register(self.windowBtn);   self.clicker.register(self.windowBtn);
-    self.bulbBtn     = new MA_Button(20,100,200,20,"Bulb",self);     self.drawer.register(self.bulbBtn);     self.clicker.register(self.bulbBtn);
-    self.sweaterBtn  = new MA_Button(20,140,200,20,"Sweater",self);  self.drawer.register(self.sweaterBtn);  self.clicker.register(self.sweaterBtn);
-    self.barrelBtn   = new MA_Button(20,180,200,20,"Barrel",self);   self.drawer.register(self.barrelBtn);   self.clicker.register(self.barrelBtn);
-    self.pavementBtn = new MA_Button(20,220,200,20,"Pavement",self); self.drawer.register(self.pavementBtn); self.clicker.register(self.pavementBtn);
-    self.wheelBtn    = new MA_Button(20,260,200,20,"Wheel",self);    self.drawer.register(self.wheelBtn);    self.clicker.register(self.wheelBtn);
+    self.bikeBtn     = new MA_Button( 20, 20,200,100,"Bike",self);     self.drawer.register(self.bikeBtn);     self.clicker.register(self.bikeBtn);
+    self.windowBtn   = new MA_Button( 60,300,200,100,"Window",self);   self.drawer.register(self.windowBtn);   self.clicker.register(self.windowBtn);
+    self.bulbBtn     = new MA_Button(200,700,200,100,"Bulb",self);     self.drawer.register(self.bulbBtn);     self.clicker.register(self.bulbBtn);
+    self.sweaterBtn  = new MA_Button(700,140,200,100,"Sweater",self);  self.drawer.register(self.sweaterBtn);  self.clicker.register(self.sweaterBtn);
+    self.barrelBtn   = new MA_Button(100,180,200,100,"Barrel",self);   self.drawer.register(self.barrelBtn);   self.clicker.register(self.barrelBtn);
+    self.pavementBtn = new MA_Button(450,620,200,100,"Pavement",self); self.drawer.register(self.pavementBtn); self.clicker.register(self.pavementBtn);
+    self.wheelBtn    = new MA_Button(500,260,200,100,"Wheel",self);    self.drawer.register(self.wheelBtn);    self.clicker.register(self.wheelBtn);
   };
 
   self.tick = function()
@@ -120,6 +120,21 @@ var MA_Map = function(game)
     if(self.y + self.deltaY < boundy-(self.h-boundh)) self.deltaY = boundy-(self.h-boundh)-self.y;
     self.x += self.deltaX;
     self.y += self.deltaY;
+
+    game.bikeBtn.x += self.deltaX;
+    game.bikeBtn.y += self.deltaY;
+    game.windowBtn.x += self.deltaX;
+    game.windowBtn.y += self.deltaY;
+    game.bulbBtn.x += self.deltaX;
+    game.bulbBtn.y += self.deltaY;
+    game.sweaterBtn.x += self.deltaX;
+    game.sweaterBtn.y += self.deltaY;
+    game.barrelBtn.x += self.deltaX;
+    game.barrelBtn.y += self.deltaY;
+    game.pavementBtn.x += self.deltaX;
+    game.pavementBtn.y += self.deltaY;
+    game.wheelBtn.x += self.deltaX;
+    game.wheelBtn.y += self.deltaY;
   };
   self.dragFinish = function()
   {
@@ -128,10 +143,11 @@ var MA_Map = function(game)
   {
     canv.context.strokeStyle = "#000000";
     canv.context.lineWidth = 1;
-    for(var i = 0; i < 100; i+=2)
-      canv.context.strokeRect(self.x+(self.w/100)*i, self.y, self.w/100, self.h);
-    for(var i = 0; i < 100; i+=2)
-      canv.context.strokeRect(self.x, self.y+(self.h/100)*i, self.w, self.h/100);
+    var dens = 200;
+    for(var i = 0; i < dens; i+=2)
+      canv.context.strokeRect(self.x+(self.w/dens)*i, self.y, self.w/dens, self.h);
+    for(var i = 0; i < dens; i+=2)
+      canv.context.strokeRect(self.x, self.y+(self.h/dens)*i, self.w, self.h/dens);
   }
 }
 
@@ -146,6 +162,7 @@ var MA_Button = function(x,y,w,h,text,game)
 
   self.draw = function(canv)
   {
+    canv.context.lineWidth = 2;
     canv.context.strokeStyle = "#000000";
     canv.context.strokeRect(self.x, self.y, self.w, self.h);
     canv.context.fillStyle = "#000000";
