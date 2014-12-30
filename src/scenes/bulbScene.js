@@ -721,6 +721,7 @@ var BU_Graph = function(x,y,w,h,color,game)
   self.draw = function(canv)
   {
     if(totalPts == 0) return;
+    if(self.lastCompressed+1000 < totalPts) self.compress(640);
     canv.context.lineWidth = 5;
     canv.context.strokeStyle = self.color;
     canv.context.fillRect(self.x,self.y+20,((self.maxChangeTimer-self.changeTimer)/self.maxChangeTimer)*self.w,10);
@@ -736,6 +737,68 @@ var BU_Graph = function(x,y,w,h,color,game)
     }
     canv.context.stroke();
     canv.context.closePath();
+  }
+
+  self.lastCompressed = 0;
+  self.compress = function(numpts) //more like "throw away a ton of data"
+  {
+    var oldpts = pts;
+    var oldptLens = ptLens;
+    var oldtotalPts = totalPts;
+
+    var sampleDist = totalPts/numpts;
+    var sampleI = 0;
+    var sampleJ = 0;
+    var ptsTraversed = 0;
+
+    var ptsAtNextSample = 0;
+    var ptsAtLeftInRun = oldptLens[0];
+
+    pts = [];
+    ptLens = [];
+    totalPts = 0;
+    self.high = 1.0;
+    self.low = 0.0;
+
+    self.register(pts[0]);
+    while(totalPts < numpts)
+    {
+      ptsAtNextSample = Math.floor((totalPts+1)*sampleDist);
+      while(ptsTraversed < ptsAtNextSample)
+      {
+        ptsAtLeftInRun = ptsTraversed+(oldptLens[sampleI]-sampleJ);
+
+        if(ptsAtNextSample > ptsAtLeftInRun)
+        {
+          ptsTraversed += (oldptLens[sampleI]-sampleJ);
+          sampleJ = 0;
+          sampleI++;
+        }
+        else if(ptsAtNextSample == ptsAtLeftInRun)
+        {
+          ptsTraversed += (oldptLens[sampleI]-sampleJ);
+          self.register(oldpts[sampleI]);
+          sampleJ = 0;
+          sampleI++;
+        }
+        else //ptsAtNextSample < ptsAtLeftInRun
+        {
+          sampleJ      += ptsAtNextSample - ptsTraversed;
+          ptsTraversed += ptsAtNextSample - ptsTraversed;
+          self.register(oldpts[sampleI]);
+        }
+      }
+    }
+
+    //re pad out so new contributions aren't super heavily weighted
+    var newtotalPts = 0;
+    for(var i = 0; i < ptLens.length; i++)
+    {
+      ptLens[i] *= oldtotalPts/numpts;
+      newtotalPts += ptLens[i];
+    }
+    totalPts = newtotalPts;
+    self.lastCompressed = newtotalPts;
   }
 }
 
