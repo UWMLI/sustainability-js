@@ -721,7 +721,7 @@ var BU_Graph = function(x,y,w,h,color,game)
   self.draw = function(canv)
   {
     if(totalPts == 0) return;
-    if(self.lastCompressed+1000 < totalPts) self.compress(640);
+    if(self.lastCompressed+1000 < totalPts) self.compress(50);
 
     canv.context.lineWidth = 5;
     canv.context.strokeStyle = self.color;
@@ -758,8 +758,6 @@ var BU_Graph = function(x,y,w,h,color,game)
     pts = [];
     ptLens = [];
     totalPts = 0;
-    self.high = 1.0;
-    self.low = 0.0;
 
     self.register(pts[0]);
     while(totalPts < numpts)
