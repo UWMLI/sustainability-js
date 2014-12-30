@@ -722,6 +722,7 @@ var BU_Graph = function(x,y,w,h,color,game)
   {
     if(totalPts == 0) return;
     if(self.lastCompressed+1000 < totalPts) self.compress(640);
+
     canv.context.lineWidth = 5;
     canv.context.strokeStyle = self.color;
     canv.context.fillRect(self.x,self.y+20,((self.maxChangeTimer-self.changeTimer)/self.maxChangeTimer)*self.w,10);

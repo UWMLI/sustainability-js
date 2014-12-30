@@ -365,7 +365,7 @@ var WH_Wheel = function(game)
     canv.context.lineWidth = 2;
     canv.context.strokeStyle = "#000000";
     canv.context.beginPath();
-    canv.context.arc(self.x+self.w/2, self.y+self.h/2, (game.box.h-40)/2, 0, Math.PI*2, true); 
+    canv.context.arc(self.x+self.w/2, self.y+self.h/2, (game.box.h-40)/2, 0, Math.PI*2, true);
     canv.context.stroke();
     canv.context.closePath();
   }
@@ -376,17 +376,37 @@ var WH_Wheel = function(game)
 
   self.dragStart = function(evt)
   {
-    self.offX = self.x+(self.w/2)-evt.doX;
-    self.offY = self.y+(self.h/2)-evt.doY;
+    self.offX = evt.doX-(self.x+(self.w/2));
+    self.offY = evt.doY-(self.y+(self.h/2));
   };
+  function len(x,y)
+  {
+    return Math.sqrt((x*x)+(y*y));
+  }
   self.drag = function(evt)
   {
-    self.deltaX = (evt.doX-(self.w/2)+self.offX)-self.x;
-    self.deltaY = (evt.doY-(self.h/2)+self.offY)-self.y;
-    self.x += self.deltaX;
-    self.y += self.deltaY;
+    self.deltaX = (evt.doX-self.x+(self.w/2))-self.offX;
+    self.deltaY = (evt.doY-self.y+(self.h/2))-self.offY;
+
+    self.newOffX = evt.doX-(self.x+(self.w/2));
+    self.newOffY = evt.doY-(self.y+(self.h/2));
+
+    var x = self.offX/len(self.offX,self.offY);
+    var y = self.offY/len(self.offX,self.offY);
+    self.oldT = ((-Math.atan2(x,y))+(Math.PI/2)+(2*Math.PI))%(2*Math.PI); //why terrible coordinate spaces...
+    var x = self.newOffX/len(self.newOffX,self.newOffY);
+    var y = self.newOffY/len(self.newOffX,self.newOffY);
+    self.newT = ((-Math.atan2(x,y))+(Math.PI/2)+(2*Math.PI))%(2*Math.PI); //why terrible coordinate spaces...
+
+    var a = self.oldT-self.newT;
+    if((a > 0 && a < Math.PI) || a < -Math.PI) console.log("cw");
+    else                                       console.log("ccw");
+
+    self.offX = self.newOffX;
+    self.offY = self.newOffY;
   };
   self.dragFinish = function()
   {
   };
 }
+
