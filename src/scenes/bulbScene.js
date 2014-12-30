@@ -143,7 +143,9 @@ var BulbScene = function(game, stage)
   var theylights = 0;
   self.trunc = function(v,t)
   {
-    return Math.round(v*t)/t;
+    var x = Math.round(v*t)/t;
+    if(!isFinite(x)) return 0;
+    return x;
   }
   self.draw = function()
   {
