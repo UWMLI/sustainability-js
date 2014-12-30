@@ -63,12 +63,12 @@ var BulbScene = function(game, stage)
       {
         self.nodes[(i*(self.bulbsPerFloor+1))+j] = new BU_Node(self,j,i);
         self.bulbs[(i* self.bulbsPerFloor)   +j] = new BU_Bulb(self,self.node(j,i));
-        self.bulb(j,i).setType("BAD");
+        self.bulb(j,i).setType("OLD_BAD");
         self.bulb(j,i).energy = Math.round(Math.random()*100);
       }
       self.nodes[(i*(self.bulbsPerFloor+1))+self.bulbsPerFloor] = new BU_Node(self,self.bulbsPerFloor,i); //create extra node (for elevator)
     }
-    self.bulb(0,0).energy = 0.1; //let first bulb run out so player immediately can replace it
+    self.bulb(0,0).energy = 0.01; //let first bulb run out so player immediately can replace it
 
     self.player = new BU_Dude(self, 0, "GOOD");
 
@@ -76,14 +76,14 @@ var BulbScene = function(game, stage)
     self.janitors.push(new BU_Dude(self, 0, "BAD"));
     self.janitors.push(new BU_Dude(self, self.numFloors-1, "BAD"));
 
-    self.iSpendGraph         = new BU_CircGraph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#00FF00",self);
-    self.theySpendGraph      = new BU_CircGraph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#FF0000",self);
+    self.iSpendGraph         = new BU_Graph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#00FF00",self);
+    self.theySpendGraph      = new BU_Graph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#FF0000",self);
     self.spendGraphMarkings  = new SpendGraphMarkings(self);
-    self.iEmitGraph          = new BU_CircGraph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#00FF00",self);
-    self.theyEmitGraph       = new BU_CircGraph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#FF0000",self);
+    self.iEmitGraph          = new BU_Graph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#00FF00",self);
+    self.theyEmitGraph       = new BU_Graph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#FF0000",self);
     self.emitGraphMarkings   = new EmitGraphMarkings(self);
-    self.iEfficiencyGraph    = new BU_CircGraph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#00FF00",self);
-    self.theyEfficiencyGraph = new BU_CircGraph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#FF0000",self);
+    self.iEfficiencyGraph    = new BU_Graph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#00FF00",self);
+    self.theyEfficiencyGraph = new BU_Graph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#FF0000",self);
     self.efficiencyGraphMarkings = new EfficiencyGraphMarkings(self);
 
     self.setDrawMode("MAIN");
@@ -264,7 +264,7 @@ var BulbScene = function(game, stage)
     var bestScore = 10000000; //terrible
     for(var i = 0; i < self.bulbs.length; i++)
     {
-      if(self.bulbs[i].type == "BURNT_GOOD" || self.bulbs[i].type == "BURNT_BAD" || self.bulbs[i].type == "NONE")
+      if(self.bulbs[i].type == "BURNT_GOOD" || self.bulbs[i].type == "BURNT_BAD" || self.bulbs[i].type == "BURNT_OLD_BAD" || self.bulbs[i].type == "NONE")
       {
         var n = self.bulbs[i].node;
         var score = bestScore+1; //less is better
@@ -462,7 +462,7 @@ var BU_Dude = function(game, floor, bulb)
         else //at goal
         {
           var b = game.bulbAt(self.goalNode);
-          if(b.type == "BURNT_GOOD" || b.type == "BURNT_BAD" || b.type == "NONE")
+          if(b.type == "BURNT_GOOD" || b.type == "BURNT_BAD" || b.type == "BURNT_OLD_BAD" || b.type == "NONE")
           {
             self.state = 2;
             self.changeTimer = 200;
@@ -527,6 +527,15 @@ var BU_Bulb = function(game,node)
   {
     switch(type)
     {
+      case "OLD_BAD":
+        self.type = type;
+        self.dollarsPer = 3;
+        self.energyPer = 3.0;
+        self.light = 0.25;
+        self.maxEnergy = 100.0;
+        self.energy = self.maxEnergy;
+        self.img = game.assetter.asset("man.png");
+        break;
       case "BAD":
         self.type = type;
         self.dollarsPer = 3;
@@ -542,6 +551,15 @@ var BU_Bulb = function(game,node)
         self.energyPer = 0.2; // 1/3-1/30 less energy (1/15)
         self.light = 0.35;
         self.maxEnergy = 300.0; //lasts ~50x longer
+        self.energy = self.maxEnergy;
+        self.img = game.assetter.asset("man.png");
+        break;
+      case "BURNT_OLD_BAD":
+        self.type = type;
+        self.dollarsPer = 0.0;
+        self.energyPer = 0.0;
+        self.light = 0.0;
+        self.maxEnergy = 0;
         self.energy = self.maxEnergy;
         self.img = game.assetter.asset("man.png");
         break;
@@ -625,10 +643,13 @@ var BU_Bulb = function(game,node)
       case "BURNT_GOOD": canv.context.strokeStyle = "#005500"; break;
       case "BAD":        canv.context.strokeStyle = "#FF0000"; break;
       case "BURNT_BAD":  canv.context.strokeStyle = "#550000"; break;
+      //for preexisting bulbs
+      case "OLD_BAD":        canv.context.strokeStyle = "#FF0000"; break;
+      case "BURNT_OLD_BAD":  canv.context.strokeStyle = "#550000"; break;
     }
     canv.context.strokeRect(self.x,self.y,self.w,self.h);
 
-    if(self.type == "GOOD" || self.type == "BAD")
+    if(self.type == "GOOD" || self.type == "BAD" || self.type == "OLD_BAD")
     {
       canv.context.fillStyle = "#00FFFF";
       canv.context.fillRect(self.x,self.y+((1-(self.energy/self.maxEnergy))*self.h),10,(self.energy/self.maxEnergy)*self.h);
