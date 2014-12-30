@@ -7,12 +7,14 @@ var SweaterScene = function(game, stage)
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.ticker;
   self.clicker;
+  self.presser;
   self.drawer;
   self.particler;
   self.assetter;
 
   self.house;
   self.player;
+  self.thermostat;
   self.buttons;
   self.enemies;
   self.sweaters;
@@ -31,12 +33,14 @@ var SweaterScene = function(game, stage)
   {
     self.ticker = new Ticker({});
     self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
     self.particler = new Particler({});
     self.assetter = new Assetter({});
 
     self.house = new SW_House(self);
     self.player = new SW_Player(self);
+    self.thermostat = new SW_Thermostat(self);
     self.buttons = [];
     self.enemies = [];
     self.sweaters = [];
@@ -59,6 +63,10 @@ var SweaterScene = function(game, stage)
     self.ticker.register(self.player);
     self.drawer.register(self.player);
 
+    self.drawer.register(self.thermostat);
+    self.presser.register(self.thermostat);
+    self.ticker.register(self.thermostat);
+
     self.ticker.register(self.enemyFactory);
     self.ticker.register(self.particler);
     self.drawer.register(self.particler);
@@ -67,17 +75,13 @@ var SweaterScene = function(game, stage)
   self.tick = function()
   {
     self.clicker.flush();
+    self.presser.flush();
     self.ticker.flush();
   };
 
   self.draw = function()
   {
     self.drawer.flush();
-    stage.drawCanv.context.font = "60px Georgia";
-    stage.drawCanv.context.fillStyle = "#FF0000"
-    var base = 66;
-    for(var i = 0; i < self.enemiesWon.length; i++) base+=self.enemiesWon[i];
-    stage.drawCanv.context.fillText(base+"",300,900);
   };
 
   self.cleanup = function()
@@ -94,6 +98,10 @@ var SweaterScene = function(game, stage)
     self.particler.detach();
     self.assetter.detach();
   };
+
+  self.thermostatHit = function()
+  {
+  }
 
   self.sweaterProduced = function(floor) { self.sweatersThrown[floor]++; }
   self.enemyProduced   = function(floor) { self.enemiesAttacked[floor]++; }
@@ -153,6 +161,67 @@ var SW_Player = function(game)
     canv.context.drawImage(self.img,self.x,yForFloor(self.floor),self.w,self.h);
     canv.context.fillStyle = "#00FF00";
     canv.context.fillRect(self.x,yForFloor(self.floor)+self.h-((self.charge/100)*self.h),20,(self.charge/100)*self.h);
+  }
+}
+
+var SW_Thermostat = function(game)
+{
+  var self = this;
+
+  self.w = 200;
+  self.h = 80;
+  self.x = game.stage.drawCanv.canvas.width/2-(self.w/2);
+  self.y = game.stage.drawCanv.canvas.height-(self.w/2)-(self.h/2)-20;
+
+  self.pressing = false;
+  self.pressTimerMax = 100;
+  self.pressTimer = self.pressTimerMax;
+
+  self.baseTemp = 66;
+
+  self.press = function()
+  {
+    self.pressing = true;
+  }
+
+  self.unpress = function()
+  {
+    self.pressing = false;
+    self.pressTimer = self.pressTimerMax;
+  }
+
+  self.tick = function()
+  {
+    if(self.pressing)
+    {
+      self.pressTimer--;
+      if(self.pressTimer <= 0)
+      {
+        self.pressTimer = self.pressTimerMax;
+        game.thermostatHit();
+        self.baseTemp--;
+      }
+    }
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+
+    canv.context.font = Math.round(self.h*(3/4))+"px Georgia";
+    canv.context.fillStyle = "#FF0000"
+    var base = self.baseTemp;
+    for(var i = 0; i < game.enemiesWon.length; i++) base+=game.enemiesWon[i];
+    canv.context.fillText(base+"",self.x,self.y+self.h);
+
+    if(self.pressing)
+    {
+      canv.context.strokeStyle = "#00FF00"
+      canv.context.lineWidth = 3;
+      canv.context.beginPath();
+      canv.context.arc(self.x+self.w/2,self.y+self.h/2,self.w/2,3*Math.PI/2,(3*(Math.PI/2)+((self.pressTimerMax-self.pressTimer)/self.pressTimerMax)*(2*Math.PI))%(2*Math.PI));
+      canv.context.stroke();
+    }
   }
 }
 
