@@ -83,7 +83,23 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/bike_victory_helmet.png");
     //wheel
     img_srcs.push("assets/wheel.png");
+    //bulb
+    img_srcs.push("assets/bulb_bulb.png");
+    img_srcs.push("assets/bulb_player_walk_0_r.png");
+    img_srcs.push("assets/bulb_player_walk_1_r.png");
+    img_srcs.push("assets/bulb_player_walk_0_l.png");
+    img_srcs.push("assets/bulb_player_walk_1_l.png");
+    img_srcs.push("assets/bulb_player_change.png");
+    img_srcs.push("assets/bulb_janitor_walk_0_r.png");
+    img_srcs.push("assets/bulb_janitor_walk_1_r.png");
+    img_srcs.push("assets/bulb_janitor_walk_0_l.png");
+    img_srcs.push("assets/bulb_janitor_walk_1_l.png");
+    img_srcs.push("assets/bulb_janitor_change.png");
+    img_srcs.push("assets/bulb_bg.png");
+    img_srcs.push("assets/bulb_glow_blue.png");
+    img_srcs.push("assets/bulb_glow_yellow.png");
     //misc
+    img_srcs.push("assets/null.png");
     img_srcs.push("assets/bike_bg.png");
     img_srcs.push("assets/man.png");
     img_srcs.push("assets/back1.png");
