@@ -113,11 +113,11 @@ var BulbScene = function(game, stage)
     self.hours += BU_c.hours_per_tick;
 
     //rates
-    // 0.11 @ 2 jan
-    // 0.152 @ 4 jan
-    // 0.072 @ 2 jan, 1 play
-    // 0.06  @ 4 jan, 1 play
-    self.theyspent += 0.152*BU_c.hours_per_tick; //$0.11 experimentally determined to be rate of spending w/ 2 janitors, no player
+    //control 0.123   $/h @ infnty w/ 4 janitors
+    //recoup  (0.123) $/h @ 13653h w/ 3 jan, 1 player
+    //halve   (0.06)  $/h @ 26398h w/ 3 jan, 1 player
+    //lowest  (0.05)  $/h @ 37000h w/ 3 jan, 1 player
+    self.theyspent += 0.123*BU_c.hours_per_tick; //$0.11 experimentally determined to be rate of spending w/ 2 janitors, no player
 
     self.clicker.flush();
     self.presser.flush();
@@ -141,14 +141,22 @@ var BulbScene = function(game, stage)
     if(!isFinite(x)) return 0;
     return x;
   }
+  self.savings;
+  self.savingstick = 0;
   self.draw = function()
   {
     self.drawer.flush();
     self.stage.drawCanv.context.font = "30px Georgia";
     self.stage.drawCanv.context.fillStyle = "#000000";
-    self.stage.drawCanv.context.fillText("Savings:$"+self.trunc(self.theyspent-self.ispent,100),100,50);
-    self.stage.drawCanv.context.fillText("Spend:$"+self.trunc(self.ispent,100),100,80);
-    self.stage.drawCanv.context.fillText("Rate:$"+(self.ispent)/self.hours, 100,110);
+    if(self.savingstick %100 == 0)
+    {
+      self.savings = self.theyspent-self.ispent;
+      self.savingstick = 0;
+    }
+    self.savingstick++;
+    self.stage.drawCanv.context.fillText("Savings:$"+self.trunc(self.savings,100),100,50);
+    //self.stage.drawCanv.context.fillText("Spend:$"+self.trunc(self.ispent,100),100,80);
+    //self.stage.drawCanv.context.fillText("Rate:$"+(self.ispent)/self.hours, 100,110);
   };
 
   self.cleanup = function()
@@ -231,14 +239,14 @@ var BulbScene = function(game, stage)
   self.purchaseBulb = function(bulb)
   {
     self.ispent += BU_c.cost[bulb.type];
-    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/2),"$"+BU_c.cost[bulb.type],30,"#000000",0));
+    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/2),"$"+BU_c.cost[bulb.type],20+BU_c.cost[bulb.type],"#008800",0));
   }
 
   self.purchaseEnergy = function(bulb, hours)
   {
     var cost = Math.round((BU_c.energy_jh[bulb.type]*hours*BU_c.electricity_cost)*100)/100;
     self.ispent += cost;
-    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/2),"$"+cost,20,"#000000",(bulb.node.n_x+bulb.node.n_y)/20));
+    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/2),"$"+cost,20+(cost*10),"#008800",(bulb.node.n_x+bulb.node.n_y)/20));
   }
 };
 
