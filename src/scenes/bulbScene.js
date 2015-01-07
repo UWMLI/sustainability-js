@@ -45,6 +45,8 @@ var BulbScene = function(game, stage)
   self.bulbs;
   self.janitors;
 
+  self.selector;
+
   self.theySpendGraph;
   self.iSpendGraph;
   self.spendGraphMarkings;
@@ -84,6 +86,8 @@ var BulbScene = function(game, stage)
     for(var i = 1; i < self.house.numFloors; i++) //i starts at 1 (player on 0)
       self.janitors.push(new BU_Dude(self, i, BU_c.BULB_INCANDESCENT_ON));
 
+    self.selector = new BU_Selector(self);
+
     self.iSpendGraph         = new BU_Graph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#00FF00",self);
     self.theySpendGraph      = new BU_Graph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#FF0000",self);
     self.spendGraphMarkings  = new SpendGraphMarkings(self);
@@ -91,6 +95,9 @@ var BulbScene = function(game, stage)
     self.drawer.register(self.house);
     for(var i = 0; i < self.bulbs.length; i++)
       self.drawer.register(self.bulbs[i]);
+
+    self.drawer.register(self.selector);
+
     for(var i = 0; i < self.janitors.length; i++)
       self.drawer.register(self.janitors[i]);
 
@@ -127,6 +134,8 @@ var BulbScene = function(game, stage)
       if(self.janitors[i].state != 2)
         self.janitors[i].goalNode = self.bestGoalFromNode(self.nodeNearestDude(self.janitors[i]));
     }
+
+    if(self.player.state == 0 && self.selector.lastNode) self.player.goalNode = self.selector.lastNode;
 
     self.iSpendGraph.register(self.ispent);
     self.theySpendGraph.register(self.theyspent);
@@ -226,6 +235,7 @@ var BulbScene = function(game, stage)
 
   self.bulbClicked = function(bulb)
   {
+    self.selector.setNode(bulb.node);
     if(self.player.state == 0 || self.player.state == 1)
       self.player.goalNode = bulb.node;
   }
@@ -249,6 +259,34 @@ var BulbScene = function(game, stage)
     self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/2),"$"+cost,20+(cost*10),"#008800",(bulb.node.n_x+bulb.node.n_y)/20));
   }
 };
+
+var BU_Selector = function(game)
+{
+  var self = this;
+
+  self.w = 50;
+  self.h = 50;
+  self.x;
+  self.y;
+  //self.x = self.node.x-(self.w/2);
+  //self.y = self.node.y;
+  self.lastNode;
+
+  self.img = game.assetter.asset("bulb_select.png");
+
+  self.setNode = function(node)
+  {
+    self.lastNode = node;
+    self.x = node.x-self.w/2;
+    self.y = node.y+self.h/4;
+  }
+
+  self.draw = function(canv)
+  {
+    if(self.lastNode)
+      canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+  }
+}
 
 var BU_House = function(game)
 {
@@ -417,8 +455,8 @@ var BU_Bulb = function(game,node)
   self.ticksTilPurchase = self.ticksPerPurchase;
 
   self.node = node;
-  self.w = 50;
-  self.h = 50;
+  self.w = 75;
+  self.h = 100;
   self.x = self.node.x-(self.w/2);
   self.y = self.node.y;
 
@@ -464,13 +502,13 @@ var BU_Bulb = function(game,node)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x+self.w/4,self.y,self.w/2,self.h);
-    canv.context.drawImage(self.glow_img,self.x-self.w/2,self.y,self.w*2,self.h*3);
+    canv.context.drawImage(self.img,self.x+self.w/3,self.y,self.w/3,self.h/2);
+    canv.context.drawImage(self.glow_img,self.x-self.w/2,self.y-(self.h/4),self.w*2,self.h*2);
 
     if(self.hours_left > 0)
     {
       canv.context.fillStyle = "#00FFFF";
-      canv.context.fillRect(self.x,self.y+((1-(self.hours_left/BU_c.lifespan[self.type]))*self.h),10,(self.hours_left/BU_c.lifespan[self.type])*self.h);
+      canv.context.fillRect(self.x,self.y+((1-(self.hours_left/BU_c.lifespan[self.type]))*self.h/2),10,(self.hours_left/BU_c.lifespan[self.type])*self.h/2);
     }
   }
 }

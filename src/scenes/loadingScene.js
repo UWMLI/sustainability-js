@@ -98,6 +98,7 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/bulb_bg.png");
     img_srcs.push("assets/bulb_glow_blue.png");
     img_srcs.push("assets/bulb_glow_yellow.png");
+    img_srcs.push("assets/bulb_select.png");
     //misc
     img_srcs.push("assets/null.png");
     img_srcs.push("assets/bike_bg.png");
