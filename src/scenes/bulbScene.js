@@ -117,31 +117,34 @@ var BulbScene = function(game, stage)
 
   self.tick = function()
   {
-    self.hours += BU_c.hours_per_tick;
-
-    //rates
-    //control 0.123   $/h @ infnty w/ 4 janitors
-    //recoup  (0.123) $/h @ 13653h w/ 3 jan, 1 player
-    //halve   (0.06)  $/h @ 26398h w/ 3 jan, 1 player
-    //lowest  (0.05)  $/h @ 37000h w/ 3 jan, 1 player
-    self.theyspent += 0.123*BU_c.hours_per_tick; //$0.11 experimentally determined to be rate of spending w/ 2 janitors, no player
-
-    self.clicker.flush();
-    self.presser.flush();
-    self.ticker.flush();
-    for(var i = 0; i < self.janitors.length; i++)
+    for(var z = 0; z < 2; z++)
     {
-      if(self.janitors[i].state != 2)
-        self.janitors[i].goalNode = self.bestGoalFromNode(self.nodeNearestDude(self.janitors[i]));
+      self.hours += BU_c.hours_per_tick;
+
+      //rates
+      //control 0.123   $/h @ infnty w/ 4 janitors
+      //recoup  (0.123) $/h @ 13653h w/ 3 jan, 1 player
+      //halve   (0.06)  $/h @ 26398h w/ 3 jan, 1 player
+      //lowest  (0.05)  $/h @ 37000h w/ 3 jan, 1 player
+      self.theyspent += 0.123*BU_c.hours_per_tick; //$0.11 experimentally determined to be rate of spending w/ 2 janitors, no player
+
+      self.clicker.flush();
+      self.presser.flush();
+      self.ticker.flush();
+      for(var i = 0; i < self.janitors.length; i++)
+      {
+        if(self.janitors[i].state != 2)
+          self.janitors[i].goalNode = self.bestGoalFromNode(self.nodeNearestDude(self.janitors[i]));
+      }
+
+      if(self.player.state == 0 && self.selector.lastNode) self.player.goalNode = self.selector.lastNode;
+
+      self.iSpendGraph.register(self.ispent);
+      self.theySpendGraph.register(self.theyspent);
+
+      if(self.theySpendGraph.high > self.iSpendGraph.high) self.iSpendGraph.high = self.theySpendGraph.high;
+      else                                                 self.theySpendGraph.high = self.iSpendGraph.high;
     }
-
-    if(self.player.state == 0 && self.selector.lastNode) self.player.goalNode = self.selector.lastNode;
-
-    self.iSpendGraph.register(self.ispent);
-    self.theySpendGraph.register(self.theyspent);
-
-    if(self.theySpendGraph.high > self.iSpendGraph.high) self.iSpendGraph.high = self.theySpendGraph.high;
-    else                                                 self.theySpendGraph.high = self.iSpendGraph.high;
   };
 
   self.trunc = function(v,t)
