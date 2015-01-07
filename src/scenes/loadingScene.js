@@ -99,6 +99,17 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/bulb_glow_blue.png");
     img_srcs.push("assets/bulb_glow_yellow.png");
     img_srcs.push("assets/bulb_select.png");
+    //thermo
+    img_srcs.push("assets/thermo_bg.png");
+    img_srcs.push("assets/thermo_cold_0.png");
+    img_srcs.push("assets/thermo_cold_1.png");
+    img_srcs.push("assets/thermo_neut_0.png");
+    img_srcs.push("assets/thermo_neut_1.png");
+    img_srcs.push("assets/thermo_warm_0.png");
+    img_srcs.push("assets/thermo_warm_1.png");
+    img_srcs.push("assets/thermo_you_grab.png");
+    img_srcs.push("assets/thermo_you_throw.png");
+    img_srcs.push("assets/thermo_stat.png");
     //misc
     img_srcs.push("assets/null.png");
     img_srcs.push("assets/bike_bg.png");

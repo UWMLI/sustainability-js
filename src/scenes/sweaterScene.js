@@ -22,12 +22,10 @@ var SweaterScene = function(game, stage)
   self.enemyFactory;
   self.sweaterFactory;
 
-  self.numFloors = 5;
-
-  self.sweatersThrown  = []; for(var i = 0; i < self.numFloors; i++) self.sweatersThrown[i]  = 0;
-  self.enemiesAttacked = []; for(var i = 0; i < self.numFloors; i++) self.enemiesAttacked[i] = 0;
-  self.enemiesDefeated = []; for(var i = 0; i < self.numFloors; i++) self.enemiesDefeated[i] = 0;
-  self.enemiesWon      = []; for(var i = 0; i < self.numFloors; i++) self.enemiesWon[i]      = 0;
+  self.sweatersThrown  = [];
+  self.enemiesAttacked = [];
+  self.enemiesDefeated = [];
+  self.enemiesWon      = [];
 
   self.ready = function()
   {
@@ -48,17 +46,28 @@ var SweaterScene = function(game, stage)
     self.enemyFactory = new SW_EnemyFactory(self);
     self.sweaterFactory = new SW_SweaterFactory(self);
 
-    //verbose, I know
-    //x = 0 rather than self.house.x because we want to allow click at left side of screen
-    self.buttons.push(new Clickable({"x":0,"y":self.house.y+(self.house.h/self.numFloors)*0,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(4);}}));
-    self.buttons.push(new Clickable({"x":0,"y":self.house.y+(self.house.h/self.numFloors)*1,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(3);}}));
-    self.buttons.push(new Clickable({"x":0,"y":self.house.y+(self.house.h/self.numFloors)*2,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(2);}}));
-    self.buttons.push(new Clickable({"x":0,"y":self.house.y+(self.house.h/self.numFloors)*3,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(1);}}));
-    self.buttons.push(new Clickable({"x":0,"y":self.house.y+(self.house.h/self.numFloors)*4,"w":self.house.w,"h":self.house.h/self.numFloors,"click":function(){self.player.setFloor(0);}}));
-    for(var i = 0; i < self.buttons.length; i++)
-      self.clicker.register(self.buttons[i]);
+    for(var i = 0; i < self.house.numFloors; i++) self.sweatersThrown[i]  = 0;
+    for(var i = 0; i < self.house.numFloors; i++) self.enemiesAttacked[i] = 0;
+    for(var i = 0; i < self.house.numFloors; i++) self.enemiesDefeated[i] = 0;
+    for(var i = 0; i < self.house.numFloors; i++) self.enemiesWon[i]      = 0;
 
     self.drawer.register(self.house);
+
+
+    function getClickFuncForFloor(i)
+    {
+      return function() { self.player.setFloor(i); }
+    }
+
+    //verbose, I know
+    //x = 0 rather than self.house.x because we want to allow click at left side of screen
+    for(var i = 0; i < self.house.numFloors; i++)
+    {
+      self.buttons.push( new Clickable( { "x":0, "y":self.house.yForFloor(i), "w":self.house.w, "h":self.house.f_h, "click":getClickFuncForFloor(i) }));
+      self.clicker.register(self.buttons[i]);
+      //self.drawer.register(self.buttons[i]);
+    }
+
 
     self.ticker.register(self.player);
     self.drawer.register(self.player);
@@ -112,16 +121,29 @@ var SweaterScene = function(game, stage)
 var SW_House = function(game)
 {
   var self = this;
-  self.x = 100;
-  self.y = 200;
+  self.x = 0;
+  self.y = 0;
   self.w = game.stage.drawCanv.canvas.width;
-  self.h = game.stage.drawCanv.canvas.height-400;
+  self.h = game.stage.drawCanv.canvas.height;
+
+  self.y_t = 120;
+  self.y_b = 160;
+  self.x_l = 70;
+  self.x_r = 0;
+
+  self.numFloors = 4;
+
+  self.f_h = (self.h-(self.y_t+self.y_b))/self.numFloors;
+  self.yForFloor = function(floor) { return self.y+self.y_t+self.f_h*((self.numFloors-1)-floor); }
+  self.ybForFloor = function(floor) { return self.y+self.y_t+self.f_h*((self.numFloors-1)-floor)+self.f_h; }
+
+  self.img = game.assetter.asset("thermo_bg.png");
 
   self.draw = function(canv)
   {
-    canv.context.strokeStyle = "#000000";
-    for(var i = 0; i < game.numFloors; i++)
-      canv.context.strokeRect(self.x, self.y+(i*(self.h/game.numFloors)), self.w, self.h/game.numFloors);
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+    //canv.context.lineWidth = 2;
+    //canv.context.strokeRect(self.x+self.x_l,self.y+self.y_t,self.w-(self.x_l+self.x_r),self.h-(self.y_t+self.y_b));
   }
 }
 
@@ -129,15 +151,16 @@ var SW_Player = function(game)
 {
   var self = this;
   self.floor = 0;
-  //helper func
-  function yForFloor(floor) { return game.house.y+(game.house.h/game.numFloors)*((game.numFloors-1)-self.floor); }
 
-  self.x = game.house.x;
-  self.y = yForFloor(0);
   self.w = 100;
   self.h = 100;
+  self.x = game.house.x+game.house.x_l;
+  self.y = game.house.ybForFloor(0)-self.h;
 
-  self.img = game.assetter.asset("man.png");
+  self.img_grab  = game.assetter.asset("thermo_you_grab.png");
+  self.img_throw = game.assetter.asset("thermo_you_throw.png");
+  self.img = self.img_grab;
+
   self.charge = 100;
 
   self.setFloor = function(floor)
@@ -147,20 +170,21 @@ var SW_Player = function(game)
     {
       game.sweaterFactory.produce();
       self.charge = 0;
+      self.img = self.img_throw;
     }
   }
 
   self.tick = function()
   {
     self.charge += 4;
-    if(self.charge > 100) self.charge = 100;
+    if(self.charge > 100) { self.charge = 100; self.img = self.img_grab; }
   }
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,yForFloor(self.floor),self.w,self.h);
-    canv.context.fillStyle = "#00FF00";
-    canv.context.fillRect(self.x,yForFloor(self.floor)+self.h-((self.charge/100)*self.h),20,(self.charge/100)*self.h);
+    canv.context.drawImage(self.img,self.x,game.house.ybForFloor(self.floor)-self.h,self.w,self.h);
+    //canv.context.fillStyle = "#00FF00";
+    //canv.context.fillRect(self.x,game.house.yForFloor(self.floor)+self.h-((self.charge/100)*self.h),20,(self.charge/100)*self.h);
   }
 }
 
@@ -171,13 +195,15 @@ var SW_Thermostat = function(game)
   self.w = 200;
   self.h = 80;
   self.x = game.stage.drawCanv.canvas.width/2-(self.w/2);
-  self.y = game.stage.drawCanv.canvas.height-(self.w/2)-(self.h/2)-20;
+  self.y = game.stage.drawCanv.canvas.height-(self.w/2)-20; // '- self.w/2' because width of circle
 
   self.pressing = false;
   self.pressTimerMax = 100;
   self.pressTimer = self.pressTimerMax;
 
   self.baseTemp = 66;
+
+  self.img = game.assetter.asset("thermo_stat.png");
 
   self.press = function()
   {
@@ -206,13 +232,13 @@ var SW_Thermostat = function(game)
 
   self.draw = function(canv)
   {
-    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
 
-    canv.context.font = Math.round(self.h*(3/4))+"px Georgia";
-    canv.context.fillStyle = "#FF0000"
+    canv.context.font = Math.round(self.h*(1/2))+"px Georgia";
+    canv.context.fillStyle = "#000000"
     var base = self.baseTemp;
     for(var i = 0; i < game.enemiesWon.length; i++) base+=game.enemiesWon[i];
-    canv.context.fillText(base+"",self.x,self.y+self.h);
+    canv.context.fillText(base+String.fromCharCode(176),self.x+self.w/2,self.y+(self.h*2/3));
 
     if(self.pressing)
     {
@@ -233,7 +259,7 @@ var SW_EnemyFactory = function(game)
   {
     if(Math.random() < 0.01)
     {
-      var floor = Math.floor(Math.random()*game.numFloors);
+      var floor = Math.floor(Math.random()*game.house.numFloors);
       game.enemyProduced(floor);
       var e = new SW_Enemy(game,floor);
       game.enemies.push(e);
@@ -248,25 +274,59 @@ var SW_Enemy = function(game, floor)
   var self = this;
 
   self.floor = floor;
+  self.w = 100;
+  self.h = 100;
   self.x = 1000;
-  self.y = game.house.y+(game.house.h/game.numFloors)*((game.numFloors-1)-self.floor);
-  self.w = 50;
-  self.h = 50;
+  self.y = game.house.ybForFloor(floor)-self.h;
 
-  self.reversed = false;
+  self.state = 0; //0- cold, 1- neut, 2- warm
+
   self.speed = 8;
 
-  self.img = game.assetter.asset("man.png");
+  self.animTimer = Math.round(Math.random()*100);
+
+  self.img_cold_0 = game.assetter.asset("thermo_cold_0.png");
+  self.img_cold_1 = game.assetter.asset("thermo_cold_1.png");
+  self.img_neut_0 = game.assetter.asset("thermo_neut_0.png");
+  self.img_neut_1 = game.assetter.asset("thermo_neut_1.png");
+  self.img_warm_0 = game.assetter.asset("thermo_warm_0.png");
+  self.img_warm_1 = game.assetter.asset("thermo_warm_1.png");
+  self.img_0 = self.img_cold_0;
+  self.img_1 = self.img_cold_1;
+
+
+  self.setState = function(s)
+  {
+    self.state = s;
+    if(s == 0)
+    {
+      self.img_0 = self.img_cold_0;
+      self.img_1 = self.img_cold_1;
+    }
+    else if(s == 1)
+    {
+      self.img_0 = self.img_neut_0;
+      self.img_1 = self.img_neut_1;
+    }
+    else if(s == 2)
+    {
+      self.img_0 = self.img_warm_0;
+      self.img_1 = self.img_warm_1;
+    }
+  }
+  self.setState(0);
 
   self.tick = function()
   {
-    if(!self.reversed)
+    self.animTimer = (self.animTimer+2)%100;
+
+    if(self.state == 0) //cold
     {
       self.x -= self.speed;
       if(self.x < 100)
       {
         game.enemyVictory(self.floor);
-        self.kill();
+        self.setState(1);
       }
     }
     else
@@ -278,15 +338,8 @@ var SW_Enemy = function(game, floor)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
-    if(self.reversed) canv.context.strokeStyle = "#FF0000";
-    else              canv.context.strokeStyle = "#0000FF";
-    canv.context.strokeRect(self.x,self.y,self.w,self.h);
-  }
-
-  self.reverse = function()
-  {
-    self.reversed = true;
+    if(self.animTimer < 50) canv.context.drawImage(self.img_0,self.x,self.y,self.w,self.h);
+    else                    canv.context.drawImage(self.img_1,self.x,self.y,self.w,self.h);
   }
 
   self.kill = function()
@@ -316,14 +369,14 @@ var SW_Sweater = function(game, floor)
   var self = this;
 
   self.floor = floor;
+  self.w = 100;
+  self.h = 100;
   self.x = 90;
-  self.y = game.house.y+(game.house.h/game.numFloors)*((game.numFloors-1)-self.floor)+20;
-  self.w = 50;
-  self.h = 50;
+  self.y = game.house.ybForFloor(floor)-self.h;
 
   self.speed = 8;
 
-  self.img = game.assetter.asset("man.png");
+  self.img = game.assetter.asset("thermo_sweat.png");
 
   self.tick = function()
   {
@@ -333,10 +386,10 @@ var SW_Sweater = function(game, floor)
     //collision resolution. could/should go in a collision handler. #umad
     for(var i = 0; i < game.enemies.length; i++)
     {
-      if(self.floor == game.enemies[i].floor && self.x + (self.w/2) > game.enemies[i].x && self.x + (self.w/2) < game.enemies[i].x + game.enemies[i].w)
+      if(self.floor == game.enemies[i].floor && game.enemies[i].state == 0 && self.x + (self.w/2) > game.enemies[i].x && self.x + (self.w/2) < game.enemies[i].x + game.enemies[i].w)
       {
         game.enemyFail(self.floor);
-        game.enemies[i].reverse();
+        game.enemies[i].setState(2);
         self.kill();
         break;
       }
@@ -359,7 +412,6 @@ var SW_Sweater = function(game, floor)
 var SW_FailParticle = function(game,floor)
 {
   var self = this;
-  function yForFloor(floor) { return game.house.y+(game.house.h/game.numFloors)*((game.numFloors-1)-self.floor); }
 
   self.floor = floor;
   if(floor == -1) //configure for main temp
@@ -372,7 +424,7 @@ var SW_FailParticle = function(game,floor)
   else
   {
     self.x = 100;
-    self.sy = yForFloor(floor)+20;
+    self.sy = game.house.ybForFloor(floor)+20;
     self.y = self.sy;
     self.ey = self.sy-50;
   }
