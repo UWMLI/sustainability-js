@@ -234,11 +234,11 @@ var SW_Thermostat = function(game)
   {
     canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
 
-    canv.context.font = Math.round(self.h*(1/2))+"px Georgia";
+    canv.context.font = Math.round(self.h*(1/3))+"px Georgia";
     canv.context.fillStyle = "#000000"
     var base = self.baseTemp;
     for(var i = 0; i < game.enemiesWon.length; i++) base+=game.enemiesWon[i];
-    canv.context.fillText(base+String.fromCharCode(176),self.x+self.w/2,self.y+(self.h*2/3));
+    canv.context.fillText(base+String.fromCharCode(176),self.x+(self.w*(4/7)),self.y+(self.h*(3/5)));
 
     if(self.pressing)
     {
@@ -276,7 +276,7 @@ var SW_Enemy = function(game, floor)
   self.floor = floor;
   self.w = 100;
   self.h = 100;
-  self.x = 1000;
+  self.x = game.house.w;
   self.y = game.house.ybForFloor(floor)-self.h;
 
   self.state = 0; //0- cold, 1- neut, 2- warm
