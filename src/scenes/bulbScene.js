@@ -166,7 +166,8 @@ var BulbScene = function(game, stage)
       self.savingstick = 0;
     }
     self.savingstick++;
-    self.stage.drawCanv.context.fillText("Savings:$"+self.trunc(self.savings,100),100,50);
+    self.stage.drawCanv.context.fillText("Savings:$"+self.trunc(self.savings,100),200,50);
+    self.stage.drawCanv.context.fillText("Days:"+Math.round(self.hours/24),200,80);
     //self.stage.drawCanv.context.fillText("Spend:$"+self.trunc(self.ispent,100),100,80);
     //self.stage.drawCanv.context.fillText("Rate:$"+(self.ispent)/self.hours, 100,110);
   };
@@ -252,14 +253,16 @@ var BulbScene = function(game, stage)
   self.purchaseBulb = function(bulb)
   {
     self.ispent += BU_c.cost[bulb.type];
-    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/2),"$"+BU_c.cost[bulb.type],20+BU_c.cost[bulb.type],"#008800",0));
+    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),"$"+BU_c.cost[bulb.type],30,"#00AA00",0));
   }
 
   self.purchaseEnergy = function(bulb, hours)
   {
+    var energy = (Math.round((BU_c.energy_jh[bulb.type]*hours)*100)/100)/3600000;
     var cost = Math.round((BU_c.energy_jh[bulb.type]*hours*BU_c.electricity_cost)*100)/100;
     self.ispent += cost;
-    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/2),"$"+cost,20+(cost*10),"#008800",(bulb.node.n_x+bulb.node.n_y)/20));
+    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),energy+" kWh",20,"#00FFFF",(bulb.node.n_x+bulb.node.n_y)/20));
+    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),"$"+cost,20,"#00AA00",(bulb.node.n_x+bulb.node.n_y)/20+0.8));
   }
 };
 
@@ -506,12 +509,24 @@ var BU_Bulb = function(game,node)
   self.draw = function(canv)
   {
     canv.context.drawImage(self.img,self.x+self.w/3,self.y,self.w/3,self.h/2);
-    canv.context.drawImage(self.glow_img,self.x-self.w/2,self.y-(self.h/4),self.w*2,self.h*2);
+    if(self.hours_left > 20 || Math.random() < 0.95) canv.context.drawImage(self.glow_img,self.x-self.w/2,self.y-(self.h/4),self.w*2,self.h*2);
 
     if(self.hours_left > 0)
     {
-      canv.context.fillStyle = "#00FFFF";
-      canv.context.fillRect(self.x,self.y+((1-(self.hours_left/BU_c.lifespan[self.type]))*self.h/2),10,(self.hours_left/BU_c.lifespan[self.type])*self.h/2);
+      canv.context.strokeStyle = "#00FFFF"
+      canv.context.lineWidth = 5;
+      canv.context.beginPath();
+      canv.context.arc(
+      self.x+self.w/2,
+      self.y+self.h*(7/20),
+      self.w/3,
+      3*Math.PI/2,
+      (3*(Math.PI/2)+((BU_c.lifespan[self.type]-self.hours_left)/BU_c.lifespan[self.type])*(2*Math.PI))%(2*Math.PI),
+      true);
+      canv.context.stroke();
+
+      //canv.context.fillStyle = "#00FFFF";
+      //canv.context.fillRect(self.x,self.y+((1-(self.hours_left/BU_c.lifespan[self.type]))*self.h/2),10,(self.hours_left/BU_c.lifespan[self.type])*self.h/2);
     }
   }
 }
@@ -529,8 +544,8 @@ var BU_PriceParticle = function(x,y,text,size,color,delay)
   self.c = color;
   self.tick = function()
   {
-    self.t += 0.01;
-    self.y = self.y+(self.ey-self.y)/50;
+    self.t += 0.005;
+    if(self.t > 0) self.y = self.y+(self.ey-self.y)/50;
     return self.t < 1;
   }
   self.draw = function(canv)
