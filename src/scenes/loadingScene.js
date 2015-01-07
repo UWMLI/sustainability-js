@@ -110,6 +110,7 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/thermo_you_grab.png");
     img_srcs.push("assets/thermo_you_throw.png");
     img_srcs.push("assets/thermo_stat.png");
+    img_srcs.push("assets/thermo_sweat.png");
     //misc
     img_srcs.push("assets/null.png");
     img_srcs.push("assets/bike_bg.png");
