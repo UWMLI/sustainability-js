@@ -112,16 +112,6 @@ var BulbScene = function(game, stage)
 
     self.drawer.register(self.player);
     self.drawer.register(self.particler);
-
-    for(var i = 0; i < self.bulbs.length; i++)
-    {
-      self.presser.register(self.bulbs[i]);
-      self.ticker.register(self.bulbs[i]);
-    }
-    self.ticker.register(self.player); //register player before janitor to prioritize player in changing bulbs
-    for(var i = 0; i < self.janitors.length; i++)
-      self.ticker.register(self.janitors[i]);
-    self.ticker.register(self.particler);
   };
 
   self.tick = function()
@@ -314,6 +304,16 @@ var BulbScene = function(game, stage)
   {
     self.viewing = 1;
     self.clicker.unregister(self.beginButton);
+
+    for(var i = 0; i < self.bulbs.length; i++)
+    {
+      self.presser.register(self.bulbs[i]);
+      self.ticker.register(self.bulbs[i]);
+    }
+    self.ticker.register(self.player); //register player before janitor to prioritize player in changing bulbs
+    for(var i = 0; i < self.janitors.length; i++)
+      self.ticker.register(self.janitors[i]);
+    self.ticker.register(self.particler);
   }
 
   self.win = function()
