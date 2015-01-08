@@ -177,9 +177,11 @@ var BulbScene = function(game, stage)
     var savingsy = 100;
     self.savedinc+=13;
     if(self.savedinc > self.saved)  self.savedinc = self.saved;
-    else if(self.savedinc%8 == 0) self.particler.register(new BU_PriceParticle(savingsx+150+Math.random()*70,savingsy+Math.random()*20,"$",30,"#00AA00",0));
+    else if(self.savedinc%6 == 0) self.particler.register(new BU_PriceParticle(savingsx+150+Math.random()*70,savingsy+Math.random()*20,"$",30,"#00AA00",0));
 
-    self.stage.drawCanv.context.fillText("Savings:$"+self.trunc(self.savedinc,100),savingsx,savingsy);
+    self.stage.drawCanv.context.strokeStyle = "#000000";
+    self.stage.drawCanv.context.lineWidth = 2;
+    self.stage.drawCanv.context.strokeText("Savings:$"+self.trunc(self.savedinc,100),savingsx,savingsy);
     //self.stage.drawCanv.context.fillText("Savings:$"+self.trunc(self.savings,100),200,50);
     //self.stage.drawCanv.context.fillText("Days:"+Math.round(self.hours/24),200,80);
     //self.stage.drawCanv.context.fillText("Spend:$"+self.trunc(self.ispent,100),100,80);
@@ -473,7 +475,7 @@ var BU_Bulb = function(game,node)
 
   self.node = node;
   self.w = 75;
-  self.h = 100;
+  self.h = 200;
   self.x = self.node.x-(self.w/2);
   self.y = self.node.y;
 
@@ -519,8 +521,8 @@ var BU_Bulb = function(game,node)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x+self.w/3,self.y,self.w/3,self.h/2);
-    if(self.hours_left > 20 || Math.random() < 0.95) canv.context.drawImage(self.glow_img,self.x-self.w/2,self.y-(self.h/4),self.w*2,self.h*2);
+    canv.context.drawImage(self.img,self.x+self.w/3,self.y,self.w/3,self.h/4);
+    if(self.hours_left > 20 || Math.random() < 0.95) canv.context.drawImage(self.glow_img,self.x-self.w/2,self.y-(self.h/8),self.w*2,self.h);
 
     if(self.hours_left > 0)
     {
@@ -529,7 +531,7 @@ var BU_Bulb = function(game,node)
       canv.context.beginPath();
       canv.context.arc(
       self.x+self.w/2,
-      self.y+self.h*(7/20),
+      self.y+self.h*(7/40),
       self.w/3,
       3*Math.PI/2,
       (3*(Math.PI/2)+((BU_c.lifespan[self.type]-self.hours_left)/BU_c.lifespan[self.type])*(2*Math.PI))%(2*Math.PI),
