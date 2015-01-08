@@ -120,7 +120,7 @@ var PV_Rain = function(game)
 
   self.draw = function(canv)
   {
-    canv.context.lineWidth = 5;
+    canv.context.lineWidth = 2;
     canv.context.strokeStyle = "#0000FF";
     canv.context.beginPath();
     canv.context.moveTo(self.x,self.y);
@@ -182,10 +182,12 @@ var PV_ScratchableBackground = function(game)
   self.x = 0;
   self.y = 0;
   self.w = game.stage.drawCanv.canvas.width;
-  self.h = game.stage.drawCanv.canvas.height-200;
+  self.h = game.stage.drawCanv.canvas.height;
 
-  self.canv = new Canv({width:self.w,height:self.h});
-  self.img = game.assetter.asset("back2.png");
+  self.bottom_buffer = 340; //pixels not worth using in drawable canv
+
+  self.canv = new Canv({width:self.w,height:self.h-self.bottom_buffer});
+  self.img = game.assetter.asset("pavement_bad.png");
   self.canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   self.canv.context.globalCompositeOperation = "destination-out";
   self.canv.context.fillStyle = "#000000";
@@ -194,7 +196,7 @@ var PV_ScratchableBackground = function(game)
 
   var qRatio = 0.05;
   self.qw = Math.round(self.w*qRatio);
-  self.qh = Math.round(self.h*qRatio);
+  self.qh = Math.round((self.h-self.bottom_buffer)*qRatio);
   self.countcanv = new Canv({width:self.qw,height:self.qh});
   self.countcanv.context.fillStyle = "#000000";
   self.countcanv.context.fillRect(0,0,self.qw,self.qh);
@@ -217,7 +219,9 @@ var PV_ScratchableBackground = function(game)
     self.ticks++;
     if(self.ticks % self.qh == 0)
     {
-      game.percentFilled(self.filled/1250);
+      //790 = road filled
+      //1056 = actually filled
+      game.percentFilled(self.filled/790);
       self.ticks = 0;
       self.filled = 0;
     }
@@ -291,9 +295,9 @@ var PV_Background = function(game)
   self.x = 0;
   self.y = 0;
   self.w = game.stage.drawCanv.canvas.width;
-  self.h = game.stage.drawCanv.canvas.height-200;
+  self.h = game.stage.drawCanv.canvas.height;
 
-  self.img = game.assetter.asset("back1.png");
+  self.img = game.assetter.asset("pavement_good.png");
 
   self.draw = function(canv)
   {

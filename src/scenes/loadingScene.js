@@ -111,12 +111,13 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/thermo_you_throw.png");
     img_srcs.push("assets/thermo_stat.png");
     img_srcs.push("assets/thermo_sweat.png");
+    //pavement
+    img_srcs.push("assets/pavement_bad.png");
+    img_srcs.push("assets/pavement_good.png");
     //misc
     img_srcs.push("assets/null.png");
     img_srcs.push("assets/bike_bg.png");
     img_srcs.push("assets/man.png");
-    img_srcs.push("assets/back1.png");
-    img_srcs.push("assets/back2.png");
     for(var i = 0; i < img_srcs.length; i++)
     {
       images[i] = new Image();

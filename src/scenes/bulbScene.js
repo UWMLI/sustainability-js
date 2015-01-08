@@ -57,6 +57,7 @@ var BulbScene = function(game, stage)
   self.spendGraphMarkings;
 
   self.hours = 0;
+  self.numbulbs = 0;
   self.ispent = 0;
   self.theyspent = 0;
 
@@ -182,7 +183,9 @@ var BulbScene = function(game, stage)
     //self.stage.drawCanv.context.lineWidth = 2;
     self.stage.drawCanv.context.fillText("Savings:$"+self.trunc(self.savedinc,100),savingsx,savingsy);
     //self.stage.drawCanv.context.fillText("Savings:$"+self.trunc(self.savings,100),200,50);
-    //self.stage.drawCanv.context.fillText("Days:"+Math.round(self.hours/24),200,80);
+    //self.stage.drawCanv.context.fillText("Days:"+Math.round(self.hours/24),200,30);
+    //self.stage.drawCanv.context.fillText("Bulbs:"+self.numbulbs,200,60);
+    //self.stage.drawCanv.context.fillText("Bulbs/day:"+(self.numbulbs/Math.round(self.hours/24)),200,90);
     //self.stage.drawCanv.context.fillText("Spend:$"+self.trunc(self.ispent,100),100,80);
     //self.stage.drawCanv.context.fillText("Rate:$"+(self.ispent)/self.hours, 100,110);
 
@@ -288,6 +291,7 @@ var BulbScene = function(game, stage)
     self.ispent += BU_c.cost[bulb.type];
     if(bulb.type == BU_c.BULB_LED_ON) self.saved += 500;
     if(self.saved > 7500) self.viewing = 2;
+    self.numbulbs++;
     //self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),"$"+BU_c.cost[bulb.type],30,"#00AA00",0));
   }
 
