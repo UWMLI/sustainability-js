@@ -153,21 +153,35 @@ var BulbScene = function(game, stage)
     if(!isFinite(x)) return 0;
     return x;
   }
+
   self.savings;
   self.savingstick = 0;
+  self.saved = 0;
+  self.savedinc = 0;
   self.draw = function()
   {
     self.drawer.flush();
     self.stage.drawCanv.context.font = "30px Georgia";
     self.stage.drawCanv.context.fillStyle = "#000000";
+
+    /*
     if(self.savingstick %100 == 0)
     {
       self.savings = self.theyspent-self.ispent;
       self.savingstick = 0;
     }
     self.savingstick++;
-    self.stage.drawCanv.context.fillText("Savings:$"+self.trunc(self.savings,100),200,50);
-    self.stage.drawCanv.context.fillText("Days:"+Math.round(self.hours/24),200,80);
+    */
+
+    var savingsx = 200;
+    var savingsy = 100;
+    self.savedinc+=13;
+    if(self.savedinc > self.saved)  self.savedinc = self.saved;
+    else if(self.savedinc%8 == 0) self.particler.register(new BU_PriceParticle(savingsx+150+Math.random()*70,savingsy+Math.random()*20,"$",30,"#00AA00",0));
+
+    self.stage.drawCanv.context.fillText("Savings:$"+self.trunc(self.savedinc,100),savingsx,savingsy);
+    //self.stage.drawCanv.context.fillText("Savings:$"+self.trunc(self.savings,100),200,50);
+    //self.stage.drawCanv.context.fillText("Days:"+Math.round(self.hours/24),200,80);
     //self.stage.drawCanv.context.fillText("Spend:$"+self.trunc(self.ispent,100),100,80);
     //self.stage.drawCanv.context.fillText("Rate:$"+(self.ispent)/self.hours, 100,110);
   };
@@ -246,14 +260,13 @@ var BulbScene = function(game, stage)
 
   self.bulbChanged = function(bulb)
   {
-    //don't register particle here- sometimes change bulb programatically (init)
-    //self.particler.register(new BU_PriceParticle(bulb.x,bulb.y,"$"+bulb.dollarsPer,"#000000",0));
   }
 
   self.purchaseBulb = function(bulb)
   {
     self.ispent += BU_c.cost[bulb.type];
-    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),"$"+BU_c.cost[bulb.type],30,"#00AA00",0));
+    if(bulb.type == BU_c.BULB_LED_ON) self.saved += 500;
+    //self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),"$"+BU_c.cost[bulb.type],30,"#00AA00",0));
   }
 
   self.purchaseEnergy = function(bulb, hours)
@@ -261,8 +274,8 @@ var BulbScene = function(game, stage)
     var energy = (Math.round((BU_c.energy_jh[bulb.type]*hours)*100)/100)/3600000;
     var cost = Math.round((BU_c.energy_jh[bulb.type]*hours*BU_c.electricity_cost)*100)/100;
     self.ispent += cost;
-    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),energy+" kWh",20,"#00FFFF",(bulb.node.n_x+bulb.node.n_y)/20));
-    self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),"$"+cost,20,"#00AA00",(bulb.node.n_x+bulb.node.n_y)/20+0.8));
+    //self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),energy+" kWh",20,"#00FFFF",(bulb.node.n_x+bulb.node.n_y)/20));
+    //self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),"$"+cost,20,"#00AA00",(bulb.node.n_x+bulb.node.n_y)/20+0.8));
   }
 };
 
@@ -274,8 +287,6 @@ var BU_Selector = function(game)
   self.h = 50;
   self.x;
   self.y;
-  //self.x = self.node.x-(self.w/2);
-  //self.y = self.node.y;
   self.lastNode;
 
   self.img = game.assetter.asset("bulb_select.png");
@@ -524,9 +535,6 @@ var BU_Bulb = function(game,node)
       (3*(Math.PI/2)+((BU_c.lifespan[self.type]-self.hours_left)/BU_c.lifespan[self.type])*(2*Math.PI))%(2*Math.PI),
       true);
       canv.context.stroke();
-
-      //canv.context.fillStyle = "#00FFFF";
-      //canv.context.fillRect(self.x,self.y+((1-(self.hours_left/BU_c.lifespan[self.type]))*self.h/2),10,(self.hours_left/BU_c.lifespan[self.type])*self.h/2);
     }
   }
 }
