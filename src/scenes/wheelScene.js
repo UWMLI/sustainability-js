@@ -415,6 +415,8 @@ var WH_Wheel = function(game)
   self.w = 200;
   self.h = 200;
 
+  self.rot = 0;
+
   self.img = game.assetter.asset("wheel_wheel.png");
 
   self.draw = function(canv)
@@ -427,7 +429,11 @@ var WH_Wheel = function(game)
     canv.context.stroke();
     canv.context.closePath();
   */
-    canv.context.drawImage(self.img, self.x, self.y, self.w, self.h);
+    canv.context.save();
+    canv.context.translate(self.x+self.w/2, self.y+self.h/2);
+    canv.context.rotate(self.rot);
+    canv.context.drawImage(self.img, -self.w/2, -self.h/2, self.w, self.h);
+    canv.context.restore();
   }
 
   self.tick = function()
@@ -461,6 +467,7 @@ var WH_Wheel = function(game)
     var a = self.oldT-self.newT;
     if((a > 0 && a < Math.PI) || a < -Math.PI) console.log("cw");
     else                                       console.log("ccw");
+    self.rot -= a;
 
     self.offX = self.newOffX;
     self.offY = self.newOffY;
