@@ -1,6 +1,7 @@
 var WheelScene = function(game, stage)
 {
   var self = this;
+  self.stage = stage;
 
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
@@ -12,11 +13,13 @@ var WheelScene = function(game, stage)
   self.drawer;
   self.assetter;
 
+  self.bg;
+  self.box_bg;
+  self.wheel;
+  self.nests;     self.numNests;     self.nestsFlicked;
+  self.squirrels; self.numSquirrels; self.squirrelsFlicked;
   self.box;
   self.door;
-  self.squirrels; self.numSquirrels; self.squirrelsFlicked;
-  self.nests;     self.numNests;     self.nestsFlicked;
-  self.wheel;
 
   self.ready = function()
   {
@@ -28,29 +31,32 @@ var WheelScene = function(game, stage)
     self.drawer = new Drawer({source:stage.drawCanv});
     self.assetter = new Assetter({});
 
+    self.bg = new WH_BG(self);
     self.box = new WH_Box(self);
     self.wheel = new WH_Wheel(self);
+    self.door = new WH_Door(self);
+    self.box_bg = new WH_Box_BG(self);
 
-    var l = self.box.x;
-    var r = self.box.x+self.box.w;
-    var t = self.box.y;
-    var b = self.box.y+self.box.h;
+    var l = self.door.x;
+    var r = self.door.x+self.door.w;
+    var t = self.door.y;
+    var b = self.door.y+self.door.h;
 
     self.squirrels = []; self.numSquirrels = 4; self.squirrelsFlicked = 0;
     for(var i = 0; i < self.numSquirrels; i++)
       self.squirrels.push(new WH_Squirrel(self));
 
-    self.squirrels[0].x = l+30;
-    self.squirrels[0].y = t+30;
+    self.squirrels[0].x = l+50;
+    self.squirrels[0].y = t;
 
-    self.squirrels[1].x = r-self.squirrels[1].w-30;
-    self.squirrels[1].y = t+30;
+    self.squirrels[1].x = r-self.squirrels[1].w-50;
+    self.squirrels[1].y = t;
 
-    self.squirrels[2].x = r-self.squirrels[2].w-30;
-    self.squirrels[2].y = b-self.squirrels[2].h-30;
+    self.squirrels[2].x = r-self.squirrels[2].w-50;
+    self.squirrels[2].y = b-self.squirrels[2].h-20;
 
-    self.squirrels[3].x = l+30;
-    self.squirrels[3].y = b-self.squirrels[3].h-30;
+    self.squirrels[3].x = l+50;
+    self.squirrels[3].y = b-self.squirrels[3].h-20;
 
     self.nests = []; self.numNests = 64; self.nestsFlicked = 0;
     for(var i = 0; i < self.numNests; i++)
@@ -58,20 +64,20 @@ var WheelScene = function(game, stage)
 
     self.templateNests = [];
     self.templateNests[0] = new WH_Nest(self);
-    self.templateNests[0].x = l+30;
-    self.templateNests[0].y = t+30;
+    self.templateNests[0].x = l+50;
+    self.templateNests[0].y = t+50;
 
     self.templateNests[1] = new WH_Nest(self);
-    self.templateNests[1].x = r-self.templateNests[1].w-30;
-    self.templateNests[1].y = t+30;
+    self.templateNests[1].x = r-self.templateNests[1].w-50;
+    self.templateNests[1].y = t+50;
 
     self.templateNests[2] = new WH_Nest(self);
-    self.templateNests[2].x = r-self.templateNests[2].w-30;
-    self.templateNests[2].y = b-self.templateNests[2].h-30;
+    self.templateNests[2].x = r-self.templateNests[2].w-50;
+    self.templateNests[2].y = b-self.templateNests[2].h-20;
 
     self.templateNests[3] = new WH_Nest(self);
-    self.templateNests[3].x = l+30;
-    self.templateNests[3].y = b-self.templateNests[3].h-30;
+    self.templateNests[3].x = l+50;
+    self.templateNests[3].y = b-self.templateNests[3].h-20;
 
     for(var i = 0; i < 4; i++)
     {
@@ -82,9 +88,8 @@ var WheelScene = function(game, stage)
       }
     }
 
-    self.door = new WH_Door(self);
-
-    self.drawer.register(self.box);
+    self.drawer.register(self.bg);
+    self.drawer.register(self.box_bg);
     self.drawer.register(self.wheel);
     for(var i = 0; i < self.numNests; i++)
     {
@@ -96,6 +101,7 @@ var WheelScene = function(game, stage)
       self.drawer.register(self.squirrels[i]);
       self.ticker.register(self.squirrels[i]);
     }
+    self.drawer.register(self.box);
     self.drawer.register(self.door);
     self.ticker.register(self.door);
 
@@ -179,19 +185,54 @@ var WheelScene = function(game, stage)
   }
 };
 
+var WH_BG = function(game)
+{
+  var self = this;
+
+  self.x = 0;
+  self.y = 0;
+  self.w = game.stage.drawCanv.canvas.width;
+  self.h = game.stage.drawCanv.canvas.height;
+
+  self.img = game.assetter.asset("wheel_bg.png");
+
+  self.draw = function(canv)
+  {
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+  }
+}
+
+var WH_Box_BG = function(game)
+{
+  var self = this;
+
+  self.x = game.door.x;
+  self.y = game.door.y;
+  self.w = game.door.w;
+  self.h = game.door.h;
+
+  self.img = game.assetter.asset("wheel_case_bg.png");
+
+  self.draw = function(canv)
+  {
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+  }
+}
+
 var WH_Box = function(game)
 {
   var self = this;
 
-  self.x = 100;
-  self.y = 100;
-  self.w = 400;
-  self.h = 300;
+  self.x = 10;
+  self.y = 420;
+  self.w = 630;
+  self.h = 340;
+
+  self.img = game.assetter.asset("wheel_case.png");
 
   self.draw = function(canv)
   {
-    canv.context.strokeStyle = "#000000";
-    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   }
 }
 
@@ -205,21 +246,20 @@ var WH_Door = function(game)
   self.startY = 0;
   self.vec = {"x":0,"y":0};
 
-  self.x = game.box.x+20;
-  self.y = game.box.y+20;
-  self.w = game.box.w-40;
-  self.h = game.box.h-40;
+  self.x = game.box.x+150;
+  self.y = game.box.y+80;
+  self.w = game.box.w-350;
+  self.h = game.box.h-130;
   self.r = self.w/4;
 
   self.vx = 0;
   self.vy = 0;
 
+  self.img = game.assetter.asset("wheel_cover.png");
+
   self.draw = function(canv)
   {
-    canv.context.fillStyle = "#000000";
-    canv.context.fillRect(self.x,self.y,self.w,self.h);
-    canv.context.strokeStyle = "#000000";
-    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    canv.context.drawImage(self.img, self.x, self.y, self.w, self.h);
   }
 
   self.tick = function()
@@ -256,19 +296,19 @@ var WH_Squirrel = function(game)
 
   self.x = game.box.x+20;
   self.y = game.box.y+20;
-  self.w = 30;
-  self.h = 50;
+  self.w = 60;
+  self.h = 100;
   self.r = self.w/4;
 
   self.vx = 0;
   self.vy = 0;
 
+  if(Math.random() < 0.5) self.img = game.assetter.asset("wheel_squirrel_0.png");
+  else                    self.img = game.assetter.asset("wheel_squirrel_1.png");
+
   self.draw = function(canv)
   {
-    canv.context.fillStyle = "#000000";
-    canv.context.fillRect(self.x,self.y,self.w,self.h);
-    canv.context.strokeStyle = "#000000";
-    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   }
 
   self.tick = function()
@@ -286,6 +326,11 @@ var WH_Squirrel = function(game)
 
   self.flick = function(vec)
   {
+    if(!self.flicked)
+    {
+      game.drawer.unregister(self);
+      game.drawer.register(self); //bring self to front
+    }
     self.flicked = true;
     self.vx = vec.x/10;
     self.vy = vec.y/5-10;
@@ -299,32 +344,37 @@ var WH_Nest = function(game)
 
   self.flicked = false;
 
-  self.x = game.box.x+20;
-  self.y = game.box.y+20;
-  self.w = 20;
-  self.h = 20;
-
-  self.offsx = ((Math.random()*2)-1)*5;
-  self.offsy = ((Math.random()*2)-1)*5;
-  self.offex = ((Math.random()*2)-1)*5;
-  self.offey = ((Math.random()*2)-1)*5;
+  self.x = 0; //will get set on first tick
+  self.y = 0; //will get set on first tick
+  self.w = 50;
+  self.h = 50;
+  self.i = 0;
 
   self.vx = 0;
   self.vy = 0;
 
+  self.imgs = [];
+  self.imgs.push(game.assetter.asset("wheel_nest_0.png"));
+  self.imgs.push(game.assetter.asset("wheel_nest_1.png"));
+  self.imgs.push(game.assetter.asset("wheel_nest_2.png"));
+  self.imgs.push(game.assetter.asset("wheel_nest_3.png"));
+  self.imgs.push(game.assetter.asset("wheel_nest_4.png"));
+
   self.draw = function(canv)
   {
-    canv.context.lineWidth = 2;
-    canv.context.strokeStyle = "#773311";
-    canv.context.beginPath();
-    canv.context.moveTo(self.x+self.offsx,self.y+self.h/2+self.offsy);
-    canv.context.lineTo(self.x+self.w+self.offex,self.y+self.h/2+self.offey);
-    canv.context.stroke();
-    canv.context.closePath();
+    canv.context.drawImage(self.imgs[self.i],self.x,self.y,self.w,self.h);
   }
 
+  var firstTicked = false;
   self.tick = function()
   {
+    if(!firstTicked)
+    {
+      self.x += ((Math.random()*2)-1)*5;
+      self.y += ((Math.random()*2)-1)*5;
+      self.i += Math.floor(Math.random()*5);
+      firstTicked = true;
+    }
     if(self.flicked)
     {
       self.x += self.vx;
@@ -335,6 +385,11 @@ var WH_Nest = function(game)
 
   self.press = function(evt)
   {
+    if(!self.flicked)
+    {
+      game.drawer.unregister(self);
+      game.drawer.register(self); //bring self to front
+    }
     self.flicked = true;
     self.vx = ((Math.random()*2)-1)*20;
     self.vy = Math.random()*-20;
@@ -355,19 +410,24 @@ var WH_Wheel = function(game)
   self.deltaX = 0;
   self.deltaY = 0;
 
-  self.x = game.box.x+20;
-  self.y = game.box.y+20;
-  self.w = game.box.w-40;
-  self.h = game.box.h-40;
+  self.x = game.box.x+190;
+  self.y = game.box.y+80;
+  self.w = 200;
+  self.h = 200;
+
+  self.img = game.assetter.asset("wheel_wheel.png");
 
   self.draw = function(canv)
   {
+  /*
     canv.context.lineWidth = 2;
     canv.context.strokeStyle = "#000000";
     canv.context.beginPath();
     canv.context.arc(self.x+self.w/2, self.y+self.h/2, (game.box.h-40)/2, 0, Math.PI*2, true);
     canv.context.stroke();
     canv.context.closePath();
+  */
+    canv.context.drawImage(self.img, self.x, self.y, self.w, self.h);
   }
 
   self.tick = function()

@@ -82,7 +82,18 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/bike_excuse_helmet.png");
     img_srcs.push("assets/bike_victory_helmet.png");
     //wheel
-    img_srcs.push("assets/wheel.png");
+    img_srcs.push("assets/wheel_wheel.png");
+    img_srcs.push("assets/wheel_squirrel_0.png");
+    img_srcs.push("assets/wheel_squirrel_1.png");
+    img_srcs.push("assets/wheel_bg.png");
+    img_srcs.push("assets/wheel_cover.png");
+    img_srcs.push("assets/wheel_case.png");
+    img_srcs.push("assets/wheel_case_bg.png");
+    img_srcs.push("assets/wheel_nest_0.png");
+    img_srcs.push("assets/wheel_nest_1.png");
+    img_srcs.push("assets/wheel_nest_2.png");
+    img_srcs.push("assets/wheel_nest_3.png");
+    img_srcs.push("assets/wheel_nest_4.png");
     //bulb
     img_srcs.push("assets/bulb_bulb.png");
     img_srcs.push("assets/bulb_player_walk_0_r.png");
