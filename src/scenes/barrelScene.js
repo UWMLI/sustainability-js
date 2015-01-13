@@ -13,7 +13,8 @@ var BarrelScene = function(game, stage)
   self.particler;
   self.assetter;
 
-  self.mapView;
+  self.mapBorder;
+  self.mapPipe;
 
   self.rain; //keep record of it for updating deltas during panning
   self.runoff;
@@ -23,6 +24,7 @@ var BarrelScene = function(game, stage)
   self.numBarrels;
   self.barrelsFound;
   self.totalRunoff;
+  self.maxRunoff;
 
   self.ready = function()
   {
@@ -37,34 +39,38 @@ var BarrelScene = function(game, stage)
     self.numBarrels = 50;
     self.barrelsFound = 0;
     self.totalRunoff = 0;
+    self.maxRunoff = 100000;
 
-    self.mapView = new RB_MapView(self);
-
-    self.rain = [];
+    self.mapBorder = new RB_MapBorder(self);
+    self.mapPipe   = new RB_MapPipe(self);
+    self.map = new RB_Map(self);
     self.runoff = new RB_Runoff(self);
 
+    self.rain = [];
     self.barrels = [];
     var bar = new RB_Barrel(self,0,0); //BS variable because js doesn't have static props
-    var randx = function(){ return (Math.random()*((self.mapView.w*2)-bar.w)); }
-    var randy = function(){ return (Math.random()*((self.mapView.h*2)-bar.h)); }
+    var randx = function(){ return (Math.random()*((self.map.w)-bar.w))+self.mapBorder.insetX; }
+    var randy = function(){ return (Math.random()*((self.map.h)-bar.h))+self.mapBorder.insetY; }
     for(var i = 0; i < self.numBarrels; i++)
       self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
-    self.map = new RB_Map(self);
+
+    self.dragger.register(self.map);
+    self.drawer.register(self.map);
+
     for(var i = 0; i < self.barrels.length; i++)
     {
       self.clicker.register(self.barrels[i]);
       self.drawer.register(self.barrels[i]);
     }
-    self.dragger.register(self.map);
-    self.drawer.register(self.map);
 
     self.drawer.register(self.particler);
     self.ticker.register(self.particler);
 
-    self.drawer.register(self.mapView); //strategically must place after map, before overlays
+    self.drawer.register(self.mapBorder);
 
     self.ticker.register(self.runoff);
     self.drawer.register(self.runoff);
+    self.drawer.register(self.mapPipe);
   };
 
   var stopGen = false;
@@ -80,7 +86,7 @@ var BarrelScene = function(game, stage)
       }
     }
     self.totalRunoff += ((self.numBarrels-self.barrelsFound)/self.numBarrels)*15;
-    if(self.totalRunoff > 10000) self.totalRunoff = 10000;
+    if(self.totalRunoff > self.maxRunoff) self.totalRunoff = self.maxRunoff;
     self.clicker.flush();
     self.dragger.flush();
     self.ticker.flush();
@@ -126,40 +132,59 @@ var BarrelScene = function(game, stage)
   }
 };
 
-var RB_MapView = function(game)
+var RB_MapBorder = function(game)
 {
   var self = this;
-  self.x = 50;
-  self.y = 50;
-  self.w = game.stage.drawCanv.canvas.width-100;
-  self.h = game.stage.drawCanv.canvas.height-400;
+  self.x = 0;
+  self.y = 0;
+  self.w = game.stage.drawCanv.canvas.width;
+  self.h = game.stage.drawCanv.canvas.height;
+
+  self.insetX = 32;
+  self.insetY = 30;
+  self.insetW = game.stage.drawCanv.canvas.width-67;
+  self.insetH = game.stage.drawCanv.canvas.width+48;
+
+  self.img_0 = game.assetter.asset("barrel_border_0.png");
 
   self.draw = function(canv)
   {
-    canv.context.fillStyle = "#FFFFFF";
-    canv.context.fillRect(0,0,game.stage.drawCanv.canvas.width,self.y);
-    canv.context.fillRect(0,0,self.x,game.stage.drawCanv.canvas.height);
-    canv.context.fillRect(0,self.y+self.h,game.stage.drawCanv.canvas.width,(game.stage.drawCanv.canvas.height-self.h)-self.y);
-    canv.context.fillRect(self.x+self.w,0,(game.stage.drawCanv.canvas.width-self.w)-self.x,game.stage.drawCanv.canvas.height);
-    canv.context.strokeStyle = "#000000";
-    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    canv.context.drawImage(self.img_0,self.x,self.y,self.w,self.h);
+  }
+}
+
+var RB_MapPipe = function(game)
+{
+  var self = this;
+  self.x = 0;
+  self.y = 0;
+  self.w = game.stage.drawCanv.canvas.width;
+  self.h = game.stage.drawCanv.canvas.height;
+
+  self.img_1 = game.assetter.asset("barrel_border_1.png");
+
+  self.draw = function(canv)
+  {
+    canv.context.drawImage(self.img_1,self.x,self.y,self.w,self.h-220);
   }
 }
 
 var RB_Map = function(game)
 {
   var self = this;
-  self.img = game.assetter.asset("man.png");
 
   //nice in smooth dragging
   self.offX = 0;
   self.offY = 0;
   self.deltaX = 0;
   self.deltaY = 0;
-  self.x = 0;
-  self.y = 0;
-  self.w = game.mapView.w*2;
-  self.h = game.mapView.h*2;
+
+  self.x = 30;
+  self.y = 30;
+  self.w = 1008;
+  self.h = 1008;
+
+  self.img = game.assetter.asset("barrel_map.png");
 
   self.tick = function()
   {
@@ -175,10 +200,10 @@ var RB_Map = function(game)
   {
     self.deltaX = (evt.doX-(self.w/2)+self.offX)-self.x;
     self.deltaY = (evt.doY-(self.h/2)+self.offY)-self.y;
-    if(self.x + self.deltaX > game.mapView.x)                         self.deltaX = game.mapView.x-self.x;
-    if(self.x + self.deltaX < game.mapView.x-(self.w-game.mapView.w)) self.deltaX = game.mapView.x-(self.w-game.mapView.w)-self.x;
-    if(self.y + self.deltaY > game.mapView.y)                         self.deltaY = game.mapView.y-self.y;
-    if(self.y + self.deltaY < game.mapView.y-(self.h-game.mapView.h)) self.deltaY = game.mapView.y-(self.h-game.mapView.h)-self.y;
+    if(self.x + self.deltaX > game.mapBorder.insetX)                                self.deltaX = game.mapBorder.insetX-self.x;
+    if(self.x + self.deltaX < game.mapBorder.insetX-(self.w-game.mapBorder.insetW)) self.deltaX = game.mapBorder.insetX-(self.w-game.mapBorder.insetW)-self.x;
+    if(self.y + self.deltaY > game.mapBorder.insetY)                                self.deltaY = game.mapBorder.insetY-self.y;
+    if(self.y + self.deltaY < game.mapBorder.insetY-(self.h-game.mapBorder.insetH)) self.deltaY = game.mapBorder.insetY-(self.h-game.mapBorder.insetH)-self.y;
     self.x += self.deltaX;
     self.y += self.deltaY;
     for(var i = 0; i < game.barrels.length; i++)
@@ -197,6 +222,7 @@ var RB_Map = function(game)
   };
   self.draw = function(canv)
   {
+      canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   }
 }
 
@@ -208,8 +234,8 @@ var RB_Rain = function(game)
   {
     self.dx = 2;
     self.dy = 10;
-    self.x = (Math.random()*game.mapView.w)+game.mapView.x;
-    self.y = game.mapView.y-10+Math.random();
+    self.x = (Math.random()*game.mapBorder.w)+game.mapBorder.x;
+    self.y = game.mapBorder.y-10+Math.random();
     self.r = (Math.random()/2)+1;
     self.dx *= self.r;
     self.dy *= self.r;
@@ -221,11 +247,11 @@ var RB_Rain = function(game)
     self.x += self.dx;
     self.y += self.dy;
 
-    if(self.y > game.mapView.y+game.mapView.h)    game.rainFull(self);
-    while(self.x < game.mapView.x)                self.x += game.mapView.w;
-    while(self.x > game.mapView.x+game.mapView.w) self.x -= game.mapView.w;
-    while(self.y < game.mapView.y)                self.y += game.mapView.h;
-    while(self.y > game.mapView.y+game.mapView.h) self.y -= game.mapView.h;
+    if(self.y > game.mapBorder.y+game.mapBorder.h)    game.rainFull(self);
+    while(self.x < game.mapBorder.x)                self.x += game.mapBorder.w;
+    while(self.x > game.mapBorder.x+game.mapBorder.w) self.x -= game.mapBorder.w;
+    while(self.y < game.mapBorder.y)                self.y += game.mapBorder.h;
+    while(self.y > game.mapBorder.y+game.mapBorder.h) self.y -= game.mapBorder.h;
 
     return true; //never expire (just auto-loop)
   }
@@ -246,24 +272,28 @@ var RB_Runoff = function(game)
 {
   var self = this;
   self.stream_w = 1; //calculated on tick
-  self.stream_h = 100;
-  self.stream_max_w = 100;
-  self.pool_w = 500;
-  self.pool_h = 1; //calculated on tick
-  self.pool_max_h = 230;
+  self.stream_h = 200;
+  self.stream_max_w = 45;
+  self.pool_w = game.stage.drawCanv.canvas.width-50;
+  self.pool_h = 140;
+  self.min_pool_y = game.stage.drawCanv.canvas.height-190;
+  self.max_pool_y = game.stage.drawCanv.canvas.height-80;
+  self.pool_y = self.max_pool_y; //calculated on tick
+
+  self.stream_img = game.assetter.asset("barrel_stream.png");
+  self.pool_img   = game.assetter.asset("barrel_pool.png");
+  self.fg_img     = game.assetter.asset("barrel_fg.png");
   self.draw = function(canv)
   {
-    canv.context.fillStyle = "#0000FF";
-    canv.context.fillRect(canv.canvas.width/2-self.stream_w/2,game.mapView.y+game.mapView.h,self.stream_w,self.stream_h+self.pool_max_h);
-    canv.context.fillRect(canv.canvas.width/2-self.pool_w/2,game.mapView.y+game.mapView.h+self.stream_h+(self.pool_max_h-self.pool_h),self.pool_w,self.pool_h);
-    canv.context.strokeStyle = "#000000";
-    canv.context.strokeRect(0,game.mapView.y+game.mapView.h+self.stream_h,canv.canvas.width,1);
+    canv.context.drawImage(self.stream_img, 100+(self.stream_max_w/2)-(self.stream_w/2), game.mapBorder.insetY+game.mapBorder.insetH+50+Math.random()*10,self.stream_w,self.stream_h);
+    canv.context.drawImage(self.pool_img,   0, self.pool_y,self.pool_w,self.pool_h);
+    canv.context.drawImage(self.fg_img,     0, canv.canvas.height-190, canv.canvas.width, 190);
   }
 
   self.tick = function()
   {
     self.stream_w = ((game.numBarrels-game.barrelsFound)/game.numBarrels)*self.stream_max_w;
-    self.pool_h = (game.totalRunoff/10000)*self.pool_max_h;
+    self.pool_y = self.max_pool_y-((self.max_pool_y-self.min_pool_y)*(game.totalRunoff/game.maxRunoff));
   }
 }
 
@@ -296,35 +326,35 @@ var RB_Barrel = function(game, args)
   {
     canv.context.lineWidth = 5;
     canv.context.strokeStyle = "#FF0000";
-    if(!self.placed && self.x < game.mapView.x-self.w)
+    if(!self.placed && self.x < game.mapBorder.x-self.w)
     {
       canv.context.beginPath();
-      canv.context.moveTo(game.mapView.x+10,self.y);
-      canv.context.lineTo(game.mapView.x+20,self.y);
+      canv.context.moveTo(game.mapBorder.x+10,self.y);
+      canv.context.lineTo(game.mapBorder.x+20,self.y);
       canv.context.stroke();
       canv.context.closePath();
     }
-    else if(!self.placed && self.x > game.mapView.x+game.mapView.w)
+    else if(!self.placed && self.x > game.mapBorder.x+game.mapBorder.w)
     {
       canv.context.beginPath();
-      canv.context.moveTo(game.mapView.x+game.mapView.w-10,self.y);
-      canv.context.lineTo(game.mapView.x+game.mapView.w-20,self.y);
+      canv.context.moveTo(game.mapBorder.x+game.mapBorder.w-10,self.y);
+      canv.context.lineTo(game.mapBorder.x+game.mapBorder.w-20,self.y);
       canv.context.stroke();
       canv.context.closePath();
     }
-    else if(!self.placed && self.y < game.mapView.y-self.h)
+    else if(!self.placed && self.y < game.mapBorder.y-self.h)
     {
       canv.context.beginPath();
-      canv.context.moveTo(self.x,game.mapView.y+10);
-      canv.context.lineTo(self.x,game.mapView.y+20);
+      canv.context.moveTo(self.x,game.mapBorder.y+10);
+      canv.context.lineTo(self.x,game.mapBorder.y+20);
       canv.context.stroke();
       canv.context.closePath();
     }
-    else if(!self.placed && self.y > game.mapView.y+game.mapView.h)
+    else if(!self.placed && self.y > game.mapBorder.y+game.mapBorder.h)
     {
       canv.context.beginPath();
-      canv.context.moveTo(self.x,game.mapView.y+game.mapView.h-10);
-      canv.context.lineTo(self.x,game.mapView.y+game.mapView.h-20);
+      canv.context.moveTo(self.x,game.mapBorder.y+game.mapBorder.h-10);
+      canv.context.lineTo(self.x,game.mapBorder.y+game.mapBorder.h-20);
       canv.context.stroke();
       canv.context.closePath();
     }

@@ -114,6 +114,13 @@ var LoadingScene = function(game, stage)
     //pavement
     img_srcs.push("assets/pavement_bad.png");
     img_srcs.push("assets/pavement_good.png");
+    //barrel
+    img_srcs.push("assets/barrel_map.png");
+    img_srcs.push("assets/barrel_border_0.png");
+    img_srcs.push("assets/barrel_border_1.png");
+    img_srcs.push("assets/barrel_stream.png");
+    img_srcs.push("assets/barrel_pool.png");
+    img_srcs.push("assets/barrel_fg.png");
     //misc
     img_srcs.push("assets/null.png");
     img_srcs.push("assets/bike_bg.png");
