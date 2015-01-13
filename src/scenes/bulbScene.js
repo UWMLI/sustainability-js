@@ -161,7 +161,7 @@ var BulbScene = function(game, stage)
   self.draw = function()
   {
     self.drawer.flush();
-    self.stage.drawCanv.context.font = "30px Georgia";
+    self.stage.drawCanv.context.font = "30px comic_font";
     self.stage.drawCanv.context.fillStyle = "#000000";
 
     /*
@@ -194,7 +194,7 @@ var BulbScene = function(game, stage)
       self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
       self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
       self.stage.drawCanv.context.fillStyle = "#FFFFFF";
-      self.stage.drawCanv.context.font = "30px Georgia";
+      self.stage.drawCanv.context.font = "30px comic_font";
       self.stage.drawCanv.context.fillText("Hey! Switch out the lightbulbs!",100,300);
       self.stage.drawCanv.context.fillText("Begin",self.beginButton.x,self.beginButton.y+self.beginButton.h);
     }
@@ -204,7 +204,7 @@ var BulbScene = function(game, stage)
       self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
       self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
       self.stage.drawCanv.context.fillStyle = "#FFFFFF";
-      self.stage.drawCanv.context.font = "30px Georgia";
+      self.stage.drawCanv.context.font = "30px comic_font";
       self.stage.drawCanv.context.fillText("Good Work",100,300);
       self.stage.drawCanv.context.fillText("End",self.endButton.x,self.endButton.y+self.endButton.h);
     }
@@ -626,7 +626,7 @@ var BU_PriceParticle = function(x,y,text,size,color,delay)
   {
     if(self.t < 0) return;
     canv.context.globalAlpha = 1-(self.t*self.t*self.t);
-    canv.context.font = self.size+"px Georgia";
+    canv.context.font = self.size+"px comic_font";
     canv.context.fillStyle = self.c;
     canv.context.fillText(self.text,self.x-25,self.y);
     canv.context.globalAlpha = 1.0;
@@ -809,7 +809,7 @@ var SpendGraphMarkings = function(game)
   var self = this;
   self.draw = function(canv)
   {
-    canv.context.font = "30px Georgia";
+    canv.context.font = "30px comic_font";
     canv.context.fillStyle = "#000000";
     canv.context.fillText("Total Spending",game.stage.drawCanv.canvas.width/2-200,game.stage.drawCanv.canvas.height-250);
     canv.context.fillText("$"+game.trunc(game.iSpendGraph.high,100),0,150);

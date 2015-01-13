@@ -234,7 +234,7 @@ var SW_Thermostat = function(game)
   {
     canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
 
-    canv.context.font = Math.round(self.h*(1/3))+"px Georgia";
+    canv.context.font = Math.round(self.h*(1/3))+"px comic_font";
     canv.context.fillStyle = "#000000"
     var base = self.baseTemp;
     for(var i = 0; i < game.enemiesWon.length; i++) base+=game.enemiesWon[i];
@@ -441,7 +441,7 @@ var SW_FailParticle = function(game,floor)
   {
     if(self.t < 0) return;
     canv.context.globalAlpha = 1-(self.t*self.t*self.t);
-    canv.context.font = "30px Georgia";
+    canv.context.font = "30px comic_font";
     canv.context.fillStyle = "#FF0000"
     canv.context.fillText("+1",self.x-25,self.y);
     canv.context.globalAlpha = 1.0;

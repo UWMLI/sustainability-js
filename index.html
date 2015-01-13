@@ -140,6 +140,15 @@ window.addEventListener('touchstart', function(e){ e.preventDefault() }); //prev
   -ms-user-select:none;
   user-select:none;
 }
+@font-face
+{
+  font-family:comic_font;
+  src:url('assets/Comic.otf');
+}
+body
+{
+  font-family:comic_font;
+}
 </style>
 
 </head>
@@ -149,6 +158,8 @@ window.addEventListener('touchstart', function(e){ e.preventDefault() }); //prev
   <div id="stage_container" class="do"> </div>
   <div id="debug_div" class="do" style="pointer-events:none;"> </div>
 </div>
+
+<div style="position:absolute; left:-100px; top:-100px;">.</div> <!-- loads the font (#thewebiswonderful) -->
 
 </body>
 </html>

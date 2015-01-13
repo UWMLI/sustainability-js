@@ -96,7 +96,7 @@ var BarrelScene = function(game, stage)
   {
     self.drawer.flush();
 
-    stage.drawCanv.context.font = "30px Georgia";
+    stage.drawCanv.context.font = "30px comic_font";
     stage.drawCanv.context.fillStyle = "#000000";
     stage.drawCanv.context.fillText(self.barrelsFound+"/"+self.barrels.length+" barrels placed",30,30);
   };
@@ -413,7 +413,7 @@ var RB_BarrelParticle = function(barrel,game)
   self.draw = function(canv)
   {
     canv.context.globalAlpha = 1-(self.t*self.t*self.t);
-    canv.context.font = "30px Georgia";
+    canv.context.font = "30px comic_font";
     canv.context.fillStyle = "#000000";
     canv.context.fillText(self.text,barrel.x+50-52,barrel.y+self.y+10+2);
     canv.context.fillText(self.text,barrel.x+50-48,barrel.y+self.y+10-2);

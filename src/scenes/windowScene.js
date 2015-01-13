@@ -67,7 +67,7 @@ var WindowScene = function(game, stage)
   self.draw = function()
   {
     self.drawer.flush();
-    stage.drawCanv.context.font = "30px Georgia";
+    stage.drawCanv.context.font = "30px comic_font";
     if(self.score < 0)       stage.drawCanv.context.fillStyle = "#FF0000";
     else if(self.score == 0) stage.drawCanv.context.fillStyle = "#FFFFFF";
     else if(self.score > 0)  stage.drawCanv.context.fillStyle = "#00FF00";
@@ -138,7 +138,7 @@ var WI_FeedParticle = function(text, color)
   self.draw = function(canv)
   {
     canv.context.globalAlpha = 1-(self.t*self.t*self.t);
-    canv.context.font = "100px Georgia";
+    canv.context.font = "100px comic_font";
     canv.context.fillStyle = self.c;
     canv.context.fillText(self.text,self.x-25,self.y);
     canv.context.globalAlpha = 1.0;
@@ -165,7 +165,7 @@ var WI_ScoreParticle = function(x,y,delta,color,delay)
   {
     if(self.t < 0) return;
     canv.context.globalAlpha = 1-(self.t*self.t*self.t);
-    canv.context.font = "30px Georgia";
+    canv.context.font = "30px comic_font";
     canv.context.fillStyle = self.c;
     canv.context.fillText(self.d,self.x-25,self.y);
     canv.context.globalAlpha = 1.0;

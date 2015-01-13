@@ -166,7 +166,7 @@ var MA_Button = function(x,y,w,h,text,game)
     canv.context.strokeStyle = "#000000";
     canv.context.strokeRect(self.x, self.y, self.w, self.h);
     canv.context.fillStyle = "#000000";
-    canv.context.font = "30px Georgia";
+    canv.context.font = "30px comic_font";
     canv.context.fillText(self.text,self.x,self.y+self.h);
   }
   self.click = function()

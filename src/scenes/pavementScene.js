@@ -58,7 +58,7 @@ var PavementScene = function(game, stage)
   self.draw = function()
   {
     self.drawer.flush();
-    self.stage.drawCanv.context.font = "60px Georgia";
+    self.stage.drawCanv.context.font = "60px comic_font";
     self.stage.drawCanv.context.fillStyle = "#000000";
     self.stage.drawCanv.context.fillText(Math.round(percent*10000)/100+"%",0,self.stage.drawCanv.canvas.height-100);
   };
@@ -162,13 +162,13 @@ var PV_EncouragementParticle = function(x,y,game)
   self.draw = function(canv)
   {
     canv.context.globalAlpha = 1-(self.t*self.t*self.t);
-    canv.context.font = "60px Georgia";
+    canv.context.font = "60px comic_font";
     canv.context.fillStyle = "#000000";
     canv.context.fillText(self.text,self.x-52,self.y+2);
     canv.context.fillText(self.text,self.x-48,self.y-2);
     canv.context.fillText(self.text,self.x-48,self.y+2);
     canv.context.fillText(self.text,self.x-52,self.y-2);
-    canv.context.font = "60px Georgia";
+    canv.context.font = "60px comic_font";
     canv.context.fillStyle = "#FFFFFF";
     canv.context.fillText(self.text,self.x-50,self.y);
     canv.context.globalAlpha = 1.0;
