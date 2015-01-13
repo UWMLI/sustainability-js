@@ -39,7 +39,7 @@ var BarrelScene = function(game, stage)
     self.numBarrels = 50;
     self.barrelsFound = 0;
     self.totalRunoff = 0;
-    self.maxRunoff = 100000;
+    self.maxRunoff = 20000;
 
     self.mapBorder = new RB_MapBorder(self);
     self.mapPipe   = new RB_MapPipe(self);
@@ -184,7 +184,8 @@ var RB_Map = function(game)
   self.w = 1008;
   self.h = 1008;
 
-  self.img = game.assetter.asset("barrel_map.png");
+  self.map_img = game.assetter.asset("barrel_map.png");
+  self.road_img = game.assetter.asset("barrel_road.png");
 
   self.tick = function()
   {
@@ -222,7 +223,8 @@ var RB_Map = function(game)
   };
   self.draw = function(canv)
   {
-      canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+      canv.context.drawImage(self.road_img,self.x,self.y,self.w,self.h);
+      canv.context.drawImage(self.map_img,self.x,self.y,self.w,self.h);
   }
 }
 
@@ -258,7 +260,7 @@ var RB_Rain = function(game)
 
   self.draw = function(canv)
   {
-    canv.context.lineWidth = 1;
+    canv.context.lineWidth = 2;
     canv.context.strokeStyle = "#0000FF";
     canv.context.beginPath();
     canv.context.moveTo(self.x,self.y);
@@ -413,7 +415,12 @@ var RB_BarrelParticle = function(barrel,game)
     canv.context.globalAlpha = 1-(self.t*self.t*self.t);
     canv.context.font = "30px Georgia";
     canv.context.fillStyle = "#000000";
-    canv.context.fillText(self.text,barrel.x+5,barrel.y+self.y+10);
+    canv.context.fillText(self.text,barrel.x+50-52,barrel.y+self.y+10+2);
+    canv.context.fillText(self.text,barrel.x+50-48,barrel.y+self.y+10-2);
+    canv.context.fillText(self.text,barrel.x+50-48,barrel.y+self.y+10+2);
+    canv.context.fillText(self.text,barrel.x+50-52,barrel.y+self.y+10-2);
+    canv.context.fillStyle = "#FFFFFF";
+    canv.context.fillText(self.text,barrel.x+50-50,barrel.y+self.y+10);
     canv.context.globalAlpha = 1.0;
   }
 }
