@@ -1,97 +1,69 @@
-(NOTE- PLACEHOLDER URLs)
+(NOTE- PLACEHOLDER URLs. ALSO- MAKE SURE TO CLEAR YOUR CACHE FOR LATEST!)
+Mobile:  http://phildogames.com/scratch/sust/index.html?platform=MOBILE
+Desktop: http://phildogames.com/scratch/sust/index.html?platform=PC
+
+Some notes:
+  I've found a font (http://www.dafont.com/comic-book.font) that I'll use to input a bunch of the text stuff, so you shouldn't need to do any more text assets.
+  I'll be adding intro/outro screens to every game, but they should be mostly text, so you're off the hook for those.
+  I'm also going to be adding more reinforcment "awesome!" popups throughout all the games
+
+Overworld:
+  Intro screen (full screen image that contains logo, and a "touch to begin" or something)
+  Overworld Map (approx 1008x1008, could go wider. want horizontal scrolling, not vertical)
+  Building for each minigame, each in 3 states: (all of these are open to your interpretation)
+    - locked    (could just be 'available' with a padlock over it)
+    - available
+    - completed (could just be 'available' with checkmark over it)
+    examples of buildings might be:
+    Bike: a building with a bunch of bike racks in front of it
+    Window: mini version of in-game building
+    Barrel: a residential-looking area thing
+    Pavement: A parking lot (NOTES ON THIS FURTHER DOWN)
+    etc...
 
 Bike:
-  Mobile:  http://phildogames.com/scratch/sust/index.html?gameType=bike&platform=mobil
-  Desktop: http://phildogames.com/scratch/sust/index.html?gameType=bike&platform=pc
-
-  Once I get intro/outro videos in there, should be done-ish? Feel free to recommend any alterations.
-
+ -NONE-
 
 Window:
-  Mobile:  http://phildogames.com/scratch/sust/index.html?gameType=window&platform=mobil
-  Desktop: http://phildogames.com/scratch/sust/index.html?gameType=window&platform=pc
-
-  Text renderings of "Great!","Good!","Bad!","Terrible!" or whatever (similar in style to text from bike scene)
-  Again, still needs intro/outro vids. Will update you when they're in. (this applies to all the games, fyi)
-
+ -NONE-
 
 Bulb:
-  Mobile:  http://phildogames.com/scratch/sust/index.html?gameType=bulb&platform=mobil
-  Desktop: http://phildogames.com/scratch/sust/index.html?gameType=bulb&platform=pc
-
-  Building/Background
-  Janitor 2 frame walk animation (I can flip left/right)
-  Player 2 frame walk animation (I can flip left/right)
-  Janitor 2 frame change lightbulb animation (maybe can do with just a static image/only one frame)
-  Player 2 frame change lightbulb animation  (maybe can do with just a static image/only one frame)
-  CFL bulb on/CFL bulb burnt out
-  LED bulb on/LED bulb burnt out
-  Some form of selector that shows what your current chosen destination is?
-  (maybe a square glow? or something? it's just hard to know if you've selected the location you wanted to or accidentally selected the one next to it or something...)
-
-  Note- Don't think I'll end up keeping the graphs/all the numbers. Too confusing, nobody pays attention. 
-  Might just throw up a timer and say "change all the bulbs!"
-
+ -NONE-
 
 Sweater:
-  Mobile:  http://phildogames.com/scratch/sust/index.html?gameType=sweater&platform=mobil
-  Desktop: http://phildogames.com/scratch/sust/index.html?gameType=sweater&platform=pc
-
-  Building/Background
-  Dude reaching into box of sweaters
-  Dude throwing sweater (can probably just toggle between throwing/reaching pose for animation)
-  Sweater flying through air (I can animate rotation if necessary)
-  Cold student 2 frame walking/running toward thermostat w/o sweater (needed to make dudes fast for this to be challenging interesting)
-  Warm student 2 frame walking/running back w/ sweater (walk/run doesn't matter. doesn't play into mechanics, just for show)
-  Cold student 2 frame walking/running back w/o sweater after reaching thermostat (when dude successfully got past you and upped the temp 1 degree)
-  Thermostat at bottom (I think I'll add a mechanic that you can hold down on it to set the thermostat back 1 degree, but must hold down for like 1-2 seconds)
-
+ -NONE-
 
 Barrel:
-  Mobile:  http://phildogames.com/scratch/sust/index.html?gameType=barrel&platform=mobil
-  Desktop: http://phildogames.com/scratch/sust/index.html?gameType=barrel&platform=pc
-
-  Background
-  Map w/o barrels (you can either put in predetermined "goals" where barrels will go, or just give me a "goal" asset for where to place the barrels and I can put them on there in code)
-  Map frame (or whatever styling you want to do)
-  Barrel
-  Faucet-like stream of water (I will shrink with shrinking runoff)
-  Filling pool of water (I don't know the best way to do this- you could give me a water pool asset and I'll just stretch it as it "fills", but that will probably look horrible. so maybe one asset for the "top" of the water, and then another asset to put under it that I can stretch and just translate the "top" asset without stretching it?)
-  "Awesome!" and "Great!" and stuff text renderings (if you play, you'll see I have a bunch of placeholder text that pops up next to the barrel. we could change it so every time you get a barrel a full-screen-ish bit of text flies across the screen. whatever you want to do)
-  An "off screen barrel indicator". This one is optional I guess. Currently, I just draw a red line pointing to where the missing barrels are.
-
+  Need "Rain Barrel" asset, and "Glowy sillhouette of Barrel" asset. (I was imagining almost a punch-out of the barrel with a strong glow. but do whatever, as long as it's attention grabbing as being "empty" and "needing to be clicked")
 
 Pavement:
-  Mobile:  http://phildogames.com/scratch/sust/index.html?gameType=pavement&platform=mobil
-  Desktop: http://phildogames.com/scratch/sust/index.html?gameType=pavement&platform=pc
-
-  Gross, non-porous-pavement road
-  Clean, porous-pavement road
-  (We had initially planned to do something with tiling or whatever, but there's no need. I can just scratch off the whole asset (see current demo))
-  Pool with sewage
-  Pool without sewage
-  Dead fish
-  Live fish
-  Steam of sewage coming off road
-  Steam of trickle of water coming off road (will alpha blend between the two)
-  So far- this minigame is hella simple. It might be cool to just do it to like 5 roads one after the other? (which means a pair of assets for each road (gross non-porous vs clean porous))? If that's too much work, screw it.
-
+  Ok, this one we're actually changing up quite a bit.
+  Rather than a road, it should be a parking lot looking thing. (apparently, porous pavement on roads isn't really a thing)
+  Also, since it currently looks/feels like we're just cleaning the road by swiping it, and it takes only like 10 seconds to play, we're going to extend it.
+  So, we're changing it to essentially the same game, but with 3 steps.
+  It'll start with an average, old, dirty parking lot. You drag your finger around to "jackhammer" up all the pavement. Then you drag your finger around to scoop all the pavement crumbles out. Then you drag your finger to lay "porous concrete bricks". 
+  We'll still keep the sizing/styling of all the assets identical. There will still be the bottom bit with the lake and the algae and the fish (even though I haven't yet implemented that part)
+  What all this means in terms of assets is this:
+    We need 4 assets sized exactly like the two roads you have:
+    - A old, cracked, dirty parking lot paved with normal looking pavement
+    - That same parking lot but busted up with the broken bits of pavement still in place all strewn about (like you just jackhammered everything but didn't scoop any of the remnants away, or like a crazy earthquake just went through it or something)
+    - The parking lot with all the broken up pavement slabs removed (essentially just a pit of dirt)
+    - Same parking lot with porous pavement laid. (the difference between porous/non in what you did with the roads was perfect, so feel free to keep that look)
+    Also, I'm going to need
+    - a jackhammer, which I will put on the player's finger while they're "busting up the road"
+    - a small bulldozer or shovel or something that I will put on the player's finger while they're clearing the debris
+  So yeah. The mechanics will stay the exact same ("wiping" away one asset on top of another)- we'll just have 4 stages instead of 2, and I'll put a jackhammer/shovel on the player's finger when they're doing the various things.
 
 Wheel:
-  Mobile:  http://phildogames.com/scratch/sust/index.html?gameType=wheel&platform=mobil
-  Desktop: http://phildogames.com/scratch/sust/index.html?gameType=wheel&platform=pc
+  Back of head/over shoulder look of nervous presenter (that I'll put bottom left or bottom right of screen)
+  Same presenter, happy
+  A bunch of rich people looking bored that I'll slowly animate leaving (exiting to the right of the screen, placed behind the wheel) (them leaving will be the timer that they have to fix the wheel in time for)
+  The rich people looking happy
+  An overlay of hot air coming out of building on left side of wheel, and cool air coming in from outside into building on right side of wheel.
+  Same overlay, but with the wheel purpleish, and purplish air entering building after passing through the wheel, and purplish air exiting the box after coming out of the building and passing through the wheel.
 
-  Background
-  Case the wheel goes in
-  Door to case
-  Squirrels (a couple variations)
-  Nest junk? (a couple individual twigs that I can have fly away)
-  Wheel (spinnable)
-  Presenter (Happy, Medium, Sad?)
-  Presentees (A few of them- happy, medium, sad?)
+  Honestly, those overlays are going to be a bit... weird. I don't know the best way to do them. If you have an idea that illustrates the differential in temperature of the air flow in a working vs non-working wheel, awesome. Otherwise we could talk more about that later?
 
-
-For any of these- feel free to recommend alterations/additions! Thanks!
 
 
 
