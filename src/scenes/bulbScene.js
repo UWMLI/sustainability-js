@@ -142,7 +142,7 @@ var BulbScene = function(game, stage)
     self.drawer.register(self.player);
     self.drawer.register(self.particler);
 
-    game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){console.log("whaaat");self.clicker.register(self.beginButton)});
+    game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
   };
 
   self.tick = function()
@@ -160,7 +160,7 @@ var BulbScene = function(game, stage)
 
       self.clicker.flush();
       self.presser.flush();
-      if(self.viewing == 1) self.ticker.flush();
+      self.ticker.flush();
       for(var i = 0; i < self.janitors.length; i++)
       {
         if(self.janitors[i].state != 2)

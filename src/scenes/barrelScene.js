@@ -3,6 +3,37 @@ var BarrelScene = function(game, stage)
   var self = this;
   self.stage = stage;
 
+  //try to inject as much intro stuff as possible here
+  self.viewing = 0; //0- intro, 1- gameplay, 2- outro
+
+  self.intro_vid_src = "assets/sample.webm";
+  self.intro_vid_stamps = [];
+  self.outro_vid_src = "assets/sample.webm";
+  self.outro_vid_stamps = [];
+
+  self.beginGame = function()
+  {
+    self.viewing = 1;
+    self.clicker.unregister(self.beginButton);
+
+    // register all gameplay stuff
+    for(var i = 0; i < self.barrels.length; i++)
+      self.clicker.register(self.barrels[i]);
+    self.dragger.register(self.map);
+    self.ticker.register(self.runoff);
+    // end register
+  }
+
+  self.endGame = function()
+  {
+    self.viewing = 2;
+    game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
+  }
+
+  self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
+
+  //end intro stuff
+
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.dbugger;
@@ -54,23 +85,20 @@ var BarrelScene = function(game, stage)
     for(var i = 0; i < self.numBarrels; i++)
       self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
 
-    self.dragger.register(self.map);
     self.drawer.register(self.map);
 
     for(var i = 0; i < self.barrels.length; i++)
-    {
-      self.clicker.register(self.barrels[i]);
       self.drawer.register(self.barrels[i]);
-    }
 
     self.drawer.register(self.particler);
     self.ticker.register(self.particler);
 
     self.drawer.register(self.mapBorder);
 
-    self.ticker.register(self.runoff);
     self.drawer.register(self.runoff);
     self.drawer.register(self.mapPipe);
+
+    game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
   };
 
   var stopGen = false;
@@ -97,8 +125,23 @@ var BarrelScene = function(game, stage)
     self.drawer.flush();
 
     stage.drawCanv.context.font = "30px comic_font";
-    stage.drawCanv.context.fillStyle = "#000000";
-    stage.drawCanv.context.fillText(self.barrelsFound+"/"+self.barrels.length+" barrels placed",30,30);
+    stage.drawCanv.context.fillStyle = "#FF0000";
+    stage.drawCanv.context.fillText(self.barrelsFound+"/"+self.barrels.length+" barrels placed",50,685);
+
+    if(self.viewing == 0)
+    {
+      self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
+      self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
+      self.stage.drawCanv.context.fillStyle = "#FFFFFF";
+      self.stage.drawCanv.context.font = "30px comic_font";
+      self.stage.drawCanv.context.fillText("Install barrels before the   ",50,300);
+      self.stage.drawCanv.context.fillText("holding tank overflows!      ",50,340);
+      self.stage.drawCanv.context.fillText("                             ",50,380);
+      self.stage.drawCanv.context.fillText("                             ",50,440);
+      self.stage.drawCanv.context.fillText("                             ",50,480);
+      self.stage.drawCanv.context.fillText("                             ",50,540);
+      self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
+    }
   };
 
   self.cleanup = function()
@@ -124,6 +167,7 @@ var BarrelScene = function(game, stage)
   {
     self.barrelsFound++;
     self.particler.register(new RB_BarrelParticle(barrel,self));
+    if(self.barrelsFound >= self.barrels.length) self.endGame();
   }
 
   self.rainFull = function(drop)
@@ -326,6 +370,7 @@ var RB_Barrel = function(game, args)
 
   self.draw = function(canv)
   {
+  /*
     canv.context.lineWidth = 5;
     canv.context.strokeStyle = "#FF0000";
     if(!self.placed && self.x < game.mapBorder.x-self.w)
@@ -362,11 +407,12 @@ var RB_Barrel = function(game, args)
     }
     else //in visible range
     {
+  */
       canv.context.drawImage(self.img,self.x+self.w/4,self.y+self.h/4,self.w/2,self.h/2);
       if(self.placed) canv.context.strokeStyle = "#00FF00";
       else            canv.context.strokeStyle = "#FF0000";
       canv.context.strokeRect(self.x+self.w/4,self.y+self.h/4,self.w/2,self.h/2);
-    }
+    //}
   }
 
   self.kill = function()
