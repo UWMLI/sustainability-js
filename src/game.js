@@ -109,6 +109,7 @@ var Game = function(init)
     vdiv = document.getElementById("vid_div");
     vid = new Vid(vdiv, source, stamps, self.vidEnded);
     vdiv.style.display = "block";
+    vid.load();
     vid.play();
   }
   self.vidEnded = function()

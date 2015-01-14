@@ -19,13 +19,14 @@ var Vid = function(container, source, stamps, callback)
   dom_vid.controls = false;
   dom_vid.loop = false;
 
-  dom_vid.onended = function()
+  self.onended = function()
   {
     self.container.removeChild(dom_vid);
 
     dom_vid = undefined;
     self.callback();
   }
+  dom_vid.onended = self.onended;
 
   self.load = function()
   {
@@ -40,7 +41,8 @@ var Vid = function(container, source, stamps, callback)
 
   self.stop = function()
   {
-    dom_vid.stop(); //should fire "onended" callback
+    dom_vid.pause();
+    self.onended();
   }
 
   self.next = function()
