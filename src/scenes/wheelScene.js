@@ -3,12 +3,46 @@ var WheelScene = function(game, stage)
   var self = this;
   self.stage = stage;
 
+  //try to inject as much intro stuff as possible here
+  self.viewing = 0; //0- intro, 1- gameplay, 2- outro
+
+  self.intro_vid_src = "assets/sample.webm";
+  self.intro_vid_stamps = [];
+  self.outro_vid_src = "assets/sample.webm";
+  self.outro_vid_stamps = [];
+
+  self.beginGame = function()
+  {
+    self.viewing = 1;
+    self.clicker.unregister(self.beginButton);
+
+    // register all gameplay stuff
+    for(var i = 0; i < self.numSquirrels; i++)
+      self.ticker.register(self.squirrels[i]);
+    for(var i = 0; i < self.numNests; i++)
+      self.ticker.register(self.nests[i]);
+    self.ticker.register(self.door);
+    self.ticker.register(self.wheel);
+    // end register
+  }
+
+  self.endGame = function()
+  {
+    self.viewing = 2;
+    game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
+  }
+
+  self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
+  //end intro stuff
+
+
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.dbugger;
   self.ticker;
   self.flicker;
   self.presser;
+  self.clicker;
   self.dragger;
   self.drawer;
   self.assetter;
@@ -27,6 +61,7 @@ var WheelScene = function(game, stage)
     self.ticker = new Ticker({});
     self.flicker = new Flicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
     self.assetter = new Assetter({});
@@ -92,26 +127,21 @@ var WheelScene = function(game, stage)
     self.drawer.register(self.box_bg);
     self.drawer.register(self.wheel);
     for(var i = 0; i < self.numNests; i++)
-    {
       self.drawer.register(self.nests[i]);
-      self.ticker.register(self.nests[i]);
-    }
     for(var i = 0; i < self.numSquirrels; i++)
-    {
       self.drawer.register(self.squirrels[i]);
-      self.ticker.register(self.squirrels[i]);
-    }
     self.drawer.register(self.box);
     self.drawer.register(self.door);
-    self.ticker.register(self.door);
 
     self.nextTask();
+    game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
   };
 
   self.tick = function()
   {
     self.flicker.flush();
     self.presser.flush();
+    self.clicker.flush();
     self.dragger.flush();
     self.ticker.flush();
   };
@@ -119,6 +149,21 @@ var WheelScene = function(game, stage)
   self.draw = function()
   {
     self.drawer.flush();
+
+    if(self.viewing == 0)
+    {
+      self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
+      self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
+      self.stage.drawCanv.context.fillStyle = "#FFFFFF";
+      self.stage.drawCanv.context.font = "30px comic_font";
+      self.stage.drawCanv.context.fillText("Fix the heat wheel to save   ",50,300);
+      self.stage.drawCanv.context.fillText("the demo!                    ",50,340);
+      self.stage.drawCanv.context.fillText("                             ",50,380);
+      self.stage.drawCanv.context.fillText("                             ",50,440);
+      self.stage.drawCanv.context.fillText("                             ",50,480);
+      self.stage.drawCanv.context.fillText("                             ",50,540);
+      self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
+    }
   };
 
   self.cleanup = function()
@@ -127,6 +172,7 @@ var WheelScene = function(game, stage)
     self.ticker.clear();
     self.flicker.clear();
     self.presser.clear();
+    self.clicker.clear();
     self.dragger.clear();
     self.drawer.clear();
     self.assetter.clear();
@@ -135,6 +181,7 @@ var WheelScene = function(game, stage)
     self.ticker.detach();
     self.flicker.detach();
     self.presser.detach();
+    self.clicker.detach();
     self.dragger.detach();
     self.drawer.detach();
     self.assetter.detach();
@@ -159,6 +206,11 @@ var WheelScene = function(game, stage)
       self.nextTask();
   }
 
+  self.wheelSpinning = function()
+  {
+    self.nextTask();
+  }
+
   self.task = -1;
   self.nextTask = function()
   {
@@ -181,6 +233,10 @@ var WheelScene = function(game, stage)
     if(self.task == 3)
     {
       self.dragger.register(self.wheel);
+    }
+    if(self.task == 4)
+    {
+      setTimeout(self.endGame, 5000);
     }
   }
 };
@@ -280,6 +336,7 @@ var WH_Door = function(game)
     self.flicked = true;
     self.vx = vec.x/10;
     self.vy = vec.y/5;
+    game.flicker.unregister(self);
     game.doorFlicked();
   }
 }
@@ -300,6 +357,11 @@ var WH_Squirrel = function(game)
   self.h = 100;
   self.r = self.w/4;
 
+  self.offYt = Math.random()*2*Math.PI;
+  self.offY = 0;
+  self.offXt = Math.random()*2*Math.PI;
+  self.offX = 0;
+
   self.vx = 0;
   self.vy = 0;
 
@@ -308,11 +370,15 @@ var WH_Squirrel = function(game)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+    canv.context.drawImage(self.img,self.x+self.offX,self.y+self.offY,self.w,self.h);
   }
 
   self.tick = function()
   {
+    self.offYt += 0.5;
+    self.offY = Math.sin(self.offYt)*8;
+    self.offXt += 0.8;
+    self.offX = Math.sin(self.offXt)*2;
     if(self.flicked)
     {
       self.x += self.vx;
@@ -334,6 +400,7 @@ var WH_Squirrel = function(game)
     self.flicked = true;
     self.vx = vec.x/10;
     self.vy = vec.y/5-10;
+    game.flicker.unregister(self);
     game.squirrelFlicked();
   }
 }
@@ -393,6 +460,7 @@ var WH_Nest = function(game)
     self.flicked = true;
     self.vx = ((Math.random()*2)-1)*20;
     self.vy = Math.random()*-20;
+    game.presser.unregister(self);
     game.nestFlicked();
   }
   self.unpress = function(evt)
@@ -405,6 +473,8 @@ var WH_Wheel = function(game)
 {
   var self = this;
 
+  self.spinning = false;
+
   self.offX = 0;
   self.offY = 0;
   self.deltaX = 0;
@@ -416,6 +486,7 @@ var WH_Wheel = function(game)
   self.h = 200;
 
   self.rot = 0;
+  self.rev = 0;
 
   self.img = game.assetter.asset("wheel_wheel.png");
 
@@ -438,6 +509,7 @@ var WH_Wheel = function(game)
 
   self.tick = function()
   {
+    if(self.spinning) self.rot += 0.1;
   }
 
   self.dragStart = function(evt)
@@ -465,9 +537,15 @@ var WH_Wheel = function(game)
     self.newT = ((-Math.atan2(x,y))+(Math.PI/2)+(2*Math.PI))%(2*Math.PI); //why terrible coordinate spaces...
 
     var a = self.oldT-self.newT;
-    if((a > 0 && a < Math.PI) || a < -Math.PI) console.log("cw");
-    else                                       console.log("ccw");
+    if((a > 0 && a < Math.PI) || a < -Math.PI) /*wrong way...*/;
+    else                                       self.rev++; //maybe spit out a particle?
     self.rot -= a;
+
+    if(self.rev > 50)
+    {
+      if(!self.spinning) game.wheelSpinning();
+      self.spinning = true;
+    }
 
     self.offX = self.newOffX;
     self.offY = self.newOffY;
