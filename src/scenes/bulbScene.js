@@ -34,9 +34,9 @@ var BulbScene = function(game, stage)
   self.viewing = 0; //0- intro, 1- gameplay, 2- outro
 
   self.intro_vid_src = "assets/sample.webm";
-  self.intro_vid_stamps = [0,1,2,3,4,5,6,7];
+  self.intro_vid_stamps = [];
   self.outro_vid_src = "assets/sample.webm";
-  self.outro_vid_stamps = [0,1,2,3,4,5,6,7];
+  self.outro_vid_stamps = [];
 
   self.beginGame = function()
   {
@@ -225,8 +225,13 @@ var BulbScene = function(game, stage)
       self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
       self.stage.drawCanv.context.fillStyle = "#FFFFFF";
       self.stage.drawCanv.context.font = "30px comic_font";
-      self.stage.drawCanv.context.fillText("Hey! Switch out the lightbulbs!",100,300);
-      self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-100,self.stage.drawCanv.canvas.height-30,100,30);
+      self.stage.drawCanv.context.fillText("Swap in LED lights before the",50,300);
+      self.stage.drawCanv.context.fillText("maintenance workers put in   ",50,340);
+      self.stage.drawCanv.context.fillText("more incandescents.          ",50,380);
+      self.stage.drawCanv.context.fillText("Each LED will save $500 over ",50,440);
+      self.stage.drawCanv.context.fillText("its lifetime.                ",50,480);
+      self.stage.drawCanv.context.fillText("Save $7500 to win!           ",50,540);
+      self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
     }
   };
 
