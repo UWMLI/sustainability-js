@@ -35,7 +35,7 @@ var Game = function(init)
   var physicalRect    = { x:0, y:0, w:init.physical_width,    h:init.physical_height};
   var theoreticalRect = { x:0, y:0, w:init.theoretical_width, h:init.theoretical_height};
 
-  /* 
+  /*
   DEBUG CODE
   */
   self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physicalRect,theoretical_rect:theoreticalRect});
@@ -99,5 +99,29 @@ var Game = function(init)
     scenes[currentScene] = new Scene(self, stage);
     scenes[currentScene].ready();
   }
+
+  var vidCallback;
+  var vdiv;
+  var vid;
+  self.playVid = function(source, stamps, callback)
+  {
+    vidCallback = callback;
+    vdiv = document.getElementById("vid_div");
+    vid = new Vid(vdiv, source, stamps, self.vidEnded);
+    vdiv.style.display = "block";
+    vid.play();
+  }
+  self.vidEnded = function()
+  {
+    vdiv.style.display = "none";
+    vidCallback();
+    vid = undefined;
+  }
+  self.vidTouched = function()
+  {
+    if(vid) vid.next();
+  }
+  document.getElementById("vid_div").addEventListener("click",self.vidTouched);
+
 };
 

@@ -113,6 +113,8 @@ var BulbScene = function(game, stage)
 
     self.drawer.register(self.player);
     self.drawer.register(self.particler);
+
+    game.playVid("assets/sample.webm", [0,1,2,3,4,5,6,7], function(){});
   };
 
   self.tick = function()

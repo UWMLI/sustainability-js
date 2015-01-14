@@ -1,0 +1,29 @@
+<html>
+
+<script type="text/javascript">
+  var v;
+
+  var doit = function()
+  {
+    v = document.getElementById("vid");
+
+    v.addEventListener("loadedmetadata", function()
+    {
+      console.log("loaded");
+      setTimeout(function() { console.log("a"); v.currentTime = 2; }, 100);
+      setTimeout(function() { console.log("a"); v.currentTime = 2; }, 500);
+      setTimeout(function() { console.log("a"); v.currentTime = 2; }, 1000);
+      setTimeout(function() { console.log("a"); v.currentTime = 2; }, 5000);
+      setTimeout(function() { console.log("a"); v.currentTime = 2; }, 10000);
+      v.play();
+    });
+
+  }
+</script>
+
+<body onload = "doit()">
+<video id="vid" preload="auto">
+<source src="assets/sample.mp4" type="video/mp4" />
+</video>
+</body>
+</html>

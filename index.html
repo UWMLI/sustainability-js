@@ -14,6 +14,7 @@
 <script type="text/javascript" src="src/stage.js"></script>
 <script type="text/javascript" src="src/game.js"></script>
 <script type="text/javascript" src="src/model.js"></script>
+<script type="text/javascript" src="src/vid.js"></script>
 
 <script type="text/javascript" src="src/doqueues/assetter.js"></script>
 <script type="text/javascript" src="src/doqueues/clicker.js"></script>
@@ -70,6 +71,8 @@ function stackLoaded()
     document.getElementById("content").style.height = actualHeightOfStuff+"px";
     document.getElementById("debug_div").style.width = actualWidthOfStuff+"px";
     document.getElementById("debug_div").style.height = actualHeightOfStuff+"px";
+    document.getElementById("vid_div").style.width = actualWidthOfStuff+"px";
+    document.getElementById("vid_div").style.height = actualHeightOfStuff+"px";
     document.getElementById("stage_container").style.width = actualWidthOfStuff+"px";
     document.getElementById("stage_container").style.height = actualHeightOfStuff+"px";
 
@@ -156,8 +159,10 @@ body
 
 <div id="content" class="do">
   <div id="stage_container" class="do"> </div>
+  <div id="vid_div" class="do" style="display:none;"> </div>
   <div id="debug_div" class="do" style="pointer-events:none;"> </div>
 </div>
+
 
 <div style="position:absolute; left:-100px; top:-100px;">.</div> <!-- loads the font (#thewebiswonderful) -->
 

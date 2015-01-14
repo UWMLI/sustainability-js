@@ -65,22 +65,3 @@ function rectMap(oldr, newr, inputr, outputr)
   outputr.h = (inputr.h/oldr.h)*newr.h;
 }
 
-/* No idea what this actually is... */
-function hackInputs()
-{
-  actualWidthOfStuff = window.innerWidth;
-  actualHeightOfStuff = window.innerHeight;
-  document.getElementById("dabody").style.width = actualWidthOfStuff+"px";
-  document.getElementById("dabody").style.height = actualHeightOfStuff+"px";
-  document.getElementById("debug").style.width = actualWidthOfStuff+"px";
-  document.getElementById("debug").style.height = actualHeightOfStuff+"px";
-  document.getElementById("stage_container").style.width = actualWidthOfStuff+"px";
-  document.getElementById("stage_container").style.height = actualHeightOfStuff+"px";
-  var children = document.getElementById("stage_container").childNodes;
-  for(var i = 0; i < children.length; i++)
-  {
-    children[i].style.width = actualWidthOfStuff+"px";
-    children[i].style.height = actualHeightOfStuff+"px";
-  }
-}
-
