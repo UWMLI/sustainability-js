@@ -236,7 +236,7 @@ var WheelScene = function(game, stage)
     }
     if(self.task == 4)
     {
-      setTimeout(self.endGame, 5000);
+      setTimeout(self.endGame, 1000);
     }
   }
 };

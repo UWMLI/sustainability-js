@@ -3,11 +3,41 @@ var PavementScene = function(game, stage)
   var self = this;
   self.stage = stage;
 
+  //try to inject as much intro stuff as possible here
+  self.viewing = 0; //0- intro, 1- gameplay, 2- outro
+
+  self.intro_vid_src = "assets/sample.webm";
+  self.intro_vid_stamps = [];
+  self.outro_vid_src = "assets/sample.webm";
+  self.outro_vid_stamps = [];
+
+  self.beginGame = function()
+  {
+    self.viewing = 1;
+    self.clicker.unregister(self.beginButton);
+
+    // register all gameplay stuff
+    self.dragger.register(self.dirtyBG);
+    self.ticker.register(self.dirtyBG);
+    // end register
+  }
+
+  self.endGame = function()
+  {
+    self.viewing = 2;
+    game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
+  }
+
+  self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
+  //end intro stuff
+
+
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.dbugger;
   self.ticker;
   self.dragger;
+  self.clicker;
   self.drawer;
   self.particler;
   self.assetter;
@@ -21,6 +51,7 @@ var PavementScene = function(game, stage)
     self.dbugger = new Debugger({source:document.getElementById("debug_div")});
     self.ticker = new Ticker({});
     self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
     self.particler = new Particler({});
     self.assetter = new Assetter({});
@@ -31,10 +62,10 @@ var PavementScene = function(game, stage)
 
     self.drawer.register(self.cleanBG);
     self.drawer.register(self.dirtyBG);
-    self.dragger.register(self.dirtyBG);
-    self.ticker.register(self.dirtyBG);
     self.drawer.register(self.particler);
     self.ticker.register(self.particler);
+
+    game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
   };
 
   var stopGen = false;
@@ -50,6 +81,7 @@ var PavementScene = function(game, stage)
       }
     }
     self.dragger.flush();
+    self.clicker.flush();
     self.ticker.flush();
   };
 
@@ -61,6 +93,21 @@ var PavementScene = function(game, stage)
     self.stage.drawCanv.context.font = "60px comic_font";
     self.stage.drawCanv.context.fillStyle = "#000000";
     self.stage.drawCanv.context.fillText(Math.round(percent*10000)/100+"%",0,self.stage.drawCanv.canvas.height-100);
+
+    if(self.viewing == 0)
+    {
+      self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
+      self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
+      self.stage.drawCanv.context.fillStyle = "#FFFFFF";
+      self.stage.drawCanv.context.font = "30px comic_font";
+      self.stage.drawCanv.context.fillText("Swap traditional pavement    ",50,300);
+      self.stage.drawCanv.context.fillText("with porous pavement to      ",50,340);
+      self.stage.drawCanv.context.fillText("reduce runoff and prevent    ",50,380);
+      self.stage.drawCanv.context.fillText("algae from killing the fish! ",50,420);
+      self.stage.drawCanv.context.fillText("                             ",50,480);
+      self.stage.drawCanv.context.fillText("                             ",50,540);
+      self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
+    }
   };
 
   self.cleanup = function()
@@ -68,6 +115,7 @@ var PavementScene = function(game, stage)
     self.dbugger.clear();
     self.ticker.clear();
     self.dragger.clear();
+    self.clicker.clear();
     self.drawer.clear();
     self.particler.clear();
     self.assetter.clear();
@@ -75,6 +123,7 @@ var PavementScene = function(game, stage)
     self.dbugger.detach();
     self.ticker.detach();
     self.dragger.detach();
+    self.clicker.detach();
     self.drawer.detach();
     self.particler.detach();
     self.assetter.detach();
@@ -83,7 +132,8 @@ var PavementScene = function(game, stage)
   var percent = 0;
   self.percentFilled = function(p)
   {
-    if(p > 1) p = 1;
+    if(p > 1) { p = 1; }
+    if(percent != 1 && p == 1) setTimeout(self.endGame,1000);
     percent = p;
   }
 };
