@@ -7,52 +7,51 @@ var Vid = function(container, source, stamps, callback)
   self.stamps    = stamps;
   self.callback  = callback;
 
-  var dom_vid = document.createElement('video');
-  dom_vid.style.width = container.style.width;
-  dom_vid.style.height = container.style.height;
-  dom_src = document.createElement('source');
+  self.video = document.createElement('video');
+  self.video.style.width = container.style.width;
+  self.video.style.height = container.style.height;
+  var dom_src = document.createElement('source');
   dom_src.src = self.source;
   dom_src.type = "video/"+self.source.substring(self.source.indexOf('.')+1); //oh god so error prone
-
-
-  dom_vid.appendChild(dom_src);
-  dom_vid.controls = false;
-  dom_vid.loop = false;
+  self.video.appendChild(dom_src);
+  self.video.controls = false;
+  self.video.loop = false;
+  self.video.load();
 
   self.onended = function()
   {
-    self.container.removeChild(dom_vid);
+    self.container.removeChild(self.video);
 
-    dom_vid = undefined;
+    self.video = undefined;
     self.callback();
   }
-  dom_vid.onended = self.onended;
+  self.video.onended = self.onended;
 
   self.load = function()
   {
-    dom_vid.load();
+    self.video.load();
   }
 
   self.play = function()
   {
-    self.container.appendChild(dom_vid);
-    dom_vid.play();
+    self.container.appendChild(self.video);
+    self.video.play();
   }
 
   self.stop = function()
   {
-    dom_vid.pause();
+    self.video.pause();
     self.onended();
   }
 
   self.next = function()
   {
     var i = 0;
-    while(i < self.stamps.length && dom_vid.currentTime >= self.stamps[i])
+    while(i < self.stamps.length && self.video.currentTime >= self.stamps[i])
       i++;
     if(i == self.stamps.length) self.stop();
     else
-      dom_vid.currentTime = self.stamps[i];
+      self.video.currentTime = self.stamps[i];
   }
 
 
