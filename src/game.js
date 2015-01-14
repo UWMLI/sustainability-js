@@ -122,7 +122,7 @@ var Game = function(init)
   {
     if(vid) vid.next();
   }
-  document.getElementById("vid_div").addEventListener("click",self.vidTouched);
-
+  if(platform == "PC")          document.getElementById("vid_div").addEventListener('mousedown', self.vidTouched, false);
+  else if(platform == "MOBILE") document.getElementById("vid_div").addEventListener('touchstart', self.vidTouched, false);
 };
 

@@ -16,7 +16,6 @@ var Vid = function(container, source, stamps, callback)
   self.video.appendChild(dom_src);
   self.video.controls = false;
   self.video.loop = false;
-  self.video.load();
 
   self.onended = function()
   {
