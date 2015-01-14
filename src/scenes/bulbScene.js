@@ -30,7 +30,42 @@ var BulbScene = function(game, stage)
   var self = this;
   self.stage = stage;
 
+  //try to inject as much intro stuff as possible here
   self.viewing = 0; //0- intro, 1- gameplay, 2- outro
+
+  self.intro_vid_src = "assets/sample.webm";
+  self.intro_vid_stamps = [0,1,2,3,4,5,6,7];
+  self.outro_vid_src = "assets/sample.webm";
+  self.outro_vid_stamps = [0,1,2,3,4,5,6,7];
+
+  self.beginGame = function()
+  {
+    self.viewing = 1;
+    self.clicker.unregister(self.beginButton);
+
+    // register all gameplay stuff
+    for(var i = 0; i < self.bulbs.length; i++)
+    {
+      self.presser.register(self.bulbs[i]);
+      self.ticker.register(self.bulbs[i]);
+    }
+    self.ticker.register(self.player); //register player before janitor to prioritize player in changing bulbs
+    for(var i = 0; i < self.janitors.length; i++)
+      self.ticker.register(self.janitors[i]);
+    self.ticker.register(self.particler);
+    // end register
+  }
+
+  self.endGame = function()
+  {
+    self.viewing = 2;
+    game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
+  }
+
+  self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
+
+  //end intro stuff
+
 
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
@@ -48,9 +83,6 @@ var BulbScene = function(game, stage)
   self.janitors;
 
   self.selector;
-
-  self.beginButton;
-  self.endButton;
 
   self.theySpendGraph;
   self.iSpendGraph;
@@ -94,10 +126,6 @@ var BulbScene = function(game, stage)
 
     self.selector = new BU_Selector(self);
 
-    self.beginButton = new Clickable( { "x":100, "y":500, "w":200, "h":100, "click":self.beginGame });
-    self.endButton = new Clickable( { "x":100, "y":500, "w":200, "h":100, "click":self.endGame });
-    self.clicker.register(self.beginButton);
-
     self.iSpendGraph         = new BU_Graph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#00FF00",self);
     self.theySpendGraph      = new BU_Graph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#FF0000",self);
     self.spendGraphMarkings  = new SpendGraphMarkings(self);
@@ -114,7 +142,7 @@ var BulbScene = function(game, stage)
     self.drawer.register(self.player);
     self.drawer.register(self.particler);
 
-    game.playVid("assets/sample.webm", [0,1,2,3,4,5,6,7], function(){});
+    game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){console.log("whaaat");self.clicker.register(self.beginButton)});
   };
 
   self.tick = function()
@@ -198,17 +226,7 @@ var BulbScene = function(game, stage)
       self.stage.drawCanv.context.fillStyle = "#FFFFFF";
       self.stage.drawCanv.context.font = "30px comic_font";
       self.stage.drawCanv.context.fillText("Hey! Switch out the lightbulbs!",100,300);
-      self.stage.drawCanv.context.fillText("Begin",self.beginButton.x,self.beginButton.y+self.beginButton.h);
-    }
-
-    if(self.viewing == 2)
-    {
-      self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
-      self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
-      self.stage.drawCanv.context.fillStyle = "#FFFFFF";
-      self.stage.drawCanv.context.font = "30px comic_font";
-      self.stage.drawCanv.context.fillText("Good Work",100,300);
-      self.stage.drawCanv.context.fillText("End",self.endButton.x,self.endButton.y+self.endButton.h);
+      self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-100,self.stage.drawCanv.canvas.height-30,100,30);
     }
   };
 
@@ -292,7 +310,7 @@ var BulbScene = function(game, stage)
   {
     self.ispent += BU_c.cost[bulb.type];
     if(bulb.type == BU_c.BULB_LED_ON) self.saved += 500;
-    if(self.saved > 7500) self.viewing = 2;
+    if(self.saved > 7500) self.endGame();
     self.numbulbs++;
     //self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),"$"+BU_c.cost[bulb.type],30,"#00AA00",0));
   }
@@ -304,38 +322,6 @@ var BulbScene = function(game, stage)
     self.ispent += cost;
     //self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),energy+" kWh",20,"#00FFFF",(bulb.node.n_x+bulb.node.n_y)/20));
     //self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),"$"+cost,20,"#00AA00",(bulb.node.n_x+bulb.node.n_y)/20+0.8));
-  }
-
-  self.beginGame = function()
-  {
-    self.viewing = 1;
-    self.clicker.unregister(self.beginButton);
-
-    for(var i = 0; i < self.bulbs.length; i++)
-    {
-      self.presser.register(self.bulbs[i]);
-      self.ticker.register(self.bulbs[i]);
-    }
-    self.ticker.register(self.player); //register player before janitor to prioritize player in changing bulbs
-    for(var i = 0; i < self.janitors.length; i++)
-      self.ticker.register(self.janitors[i]);
-    self.ticker.register(self.particler);
-  }
-
-  self.win = function()
-  {
-    self.viewing = 2;
-    self.clicker.register(self.endButton);
-  }
-
-  self.lose = function()
-  {
-    self.viewing = 2;
-    self.clicker.register(self.endButton);
-  }
-
-  self.endGame = function()
-  {
   }
 };
 
