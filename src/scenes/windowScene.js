@@ -1,12 +1,45 @@
 var WindowScene = function(game, stage)
 {
   var self = this;
+  self.stage = stage;
+
+  //try to inject as much intro stuff as possible here
+  self.viewing = 0; //0- intro, 1- gameplay, 2- outro
+
+  self.intro_vid_src = "assets/sample.webm";
+  self.intro_vid_stamps = [];
+  self.outro_vid_src = "assets/sample.webm";
+  self.outro_vid_stamps = [];
+
+  self.beginGame = function()
+  {
+    self.viewing = 1;
+    self.clicker.unregister(self.beginButton);
+
+    // register all gameplay stuff
+    for(var i = 0; i < self.windows.length; i++)
+      self.presser.register(self.windows[i]);
+    self.ticker.register(self.sky);
+    self.ticker.register(self.reticle);
+    self.ticker.register(self.jerk);
+    // end register
+  }
+
+  self.endGame = function()
+  {
+    self.viewing = 2;
+    game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
+  }
+
+  self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
+  //end intro stuff
 
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.dbugger;
   self.ticker;
   self.presser;
+  self.clicker;
   self.drawer;
   self.assetter;
   self.particler;
@@ -27,6 +60,7 @@ var WindowScene = function(game, stage)
     self.dbugger = new Debugger({source:document.getElementById("debug_div")});
     self.ticker = new Ticker({});
     self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
     self.assetter = new Assetter({});
     self.particler = new Particler({});
@@ -42,25 +76,22 @@ var WindowScene = function(game, stage)
         self.windows.push(new WI_Window(self, i, j));
 
     self.drawer.register(self.sky);
-    self.ticker.register(self.sky);
     self.drawer.register(self.reticle);
-    self.ticker.register(self.reticle);
     self.drawer.register(self.building);
-    self.ticker.register(self.jerk);
     for(var i = 0; i < self.windows.length; i++)
-    {
-      self.presser.register(self.windows[i]);
       self.drawer.register(self.windows[i]);
-    }
     self.drawer.register(self.particler);
     self.ticker.register(self.particler);
 
     self.score = 0;
+
+    game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
   };
 
   self.tick = function()
   {
     self.presser.flush();
+    self.clicker.flush();
     self.ticker.flush();
   };
 
@@ -72,6 +103,21 @@ var WindowScene = function(game, stage)
     else if(self.score == 0) stage.drawCanv.context.fillStyle = "#FFFFFF";
     else if(self.score > 0)  stage.drawCanv.context.fillStyle = "#00FF00";
     stage.drawCanv.context.fillText(self.score,20,30);
+
+    if(self.viewing == 0)
+    {
+      self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
+      self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
+      self.stage.drawCanv.context.fillStyle = "#FFFFFF";
+      self.stage.drawCanv.context.font = "30px comic_font";
+      self.stage.drawCanv.context.fillText("Close shades in the day, open",50,300);
+      self.stage.drawCanv.context.fillText("windows at night.            ",50,340);
+      self.stage.drawCanv.context.fillText("50 windows in the correct    ",50,400);
+      self.stage.drawCanv.context.fillText("position to win!             ",50,440);
+      self.stage.drawCanv.context.fillText("                             ",50,480);
+      self.stage.drawCanv.context.fillText("                             ",50,540);
+      self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
+    }
   };
 
   self.cleanup = function()
@@ -79,6 +125,7 @@ var WindowScene = function(game, stage)
     self.dbugger.clear();
     self.ticker.clear();
     self.presser.clear();
+    self.clicker.clear();
     self.drawer.clear();
     self.assetter.clear();
     self.particler.clear();
@@ -86,6 +133,7 @@ var WindowScene = function(game, stage)
     self.dbugger.detach();
     self.ticker.detach();
     self.presser.detach();
+    self.clicker.detach();
     self.drawer.detach();
     self.assetter.detach();
     self.particler.detach();
