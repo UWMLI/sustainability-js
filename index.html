@@ -102,24 +102,24 @@ function stackLoaded()
   });
 }
 
-//Simulates injection of ARISjs- Uncomment to test outside ARIS
-///*
-ARIS.parseURLParams = function(url)
+if(!using_aris) //simulate functionality of aris
 {
-  var gameType = "";
-  var vars = window.location.search.substring(1).split("&");
-  for (var i=0;i<vars.length;i++)
+  ARIS.parseURLParams = function(url)
   {
-    var pair = vars[i].split("=");
-    if(pair[0].toLowerCase() == "gameType".toLowerCase()) gameType = pair[1].replace('/','').toLowerCase();
-    if(pair[0].toLowerCase() == "platform".toLowerCase()) platform = pair[1].replace('/','').toUpperCase(); //part of config
-    if(pair[0].toLowerCase() == "debug".toLowerCase()) debug = (pair[1].replace('/','').toLowerCase() == "true"); //part of config
-  }
-  return {"gameId":0,"playerId":0,"webPageId":0,"gameType":gameType};
-};
-ARIS.getItemCount = function(itemId){ ARIS.didUpdateItemQty(itemId, 1); };
-ARIS.ready();
-//*/
+    var gameType = "";
+    var vars = window.location.search.substring(1).split("&");
+    for (var i=0;i<vars.length;i++)
+    {
+      var pair = vars[i].split("=");
+      if(pair[0].toLowerCase() == "gameType".toLowerCase()) gameType = pair[1].replace('/','').toLowerCase();
+      if(pair[0].toLowerCase() == "platform".toLowerCase()) platform = pair[1].replace('/','').toUpperCase(); //part of config
+      if(pair[0].toLowerCase() == "debug".toLowerCase()) debug = (pair[1].replace('/','').toLowerCase() == "true"); //part of config
+    }
+    return {"gameId":0,"playerId":0,"webPageId":0,"gameType":gameType};
+  };
+  ARIS.getItemCount = function(itemId){ ARIS.didUpdateItemQty(itemId, 1); };
+  ARIS.ready();
+}
 
 window.addEventListener('touchstart', function(e){ e.preventDefault() }); //prevent browser from doing anything funny
 </script>
