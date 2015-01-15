@@ -17,6 +17,10 @@ var Model = function()
     self.webPageId = parseInt(params.webPageId);
     self.gameType  = params.gameType;
 
+    //hack
+    platform = params.platform;
+    debug = params.debug;
+
     var bogusEndOfQueueId = 99999999; //Used to flag the end of the queue
     ARIS.didUpdateItemQty = function(updatedItemId, qty)
     {
