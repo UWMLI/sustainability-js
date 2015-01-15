@@ -24,13 +24,25 @@ var BarrelScene = function(game, stage)
     // end register
   }
 
+  self.retryGame = function()
+  {
+    self.viewing = 1;
+    self.clicker.unregister(self.retryButton);
+
+    for(var i = 0; i < self.barrels.length; i++)
+      self.barrels[i].placed = false;
+    self.totalRunoff = 0;
+    self.barrelsFound = 0;
+  }
+
   self.endGame = function()
   {
-    self.viewing = 2;
+    self.viewing = 3;
     game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }
 
   self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
+  self.retryButton = self.retryButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.retryGame });
 
   //end intro stuff
 
@@ -122,7 +134,12 @@ var BarrelScene = function(game, stage)
       }
     }
     self.totalRunoff += ((self.barrels.length-self.barrelsFound)/self.barrels.length)*15;
-    if(self.totalRunoff > self.maxRunoff) self.totalRunoff = self.maxRunoff;
+    if(self.totalRunoff > self.maxRunoff)
+    {
+      self.totalRunoff = self.maxRunoff;
+      self.viewing = 2;
+      self.clicker.register(self.retryButton);
+    }
     self.clicker.flush();
     self.dragger.flush();
     self.ticker.flush();
@@ -137,6 +154,21 @@ var BarrelScene = function(game, stage)
     stage.drawCanv.context.fillText(self.barrelsFound+"/"+self.barrels.length+" barrels placed",50,685);
 
     if(self.viewing == 0)
+    {
+      self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
+      self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
+      self.stage.drawCanv.context.fillStyle = "#FFFFFF";
+      self.stage.drawCanv.context.font = "30px comic_font";
+      self.stage.drawCanv.context.fillText("Install barrels before the   ",50,300);
+      self.stage.drawCanv.context.fillText("holding tank overflows!      ",50,340);
+      self.stage.drawCanv.context.fillText("                             ",50,380);
+      self.stage.drawCanv.context.fillText("                             ",50,440);
+      self.stage.drawCanv.context.fillText("                             ",50,480);
+      self.stage.drawCanv.context.fillText("                             ",50,540);
+      self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
+    }
+
+    if(self.viewing == 2)
     {
       self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
       self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
@@ -175,7 +207,7 @@ var BarrelScene = function(game, stage)
   {
     self.barrelsFound++;
     self.particler.register(new RB_BarrelParticle(barrel,self));
-    if(self.barrelsFound >= self.barrels.length) self.endGame();
+    if(self.barrelsFound >= self.barrels.length) setTimeout(self.endGame,1000);
   }
 
   self.rainFull = function(drop)
@@ -321,9 +353,9 @@ var RB_Rain = function(game)
     self.y += self.dy;
 
     if(self.y > game.mapBorder.y+game.mapBorder.h)    game.rainFull(self);
-    while(self.x < game.mapBorder.x)                self.x += game.mapBorder.w;
+    while(self.x < game.mapBorder.x)                  self.x += game.mapBorder.w;
     while(self.x > game.mapBorder.x+game.mapBorder.w) self.x -= game.mapBorder.w;
-    while(self.y < game.mapBorder.y)                self.y += game.mapBorder.h;
+    while(self.y < game.mapBorder.y)                  self.y += game.mapBorder.h;
     while(self.y > game.mapBorder.y+game.mapBorder.h) self.y -= game.mapBorder.h;
 
     return true; //never expire (just auto-loop)
