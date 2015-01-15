@@ -3,6 +3,41 @@ var SweaterScene = function(game, stage)
   var self = this;
   self.stage = stage;
 
+  //try to inject as much intro stuff as possible here
+  self.viewing = 0; //0- intro, 1- gameplay, 2- outro
+
+  self.intro_vid_src = "assets/sample.webm";
+  self.intro_vid_stamps = [];
+  self.outro_vid_src = "assets/sample.webm";
+  self.outro_vid_stamps = [];
+
+  self.beginGame = function()
+  {
+    self.viewing = 1;
+    self.clicker.unregister(self.beginButton);
+
+    // register all gameplay stuff
+    for(var i = 0; i < self.house.numFloors; i++)
+      self.clicker.register(self.buttons[i]);
+
+    self.ticker.register(self.player);
+    self.presser.register(self.thermostat);
+    self.ticker.register(self.thermostat);
+
+    self.ticker.register(self.enemyFactory);
+    // end register
+  }
+
+  self.endGame = function()
+  {
+    self.viewing = 2;
+    game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
+  }
+
+  self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
+  //end intro stuff
+
+
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.ticker;
@@ -64,21 +99,15 @@ var SweaterScene = function(game, stage)
     for(var i = 0; i < self.house.numFloors; i++)
     {
       self.buttons.push( new Clickable( { "x":0, "y":self.house.yForFloor(i), "w":self.house.w, "h":self.house.f_h, "click":getClickFuncForFloor(i) }));
-      self.clicker.register(self.buttons[i]);
       //self.drawer.register(self.buttons[i]);
     }
 
-
-    self.ticker.register(self.player);
     self.drawer.register(self.player);
 
     self.drawer.register(self.thermostat);
-    self.presser.register(self.thermostat);
-    self.ticker.register(self.thermostat);
-
-    self.ticker.register(self.enemyFactory);
     self.ticker.register(self.particler);
     self.drawer.register(self.particler);
+    game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
   };
 
   self.tick = function()
@@ -91,6 +120,20 @@ var SweaterScene = function(game, stage)
   self.draw = function()
   {
     self.drawer.flush();
+    if(self.viewing == 0)
+    {
+      self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
+      self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
+      self.stage.drawCanv.context.fillStyle = "#FFFFFF";
+      self.stage.drawCanv.context.font = "30px comic_font";
+      self.stage.drawCanv.context.fillText("Prevent the cold students    ",50,300);
+      self.stage.drawCanv.context.fillText("from turning up the          ",50,340);
+      self.stage.drawCanv.context.fillText("thermostat!                  ",50,380);
+      self.stage.drawCanv.context.fillText("Give them sweaters instead!  ",50,440);
+      self.stage.drawCanv.context.fillText("Keep the thermostat below    ",50,500);
+      self.stage.drawCanv.context.fillText("68 degrees!                  ",50,540);
+      self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
+    }
   };
 
   self.cleanup = function()
