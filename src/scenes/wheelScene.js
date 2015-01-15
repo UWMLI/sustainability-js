@@ -34,76 +34,13 @@ var WheelScene = function(game, stage)
     self.clicker.unregister(self.retryButton);
 
     //reset game state
-    self.cleanup();
-
-    self.dbugger = new Debugger({source:document.getElementById("debug_div")});
-    self.ticker = new Ticker({});
-    self.flicker = new Flicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
-    self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
-    self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
-    self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
-    self.drawer = new Drawer({source:stage.drawCanv});
-    self.assetter = new Assetter({});
-
-    self.bg = new WH_BG(self);
-    self.box = new WH_Box(self);
-    self.wheel = new WH_Wheel(self);
-    self.door = new WH_Door(self);
-    self.box_bg = new WH_Box_BG(self);
-    self.crowd = new WH_Crowd(self);
-    self.presenter = new WH_Presenter(self);
-    self.happyPeople = new WH_HappyPeople(self);
-
-    var l = self.door.x;
-    var r = self.door.x+self.door.w;
-    var t = self.door.y;
-    var b = self.door.y+self.door.h;
-
-    self.squirrels = []; self.numSquirrels = 4; self.squirrelsFlicked = 0;
-    for(var i = 0; i < self.numSquirrels; i++)
-      self.squirrels.push(new WH_Squirrel(self));
-
-    self.squirrels[0].x = l+50;
-    self.squirrels[0].y = t;
-
-    self.squirrels[1].x = r-self.squirrels[1].w-50;
-    self.squirrels[1].y = t;
-
-    self.squirrels[2].x = r-self.squirrels[2].w-50;
-    self.squirrels[2].y = b-self.squirrels[2].h-20;
-
-    self.squirrels[3].x = l+50;
-    self.squirrels[3].y = b-self.squirrels[3].h-20;
-
-    self.nests = []; self.numNests = 64; self.nestsFlicked = 0;
-    for(var i = 0; i < self.numNests; i++)
-      self.nests.push(new WH_Nest(self));
-
-    self.templateNests = [];
-    self.templateNests[0] = new WH_Nest(self);
-    self.templateNests[0].x = l+50;
-    self.templateNests[0].y = t+50;
-
-    self.templateNests[1] = new WH_Nest(self);
-    self.templateNests[1].x = r-self.templateNests[1].w-50;
-    self.templateNests[1].y = t+50;
-
-    self.templateNests[2] = new WH_Nest(self);
-    self.templateNests[2].x = r-self.templateNests[2].w-50;
-    self.templateNests[2].y = b-self.templateNests[2].h-20;
-
-    self.templateNests[3] = new WH_Nest(self);
-    self.templateNests[3].x = l+50;
-    self.templateNests[3].y = b-self.templateNests[3].h-20;
-
-    for(var i = 0; i < 4; i++)
-    {
-      for(var j = 0; j < self.numNests/4; j++)
-      {
-        self.nests[(i*self.numNests/4)+j].x = self.templateNests[i].x+((Math.random()*2)-1)*40;
-        self.nests[(i*self.numNests/4)+j].y = self.templateNests[i].y+((Math.random()*2)-1)*10;
-      }
-    }
+    self.ticker.clear();
+    self.flicker.clear();
+    self.presser.clear();
+    self.clicker.clear();
+    self.dragger.clear();
+    self.drawer.clear();
+    self.assetter.clear();
 
     self.drawer.register(self.bg);
     self.drawer.register(self.crowd);
@@ -117,9 +54,6 @@ var WheelScene = function(game, stage)
     self.drawer.register(self.door);
     self.drawer.register(self.presenter);
 
-    self.task = -1;
-    self.nextTask();
-
     for(var i = 0; i < self.numSquirrels; i++)
       self.ticker.register(self.squirrels[i]);
     for(var i = 0; i < self.numNests; i++)
@@ -128,6 +62,14 @@ var WheelScene = function(game, stage)
     self.ticker.register(self.wheel);
     self.ticker.register(self.crowd);
     self.ticker.register(self.presenter);
+
+    self.task = -1;
+
+    self.squirrelsFlicked = 0;
+    self.nestsFlicked = 0;
+
+    self.resetPlacements();
+    self.nextTask();
     //end reset
   }
 
@@ -141,10 +83,8 @@ var WheelScene = function(game, stage)
   self.retryButton = self.retryButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.retryGame });
   //end intro stuff
 
-
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
-  self.dbugger;
   self.ticker;
   self.flicker;
   self.presser;
@@ -163,9 +103,67 @@ var WheelScene = function(game, stage)
   self.crowd;
   self.presenter;
 
+  self.task;
+
+  self.resetPlacements = function()
+  {
+    self.door.reset();
+    for(var i = 0; i < self.squirrels.length; i++)
+      self.squirrels[i].reset();
+    for(var i = 0; i < self.nests.length; i++)
+      self.nests[i].reset();
+    self.wheel.reset();
+    self.crowd.reset();
+    self.presenter.reset();
+
+    var l = self.door.x;
+    var r = self.door.x+self.door.w;
+    var t = self.door.y;
+    var b = self.door.y+self.door.h;
+
+    //squirrels
+    self.squirrels[0].x = l+50;
+    self.squirrels[0].y = t;
+
+    self.squirrels[1].x = r-self.squirrels[1].w-50;
+    self.squirrels[1].y = t;
+
+    self.squirrels[2].x = r-self.squirrels[2].w-50;
+    self.squirrels[2].y = b-self.squirrels[2].h-20;
+
+    self.squirrels[3].x = l+50;
+    self.squirrels[3].y = b-self.squirrels[3].h-20;
+
+    //nests
+    var templateNests = [];
+    templateNests[0] = new WH_Nest(self);
+    templateNests[0].x = l+50;
+    templateNests[0].y = t+50;
+
+    templateNests[1] = new WH_Nest(self);
+    templateNests[1].x = r-templateNests[1].w-50;
+    templateNests[1].y = t+50;
+
+    templateNests[2] = new WH_Nest(self);
+    templateNests[2].x = r-templateNests[2].w-50;
+    templateNests[2].y = b-templateNests[2].h-20;
+
+    templateNests[3] = new WH_Nest(self);
+    templateNests[3].x = l+50;
+    templateNests[3].y = b-templateNests[3].h-20;
+
+    for(var i = 0; i < 4; i++)
+    {
+      for(var j = 0; j < self.numNests/4; j++)
+      {
+        self.nests[(i*self.numNests/4)+j].x = templateNests[i].x+((Math.random()*2)-1)*40;
+        self.nests[(i*self.numNests/4)+j].y = templateNests[i].y+((Math.random()*2)-1)*10;
+      }
+    }
+  }
+
   self.ready = function()
   {
-    self.dbugger = new Debugger({source:document.getElementById("debug_div")});
     self.ticker = new Ticker({});
     self.flicker = new Flicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
@@ -183,56 +181,17 @@ var WheelScene = function(game, stage)
     self.presenter = new WH_Presenter(self);
     self.happyPeople = new WH_HappyPeople(self);
 
-    var l = self.door.x;
-    var r = self.door.x+self.door.w;
-    var t = self.door.y;
-    var b = self.door.y+self.door.h;
-
-    self.squirrels = []; self.numSquirrels = 4; self.squirrelsFlicked = 0;
+    self.numSquirrels = 4;
+    self.squirrelsFlicked = 0;
+    self.squirrels = [];
     for(var i = 0; i < self.numSquirrels; i++)
       self.squirrels.push(new WH_Squirrel(self));
 
-    self.squirrels[0].x = l+50;
-    self.squirrels[0].y = t;
-
-    self.squirrels[1].x = r-self.squirrels[1].w-50;
-    self.squirrels[1].y = t;
-
-    self.squirrels[2].x = r-self.squirrels[2].w-50;
-    self.squirrels[2].y = b-self.squirrels[2].h-20;
-
-    self.squirrels[3].x = l+50;
-    self.squirrels[3].y = b-self.squirrels[3].h-20;
-
-    self.nests = []; self.numNests = 64; self.nestsFlicked = 0;
+    self.numNests = 32;
+    self.nestsFlicked = 0;
+    self.nests = [];
     for(var i = 0; i < self.numNests; i++)
       self.nests.push(new WH_Nest(self));
-
-    self.templateNests = [];
-    self.templateNests[0] = new WH_Nest(self);
-    self.templateNests[0].x = l+50;
-    self.templateNests[0].y = t+50;
-
-    self.templateNests[1] = new WH_Nest(self);
-    self.templateNests[1].x = r-self.templateNests[1].w-50;
-    self.templateNests[1].y = t+50;
-
-    self.templateNests[2] = new WH_Nest(self);
-    self.templateNests[2].x = r-self.templateNests[2].w-50;
-    self.templateNests[2].y = b-self.templateNests[2].h-20;
-
-    self.templateNests[3] = new WH_Nest(self);
-    self.templateNests[3].x = l+50;
-    self.templateNests[3].y = b-self.templateNests[3].h-20;
-
-    for(var i = 0; i < 4; i++)
-    {
-      for(var j = 0; j < self.numNests/4; j++)
-      {
-        self.nests[(i*self.numNests/4)+j].x = self.templateNests[i].x+((Math.random()*2)-1)*40;
-        self.nests[(i*self.numNests/4)+j].y = self.templateNests[i].y+((Math.random()*2)-1)*10;
-      }
-    }
 
     self.drawer.register(self.bg);
     self.drawer.register(self.crowd);
@@ -246,6 +205,8 @@ var WheelScene = function(game, stage)
     self.drawer.register(self.door);
     self.drawer.register(self.presenter);
 
+    self.resetPlacements();
+    self.task = -1;
     self.nextTask();
     game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
   };
@@ -295,7 +256,6 @@ var WheelScene = function(game, stage)
 
   self.cleanup = function()
   {
-    self.dbugger.clear();
     self.ticker.clear();
     self.flicker.clear();
     self.presser.clear();
@@ -304,7 +264,6 @@ var WheelScene = function(game, stage)
     self.drawer.clear();
     self.assetter.clear();
 
-    self.dbugger.detach();
     self.ticker.detach();
     self.flicker.detach();
     self.presser.detach();
@@ -347,7 +306,6 @@ var WheelScene = function(game, stage)
     }
   }
 
-  self.task = -1;
   self.nextTask = function()
   {
     self.task++;
@@ -412,14 +370,18 @@ var WH_Crowd = function(game)
   self.tick = function()
   {
     self.t++;
-    self.x++;
-    if(self.x > game.stage.drawCanv.canvas.width) game.crowdLeft();
+    if(self.x+self.t > game.stage.drawCanv.canvas.width) game.crowdLeft();
   }
 
   self.draw = function(canv)
   {
-    if(Math.round(self.t/20)%2==0) canv.context.drawImage(self.img_0,self.x,self.y,self.w,self.h);
-    else                           canv.context.drawImage(self.img_1,self.x,self.y,self.w,self.h);
+    if(Math.round(self.t/20)%2==0) canv.context.drawImage(self.img_0,self.x+self.t,self.y,self.w,self.h);
+    else                           canv.context.drawImage(self.img_1,self.x+self.t,self.y,self.w,self.h);
+  }
+
+  self.reset = function()
+  {
+    self.t = 0;
   }
 }
 
@@ -445,6 +407,11 @@ var WH_Presenter = function(game)
   {
     if(Math.round(self.t/10)%2==0) canv.context.drawImage(self.img_0,self.x,self.y,self.w,self.h);
     else                           canv.context.drawImage(self.img_1,self.x,self.y,self.w,self.h);
+  }
+
+  self.reset = function()
+  {
+    self.t = 0;
   }
 }
 
@@ -546,6 +513,24 @@ var WH_Door = function(game)
     game.flicker.unregister(self);
     game.doorFlicked();
   }
+
+  self.reset = function()
+  {
+    self.flicked = false;
+
+    self.startX = 0;
+    self.startY = 0;
+    self.vec = {"x":0,"y":0};
+
+    self.x = game.box.x+150;
+    self.y = game.box.y+80;
+    self.w = game.box.w-350;
+    self.h = game.box.h-130;
+    self.r = self.w/4;
+
+    self.vx = 0;
+    self.vy = 0;
+  }
 }
 
 var WH_Squirrel = function(game)
@@ -610,6 +595,32 @@ var WH_Squirrel = function(game)
     game.flicker.unregister(self);
     game.squirrelFlicked();
   }
+
+  self.reset = function()
+  {
+    self.flicked = false;
+
+    self.startX = 0;
+    self.startY = 0;
+    self.vec = {"x":0,"y":0};
+
+    self.x = game.box.x+20;
+    self.y = game.box.y+20;
+    self.w = 60;
+    self.h = 100;
+    self.r = self.w/4;
+
+    self.offYt = Math.random()*2*Math.PI;
+    self.offY = 0;
+    self.offXt = Math.random()*2*Math.PI;
+    self.offX = 0;
+
+    self.vx = 0;
+    self.vy = 0;
+
+    if(Math.random() < 0.5) self.img = game.assetter.asset("wheel_squirrel_0.png");
+    else                    self.img = game.assetter.asset("wheel_squirrel_1.png");
+  }
 }
 
 var WH_Nest = function(game)
@@ -673,6 +684,27 @@ var WH_Nest = function(game)
   self.unpress = function(evt)
   {
 
+  }
+
+  self.reset = function()
+  {
+    self.flicked = false;
+
+    self.x = 0; //will get set on first tick
+    self.y = 0; //will get set on first tick
+    self.w = 50;
+    self.h = 50;
+    self.i = 0;
+
+    self.vx = 0;
+    self.vy = 0;
+
+    self.imgs = [];
+    self.imgs.push(game.assetter.asset("wheel_nest_0.png"));
+    self.imgs.push(game.assetter.asset("wheel_nest_1.png"));
+    self.imgs.push(game.assetter.asset("wheel_nest_2.png"));
+    self.imgs.push(game.assetter.asset("wheel_nest_3.png"));
+    self.imgs.push(game.assetter.asset("wheel_nest_4.png"));
   }
 }
 
@@ -760,5 +792,26 @@ var WH_Wheel = function(game)
   self.dragFinish = function()
   {
   };
+
+  self.reset = function()
+  {
+    self.spinning = false;
+
+    self.offX = 0;
+    self.offY = 0;
+    self.deltaX = 0;
+    self.deltaY = 0;
+
+    self.x = game.box.x+190;
+    self.y = game.box.y+80;
+    self.w = 200;
+    self.h = 200;
+
+    self.rot = 0;
+    self.rev = 0;
+
+    self.img = game.assetter.asset("wheel_wheel.png");
+
+  }
 }
 
