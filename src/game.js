@@ -101,12 +101,16 @@ var Game = function(init)
   {
     if(using_aris && Scene == MainScene) //trying to "finish level"
     {
+      console.log("setting item count");
       ARIS.setItemCount(3584,1);
       ARIS.closeMe();
     }
-    scenes[currentScene].cleanup();
-    scenes[currentScene] = new Scene(self, stage);
-    scenes[currentScene].ready();
+    else
+    {
+      scenes[currentScene].cleanup();
+      scenes[currentScene] = new Scene(self, stage);
+      scenes[currentScene].ready();
+    }
   }
 
   var vidCallback;
