@@ -99,6 +99,11 @@ var Game = function(init)
 
   self.setScene = function(Scene)
   {
+    if(using_aris && Scene == MainScene) //trying to "finish level"
+    {
+      ARIS.setItemCount(3584,1);
+      ARIS.closeMe();
+    }
     scenes[currentScene].cleanup();
     scenes[currentScene] = new Scene(self, stage);
     scenes[currentScene].ready();

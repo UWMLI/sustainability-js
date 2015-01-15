@@ -114,6 +114,7 @@ if(!using_aris) //simulate functionality of aris
       if(pair[0].toLowerCase() == "gameType".toLowerCase()) gameType = pair[1].replace('/','').toLowerCase();
       if(pair[0].toLowerCase() == "platform".toLowerCase()) platform = pair[1].replace('/','').toUpperCase(); //part of config
       if(pair[0].toLowerCase() == "debug".toLowerCase()) debug = (pair[1].replace('/','').toLowerCase() == "true"); //part of config
+      if(pair[0].toLowerCase() == "aris".toLowerCase()) using_aris = (pair[1].replace('/','').toLowerCase() == "true"); //part of config
     }
     return {"gameId":0,"playerId":0,"webPageId":0,"gameType":gameType};
   };
