@@ -38,6 +38,7 @@ var Game = function(init)
   /*
   DEBUG CODE
   */
+  /*
   self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physicalRect,theoretical_rect:theoreticalRect});
   self.drawer = new Drawer({source:stage.drawCanv});
   var BB = function(game)
@@ -58,11 +59,12 @@ var Game = function(init)
     }
   }
   self.backBtn = new BB(self);
+  self.clicker.register(self.backBtn);
+  self.drawer.register(self.backBtn);
+  */
   /*
   DEBUG CODE
   */
-  self.clicker.register(self.backBtn);
-  self.drawer.register(self.backBtn);
 
   self.setMainScene = function(Scene)
   {
@@ -81,8 +83,10 @@ var Game = function(init)
     stage.clear();
     scenes[currentScene].tick();
     scenes[currentScene].draw();
-    self.clicker.flush();
-    self.drawer.flush();
+    //DEBUG CODE
+    //self.clicker.flush();
+    //self.drawer.flush();
+    //DEBUG CODE
     stage.draw(); //blits from offscreen canvas to on screen one
   };
 
