@@ -28,15 +28,26 @@ var SweaterScene = function(game, stage)
     // end register
   }
 
+  self.retryGame = function()
+  {
+    self.viewing = 1;
+    self.clicker.unregister(self.retryButton);
+
+    //reset state
+    self.thermostat.temp = 66;
+    self.enemiesMade = 0;
+    //end reset
+  }
+
   self.endGame = function()
   {
-    self.viewing = 2;
+    self.viewing = 3;
     game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }
 
   self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
+  self.retryButton = self.retryButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.retryGame });
   //end intro stuff
-
 
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
@@ -107,14 +118,30 @@ var SweaterScene = function(game, stage)
     self.drawer.register(self.thermostat);
     self.ticker.register(self.particler);
     self.drawer.register(self.particler);
+
+    self.enemiesMade = 0;
+
     game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
   };
 
+  var won = false;
   self.tick = function()
   {
     self.clicker.flush();
     self.presser.flush();
     self.ticker.flush();
+
+    if(self.thermostat.temp > 69)
+    {
+      self.viewing = 2;
+      //self.clicker.unregister(self.retryButton);
+      self.clicker.register(self.retryButton);
+    }
+    else if(!won && self.enemiesMade > 10)
+    {
+      won = true;
+      setTimeout(self.endGame,1000);
+    };
   };
 
   self.draw = function()
@@ -131,7 +158,21 @@ var SweaterScene = function(game, stage)
       self.stage.drawCanv.context.fillText("thermostat!                  ",50,380);
       self.stage.drawCanv.context.fillText("Give them sweaters instead!  ",50,440);
       self.stage.drawCanv.context.fillText("Keep the thermostat below    ",50,500);
-      self.stage.drawCanv.context.fillText("68 degrees!                  ",50,540);
+      self.stage.drawCanv.context.fillText("69 degrees!                  ",50,540);
+      self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
+    }
+    if(self.viewing == 2)
+    {
+      self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
+      self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
+      self.stage.drawCanv.context.fillStyle = "#FFFFFF";
+      self.stage.drawCanv.context.font = "30px comic_font";
+      self.stage.drawCanv.context.fillText("Prevent the cold students    ",50,300);
+      self.stage.drawCanv.context.fillText("from turning up the          ",50,340);
+      self.stage.drawCanv.context.fillText("thermostat!                  ",50,380);
+      self.stage.drawCanv.context.fillText("Give them sweaters instead!  ",50,440);
+      self.stage.drawCanv.context.fillText("Keep the thermostat below    ",50,500);
+      self.stage.drawCanv.context.fillText("69 degrees!                  ",50,540);
       self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
     }
   };
@@ -156,7 +197,7 @@ var SweaterScene = function(game, stage)
   }
 
   self.sweaterProduced = function(floor) { self.sweatersThrown[floor]++; }
-  self.enemyProduced   = function(floor) { self.enemiesAttacked[floor]++; }
+  self.enemyProduced   = function(floor) { self.enemiesMade++; self.enemiesAttacked[floor]++; }
   self.enemyVictory    = function(floor) { self.thermostat.temp++; self.enemiesWon[floor]++; self.particler.register(new SW_FailParticle(self,floor)); self.particler.register(new SW_FailParticle(self,-1)); }
   self.enemyFail       = function(floor) { self.enemiesDefeated[floor]++; }
 };
@@ -301,13 +342,12 @@ var SW_EnemyFactory = function(game)
 
   self.tick = function()
   {
-    t--;
+    if(game.thermostat.temp < 70) t--;
     if(t == 0)
     {
       var floor = lastFloor;
       while(floor == lastFloor) floor = Math.floor(Math.random()*game.house.numFloors);
       lastFloor = floor;
-      console.log(floor);
 
       game.enemyProduced(floor);
       var e = new SW_Enemy(game,floor);

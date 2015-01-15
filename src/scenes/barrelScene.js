@@ -122,6 +122,7 @@ var BarrelScene = function(game, stage)
   };
 
   var stopGen = false;
+  var tryingretry = false;
   self.tick = function()
   {
     if(!stopGen)
@@ -138,6 +139,7 @@ var BarrelScene = function(game, stage)
     {
       self.totalRunoff = self.maxRunoff;
       self.viewing = 2;
+      //self.clicker.unregister(self.retryButton);
       self.clicker.register(self.retryButton);
     }
     self.clicker.flush();
