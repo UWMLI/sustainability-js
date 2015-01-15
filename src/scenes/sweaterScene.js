@@ -157,7 +157,7 @@ var SweaterScene = function(game, stage)
 
   self.sweaterProduced = function(floor) { self.sweatersThrown[floor]++; }
   self.enemyProduced   = function(floor) { self.enemiesAttacked[floor]++; }
-  self.enemyVictory    = function(floor) { self.enemiesWon[floor]++; self.particler.register(new SW_FailParticle(self,floor)); self.particler.register(new SW_FailParticle(self,-1)); }
+  self.enemyVictory    = function(floor) { self.thermostat.temp++; self.enemiesWon[floor]++; self.particler.register(new SW_FailParticle(self,floor)); self.particler.register(new SW_FailParticle(self,-1)); }
   self.enemyFail       = function(floor) { self.enemiesDefeated[floor]++; }
 };
 
@@ -244,7 +244,7 @@ var SW_Thermostat = function(game)
   self.pressTimerMax = 100;
   self.pressTimer = self.pressTimerMax;
 
-  self.baseTemp = 66;
+  self.temp = 66;
 
   self.img = game.assetter.asset("thermo_stat.png");
 
@@ -261,14 +261,14 @@ var SW_Thermostat = function(game)
 
   self.tick = function()
   {
-    if(self.pressing)
+    if(self.pressing && self.temp > 66)
     {
       self.pressTimer--;
       if(self.pressTimer <= 0)
       {
         self.pressTimer = self.pressTimerMax;
         game.thermostatHit();
-        self.baseTemp--;
+        self.temp--;
       }
     }
   }
@@ -279,9 +279,7 @@ var SW_Thermostat = function(game)
 
     canv.context.font = Math.round(self.h*(1/3))+"px comic_font";
     canv.context.fillStyle = "#000000"
-    var base = self.baseTemp;
-    for(var i = 0; i < game.enemiesWon.length; i++) base+=game.enemiesWon[i];
-    canv.context.fillText(base+String.fromCharCode(176),self.x+(self.w*(4/7)),self.y+(self.h*(3/5)));
+    canv.context.fillText(self.temp+String.fromCharCode(176),self.x+(self.w*(4/7)),self.y+(self.h*(3/5)));
 
     if(self.pressing)
     {
@@ -298,16 +296,26 @@ var SW_EnemyFactory = function(game)
 {
   var self = this;
 
+  var t = 50;
+  var lastFloor = -1;
+
   self.tick = function()
   {
-    if(Math.random() < 0.01)
+    t--;
+    if(t == 0)
     {
-      var floor = Math.floor(Math.random()*game.house.numFloors);
+      var floor = lastFloor;
+      while(floor == lastFloor) floor = Math.floor(Math.random()*game.house.numFloors);
+      lastFloor = floor;
+      console.log(floor);
+
       game.enemyProduced(floor);
       var e = new SW_Enemy(game,floor);
       game.enemies.push(e);
       game.ticker.register(e);
       game.drawer.register(e);
+
+      t = Math.round(Math.random()*50)+50;
     }
   }
 }
