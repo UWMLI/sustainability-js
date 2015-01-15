@@ -88,11 +88,18 @@ var WindowScene = function(game, stage)
     game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
   };
 
+  var won = false;
   self.tick = function()
   {
     self.presser.flush();
     self.clicker.flush();
     self.ticker.flush();
+
+    if(!won && self.score > 100)
+    {
+      won = true;
+      setTimeout(self.endGame,1000);
+    }
   };
 
   self.draw = function()
@@ -112,7 +119,7 @@ var WindowScene = function(game, stage)
       self.stage.drawCanv.context.font = "30px comic_font";
       self.stage.drawCanv.context.fillText("Close shades in the day, open",50,300);
       self.stage.drawCanv.context.fillText("windows at night.            ",50,340);
-      self.stage.drawCanv.context.fillText("50 windows in the correct    ",50,400);
+      self.stage.drawCanv.context.fillText("100 windows in the correct   ",50,400);
       self.stage.drawCanv.context.fillText("position to win!             ",50,440);
       self.stage.drawCanv.context.fillText("                             ",50,480);
       self.stage.drawCanv.context.fillText("                             ",50,540);
@@ -139,8 +146,8 @@ var WindowScene = function(game, stage)
     self.particler.detach();
   };
 
-  self.dayTick = function() { self.scoreTick(1); }
-  self.nightTick = function() { self.scoreTick(2); }
+  self.dayTick = function() { self.scoreTick(0); }
+  self.nightTick = function() { self.scoreTick(1); }
   self.scoreTick = function(vstate)
   {
     var w;
@@ -163,6 +170,7 @@ var WindowScene = function(game, stage)
 
     self.particler.register(new WI_FeedParticle(text, color));
     self.score += tickScore;
+    if(self.score < 0) self.score = 0;
   }
 
 };
@@ -332,11 +340,11 @@ var WI_Window = function(game, room, floor)
   self.h = 90;
 
   self.state = 0;
-  var s_CLOSED = "CLOSED";
+  //var s_CLOSED = "CLOSED";
   var s_DARKED = "DARKED";
   var s_OPENED = "OPENED";
-  var states = [s_CLOSED,s_DARKED,s_OPENED];
-  self.imgs = [game.assetter.asset("win_closed.png"),game.assetter.asset("win_drawn.png"),game.assetter.asset("win_open.png")];
+  var states = [s_DARKED,s_OPENED];
+  self.imgs = [game.assetter.asset("win_drawn.png"),game.assetter.asset("win_open.png")];
 
   self.draw = function(canv)
   {
