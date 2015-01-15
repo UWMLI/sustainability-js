@@ -28,13 +28,117 @@ var WheelScene = function(game, stage)
     // end register
   }
 
+  self.retryGame = function()
+  {
+    self.viewing = 1;
+    self.clicker.unregister(self.retryButton);
+
+    //reset game state
+    self.cleanup();
+
+    self.dbugger = new Debugger({source:document.getElementById("debug_div")});
+    self.ticker = new Ticker({});
+    self.flicker = new Flicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.drawer = new Drawer({source:stage.drawCanv});
+    self.assetter = new Assetter({});
+
+    self.bg = new WH_BG(self);
+    self.box = new WH_Box(self);
+    self.wheel = new WH_Wheel(self);
+    self.door = new WH_Door(self);
+    self.box_bg = new WH_Box_BG(self);
+    self.crowd = new WH_Crowd(self);
+    self.presenter = new WH_Presenter(self);
+    self.happyPeople = new WH_HappyPeople(self);
+
+    var l = self.door.x;
+    var r = self.door.x+self.door.w;
+    var t = self.door.y;
+    var b = self.door.y+self.door.h;
+
+    self.squirrels = []; self.numSquirrels = 4; self.squirrelsFlicked = 0;
+    for(var i = 0; i < self.numSquirrels; i++)
+      self.squirrels.push(new WH_Squirrel(self));
+
+    self.squirrels[0].x = l+50;
+    self.squirrels[0].y = t;
+
+    self.squirrels[1].x = r-self.squirrels[1].w-50;
+    self.squirrels[1].y = t;
+
+    self.squirrels[2].x = r-self.squirrels[2].w-50;
+    self.squirrels[2].y = b-self.squirrels[2].h-20;
+
+    self.squirrels[3].x = l+50;
+    self.squirrels[3].y = b-self.squirrels[3].h-20;
+
+    self.nests = []; self.numNests = 64; self.nestsFlicked = 0;
+    for(var i = 0; i < self.numNests; i++)
+      self.nests.push(new WH_Nest(self));
+
+    self.templateNests = [];
+    self.templateNests[0] = new WH_Nest(self);
+    self.templateNests[0].x = l+50;
+    self.templateNests[0].y = t+50;
+
+    self.templateNests[1] = new WH_Nest(self);
+    self.templateNests[1].x = r-self.templateNests[1].w-50;
+    self.templateNests[1].y = t+50;
+
+    self.templateNests[2] = new WH_Nest(self);
+    self.templateNests[2].x = r-self.templateNests[2].w-50;
+    self.templateNests[2].y = b-self.templateNests[2].h-20;
+
+    self.templateNests[3] = new WH_Nest(self);
+    self.templateNests[3].x = l+50;
+    self.templateNests[3].y = b-self.templateNests[3].h-20;
+
+    for(var i = 0; i < 4; i++)
+    {
+      for(var j = 0; j < self.numNests/4; j++)
+      {
+        self.nests[(i*self.numNests/4)+j].x = self.templateNests[i].x+((Math.random()*2)-1)*40;
+        self.nests[(i*self.numNests/4)+j].y = self.templateNests[i].y+((Math.random()*2)-1)*10;
+      }
+    }
+
+    self.drawer.register(self.bg);
+    self.drawer.register(self.crowd);
+    self.drawer.register(self.box_bg);
+    self.drawer.register(self.wheel);
+    for(var i = 0; i < self.numNests; i++)
+      self.drawer.register(self.nests[i]);
+    for(var i = 0; i < self.numSquirrels; i++)
+      self.drawer.register(self.squirrels[i]);
+    self.drawer.register(self.box);
+    self.drawer.register(self.door);
+    self.drawer.register(self.presenter);
+
+    self.task = -1;
+    self.nextTask();
+
+    for(var i = 0; i < self.numSquirrels; i++)
+      self.ticker.register(self.squirrels[i]);
+    for(var i = 0; i < self.numNests; i++)
+      self.ticker.register(self.nests[i]);
+    self.ticker.register(self.door);
+    self.ticker.register(self.wheel);
+    self.ticker.register(self.crowd);
+    self.ticker.register(self.presenter);
+    //end reset
+  }
+
   self.endGame = function()
   {
-    self.viewing = 2;
+    self.viewing = 3;
     game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }
 
   self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
+  self.retryButton = self.retryButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.retryGame });
   //end intro stuff
 
 
@@ -173,6 +277,20 @@ var WheelScene = function(game, stage)
       self.stage.drawCanv.context.fillText("                             ",50,540);
       self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
     }
+    if(self.viewing == 2)
+    {
+      self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
+      self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
+      self.stage.drawCanv.context.fillStyle = "#FFFFFF";
+      self.stage.drawCanv.context.font = "30px comic_font";
+      self.stage.drawCanv.context.fillText("Fix the heat wheel to save   ",50,300);
+      self.stage.drawCanv.context.fillText("the demo!                    ",50,340);
+      self.stage.drawCanv.context.fillText("                             ",50,380);
+      self.stage.drawCanv.context.fillText("                             ",50,440);
+      self.stage.drawCanv.context.fillText("                             ",50,480);
+      self.stage.drawCanv.context.fillText("                             ",50,540);
+      self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
+    }
   };
 
   self.cleanup = function()
@@ -218,6 +336,15 @@ var WheelScene = function(game, stage)
   self.wheelSpinning = function()
   {
     self.nextTask();
+  }
+
+  self.crowdLeft = function()
+  {
+    if(!self.wheel.spinning)
+    {
+      self.viewing = 2;
+      self.clicker.register(self.retryButton);
+    }
   }
 
   self.task = -1;
@@ -273,7 +400,7 @@ var WH_Crowd = function(game)
 {
   var self = this;
 
-  self.x = -100;
+  self.x = -200;
   self.y = 180;
   self.w = 750;
   self.h = 450;
@@ -286,6 +413,7 @@ var WH_Crowd = function(game)
   {
     self.t++;
     self.x++;
+    if(self.x > game.stage.drawCanv.canvas.width) game.crowdLeft();
   }
 
   self.draw = function(canv)
