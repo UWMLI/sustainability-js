@@ -94,6 +94,11 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/wheel_nest_2.png");
     img_srcs.push("assets/wheel_nest_3.png");
     img_srcs.push("assets/wheel_nest_4.png");
+    img_srcs.push("assets/wheel_crowd_0.png");
+    img_srcs.push("assets/wheel_crowd_1.png");
+    img_srcs.push("assets/wheel_crowd_happy.png");
+    img_srcs.push("assets/wheel_presenter_0.png");
+    img_srcs.push("assets/wheel_presenter_1.png");
     //bulb
     img_srcs.push("assets/bulb_bulb.png");
     img_srcs.push("assets/bulb_player_walk_0_r.png");

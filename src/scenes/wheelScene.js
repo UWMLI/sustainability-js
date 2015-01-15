@@ -23,6 +23,8 @@ var WheelScene = function(game, stage)
       self.ticker.register(self.nests[i]);
     self.ticker.register(self.door);
     self.ticker.register(self.wheel);
+    self.ticker.register(self.crowd);
+    self.ticker.register(self.presenter);
     // end register
   }
 
@@ -54,6 +56,8 @@ var WheelScene = function(game, stage)
   self.squirrels; self.numSquirrels; self.squirrelsFlicked;
   self.box;
   self.door;
+  self.crowd;
+  self.presenter;
 
   self.ready = function()
   {
@@ -71,6 +75,9 @@ var WheelScene = function(game, stage)
     self.wheel = new WH_Wheel(self);
     self.door = new WH_Door(self);
     self.box_bg = new WH_Box_BG(self);
+    self.crowd = new WH_Crowd(self);
+    self.presenter = new WH_Presenter(self);
+    self.happyPeople = new WH_HappyPeople(self);
 
     var l = self.door.x;
     var r = self.door.x+self.door.w;
@@ -124,6 +131,7 @@ var WheelScene = function(game, stage)
     }
 
     self.drawer.register(self.bg);
+    self.drawer.register(self.crowd);
     self.drawer.register(self.box_bg);
     self.drawer.register(self.wheel);
     for(var i = 0; i < self.numNests; i++)
@@ -132,6 +140,7 @@ var WheelScene = function(game, stage)
       self.drawer.register(self.squirrels[i]);
     self.drawer.register(self.box);
     self.drawer.register(self.door);
+    self.drawer.register(self.presenter);
 
     self.nextTask();
     game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
@@ -236,10 +245,80 @@ var WheelScene = function(game, stage)
     }
     if(self.task == 4)
     {
+      self.drawer.unregister(self.crowd);
+      self.drawer.unregister(self.presenter);
+      self.drawer.register(self.happyPeople);
       setTimeout(self.endGame, 1000);
     }
   }
 };
+
+var WH_HappyPeople = function(game)
+{
+  var self = this;
+  self.x = 0;
+  self.y = game.stage.drawCanv.canvas.height-400;
+  self.w = 600;
+  self.h = 500;
+
+  self.img = game.assetter.asset("wheel_crowd_happy.png");
+
+  self.draw = function(canv)
+  {
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+  }
+}
+
+var WH_Crowd = function(game)
+{
+  var self = this;
+
+  self.x = -100;
+  self.y = 180;
+  self.w = 750;
+  self.h = 450;
+
+  self.img_0 = game.assetter.asset("wheel_crowd_0.png");
+  self.img_1 = game.assetter.asset("wheel_crowd_1.png");
+
+  self.t = 0;
+  self.tick = function()
+  {
+    self.t++;
+    self.x++;
+  }
+
+  self.draw = function(canv)
+  {
+    if(Math.round(self.t/20)%2==0) canv.context.drawImage(self.img_0,self.x,self.y,self.w,self.h);
+    else                           canv.context.drawImage(self.img_1,self.x,self.y,self.w,self.h);
+  }
+}
+
+var WH_Presenter = function(game)
+{
+  var self = this;
+
+  self.x = -50;
+  self.y = game.stage.drawCanv.canvas.height-400;
+  self.w = 400;
+  self.h = 500;
+
+  self.img_0 = game.assetter.asset("wheel_presenter_0.png");
+  self.img_1 = game.assetter.asset("wheel_presenter_1.png");
+
+  self.t = 0;
+  self.tick = function()
+  {
+    self.t++;
+  }
+
+  self.draw = function(canv)
+  {
+    if(Math.round(self.t/10)%2==0) canv.context.drawImage(self.img_0,self.x,self.y,self.w,self.h);
+    else                           canv.context.drawImage(self.img_1,self.x,self.y,self.w,self.h);
+  }
+}
 
 var WH_BG = function(game)
 {
