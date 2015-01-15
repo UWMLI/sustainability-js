@@ -52,7 +52,6 @@ var BarrelScene = function(game, stage)
   self.barrels;
   self.map;
 
-  self.numBarrels;
   self.barrelsFound;
   self.totalRunoff;
   self.maxRunoff;
@@ -67,7 +66,8 @@ var BarrelScene = function(game, stage)
     self.particler = new Particler({});
     self.assetter = new Assetter({});
 
-    self.numBarrels = 50;
+    //self.clicker.register(new RB_PlaceLogger(self));
+
     self.barrelsFound = 0;
     self.totalRunoff = 0;
     self.maxRunoff = 20000;
@@ -79,11 +79,19 @@ var BarrelScene = function(game, stage)
 
     self.rain = [];
     self.barrels = [];
+
+    /*
+    //for randomly placed barrels
     var bar = new RB_Barrel(self,0,0); //BS variable because js doesn't have static props
     var randx = function(){ return (Math.random()*((self.map.w)-bar.w))+self.mapBorder.insetX; }
     var randy = function(){ return (Math.random()*((self.map.h)-bar.h))+self.mapBorder.insetY; }
-    for(var i = 0; i < self.numBarrels; i++)
+    for(var i = 0; i < 50; i++)
       self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
+    */
+    var barxs = [98, 224, 130, 40, -16, 246, 376, 508, 640, 768, 899, 813, 865, 581, 449, 313, 449, 579, 709, 781, 643, 373, 773, 631, 499, 233, 104, 54, 190];
+    var barys = [38,104,254,392,518,516,584,642,706,774,840,544,432,434,368,294,204,272,338,118,52,730,932,862,794,662,600,840,904];
+    for(var i = 0; i < barxs.length; i++)
+      self.barrels.push(new RB_Barrel(self,{"x":barxs[i]+30,"y":barys[i]+30}));
 
     self.drawer.register(self.map);
 
@@ -113,7 +121,7 @@ var BarrelScene = function(game, stage)
         self.drawer.register(self.rain[self.rain.length-1]);
       }
     }
-    self.totalRunoff += ((self.numBarrels-self.barrelsFound)/self.numBarrels)*15;
+    self.totalRunoff += ((self.barrels.length-self.barrelsFound)/self.barrels.length)*15;
     if(self.totalRunoff > self.maxRunoff) self.totalRunoff = self.maxRunoff;
     self.clicker.flush();
     self.dragger.flush();
@@ -175,6 +183,25 @@ var BarrelScene = function(game, stage)
     stopGen = true;
   }
 };
+
+var RB_PlaceLogger = function(game)
+{
+  var self = this;
+
+  self.x = 0;
+  self.y = 0;
+  self.w = game.stage.drawCanv.canvas.width;
+  self.h = game.stage.drawCanv.canvas.height;
+
+  self.click = function(evt)
+  {
+    var x = (evt.doX-game.map.x)-50;
+    var y = (evt.doY-game.map.y)-50;
+    game.barrels.push(new RB_Barrel(game,{"x":evt.doX-50,"y":evt.doY-50}));
+    game.drawer.register(game.barrels[game.barrels.length-1]);
+    console.log(x+","+y);
+  }
+}
 
 var RB_MapBorder = function(game)
 {
@@ -338,7 +365,7 @@ var RB_Runoff = function(game)
 
   self.tick = function()
   {
-    self.stream_w = ((game.numBarrels-game.barrelsFound)/game.numBarrels)*self.stream_max_w;
+    self.stream_w = ((game.barrels.length-game.barrelsFound)/game.barrels.length)*self.stream_max_w;
     self.pool_y = self.max_pool_y-((self.max_pool_y-self.min_pool_y)*(game.totalRunoff/game.maxRunoff));
   }
 }
@@ -352,7 +379,8 @@ var RB_Barrel = function(game, args)
   self.w = 100;
   self.h = 100;
 
-  self.img = game.assetter.asset("man.png");
+  self.img_mark = game.assetter.asset("barrel_marker.png");
+  self.img_placed = game.assetter.asset("barrel_barrel.png");
   self.placed = false;
 
   self.tick = function()
@@ -370,49 +398,17 @@ var RB_Barrel = function(game, args)
 
   self.draw = function(canv)
   {
-  /*
-    canv.context.lineWidth = 5;
-    canv.context.strokeStyle = "#FF0000";
-    if(!self.placed && self.x < game.mapBorder.x-self.w)
+    if(self.placed)
     {
-      canv.context.beginPath();
-      canv.context.moveTo(game.mapBorder.x+10,self.y);
-      canv.context.lineTo(game.mapBorder.x+20,self.y);
-      canv.context.stroke();
-      canv.context.closePath();
+      canv.context.drawImage(self.img_placed,self.x+self.w/4,self.y+self.h/4,self.w/2,self.h/2);
     }
-    else if(!self.placed && self.x > game.mapBorder.x+game.mapBorder.w)
+    else
     {
-      canv.context.beginPath();
-      canv.context.moveTo(game.mapBorder.x+game.mapBorder.w-10,self.y);
-      canv.context.lineTo(game.mapBorder.x+game.mapBorder.w-20,self.y);
-      canv.context.stroke();
-      canv.context.closePath();
+      canv.context.drawImage(self.img_mark,  self.x+self.w/4,self.y+self.h/4,self.w/2,self.h/2);
+      canv.context.drawImage(self.img_mark,  self.x+self.w/4,self.y+self.h/4,self.w/2,self.h/2);
+      canv.context.drawImage(self.img_mark,  self.x+self.w/4,self.y+self.h/4,self.w/2,self.h/2);
+      canv.context.drawImage(self.img_mark,  self.x+self.w/4,self.y+self.h/4,self.w/2,self.h/2);
     }
-    else if(!self.placed && self.y < game.mapBorder.y-self.h)
-    {
-      canv.context.beginPath();
-      canv.context.moveTo(self.x,game.mapBorder.y+10);
-      canv.context.lineTo(self.x,game.mapBorder.y+20);
-      canv.context.stroke();
-      canv.context.closePath();
-    }
-    else if(!self.placed && self.y > game.mapBorder.y+game.mapBorder.h)
-    {
-      canv.context.beginPath();
-      canv.context.moveTo(self.x,game.mapBorder.y+game.mapBorder.h-10);
-      canv.context.lineTo(self.x,game.mapBorder.y+game.mapBorder.h-20);
-      canv.context.stroke();
-      canv.context.closePath();
-    }
-    else //in visible range
-    {
-  */
-      canv.context.drawImage(self.img,self.x+self.w/4,self.y+self.h/4,self.w/2,self.h/2);
-      if(self.placed) canv.context.strokeStyle = "#00FF00";
-      else            canv.context.strokeStyle = "#FF0000";
-      canv.context.strokeRect(self.x+self.w/4,self.y+self.h/4,self.w/2,self.h/2);
-    //}
   }
 
   self.kill = function()

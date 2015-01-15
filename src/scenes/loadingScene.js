@@ -135,6 +135,8 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/barrel_road.png");
     img_srcs.push("assets/barrel_monster.png");
     img_srcs.push("assets/barrel_monster_move.png");
+    img_srcs.push("assets/barrel_marker.png");
+    img_srcs.push("assets/barrel_barrel.png");
     //misc
     img_srcs.push("assets/null.png");
     img_srcs.push("assets/bike_bg.png");
