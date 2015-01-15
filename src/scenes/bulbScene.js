@@ -311,11 +311,12 @@ var BulbScene = function(game, stage)
   {
   }
 
+  var won = false;
   self.purchaseBulb = function(bulb)
   {
     self.ispent += BU_c.cost[bulb.type];
     if(bulb.type == BU_c.BULB_LED_ON) self.saved += 500;
-    if(self.saved > 7500) self.endGame();
+    if(!won && self.saved >= 7500) { won = true; setTimeout(self.endGame,1000);}
     self.numbulbs++;
     //self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),"$"+BU_c.cost[bulb.type],30,"#00AA00",0));
   }
