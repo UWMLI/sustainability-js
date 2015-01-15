@@ -101,7 +101,6 @@ var Game = function(init)
   {
     if(using_aris && Scene == MainScene) //trying to "finish level"
     {
-      console.log("setting item count");
       ARIS.setItemCount(3584,1);
       ARIS.closeMe();
     }
