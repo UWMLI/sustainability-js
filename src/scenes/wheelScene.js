@@ -3,7 +3,6 @@ var WheelScene = function(game, stage)
   var self = this;
   self.stage = stage;
 
-  //try to inject as much intro stuff as possible here
   self.viewing = 0; //0- intro, 1- gameplay, 2- outro
 
   self.intro_vid_src = "assets/sample.webm";
@@ -11,77 +10,8 @@ var WheelScene = function(game, stage)
   self.outro_vid_src = "assets/sample.webm";
   self.outro_vid_stamps = [];
 
-  self.beginGame = function()
-  {
-    self.viewing = 1;
-    self.clicker.unregister(self.beginButton);
-
-    // register all gameplay stuff
-    for(var i = 0; i < self.numSquirrels; i++)
-      self.ticker.register(self.squirrels[i]);
-    for(var i = 0; i < self.numNests; i++)
-      self.ticker.register(self.nests[i]);
-    self.ticker.register(self.door);
-    self.ticker.register(self.wheel);
-    self.ticker.register(self.crowd);
-    self.ticker.register(self.presenter);
-    // end register
-  }
-
-  self.retryGame = function()
-  {
-    self.viewing = 1;
-    self.clicker.unregister(self.retryButton);
-
-    //reset game state
-    self.ticker.clear();
-    self.flicker.clear();
-    self.presser.clear();
-    self.clicker.clear();
-    self.dragger.clear();
-    self.drawer.clear();
-    self.assetter.clear();
-
-    self.drawer.register(self.bg);
-    self.drawer.register(self.crowd);
-    self.drawer.register(self.box_bg);
-    self.drawer.register(self.wheel);
-    for(var i = 0; i < self.numNests; i++)
-      self.drawer.register(self.nests[i]);
-    for(var i = 0; i < self.numSquirrels; i++)
-      self.drawer.register(self.squirrels[i]);
-    self.drawer.register(self.box);
-    self.drawer.register(self.door);
-    self.drawer.register(self.presenter);
-
-    for(var i = 0; i < self.numSquirrels; i++)
-      self.ticker.register(self.squirrels[i]);
-    for(var i = 0; i < self.numNests; i++)
-      self.ticker.register(self.nests[i]);
-    self.ticker.register(self.door);
-    self.ticker.register(self.wheel);
-    self.ticker.register(self.crowd);
-    self.ticker.register(self.presenter);
-
-    self.task = -1;
-
-    self.squirrelsFlicked = 0;
-    self.nestsFlicked = 0;
-
-    self.resetPlacements();
-    self.nextTask();
-    //end reset
-  }
-
-  self.endGame = function()
-  {
-    self.viewing = 3;
-    game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
-  }
-
-  self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
-  self.retryButton = self.retryButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.retryGame });
-  //end intro stuff
+  self.numSquirrels = 4;
+  self.numNests = 32;
 
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
@@ -93,17 +23,22 @@ var WheelScene = function(game, stage)
   self.drawer;
   self.assetter;
 
+  self.beginButton;
+  self.retryButton;
+
   self.bg;
   self.box_bg;
   self.wheel;
-  self.nests;     self.numNests;     self.nestsFlicked;
-  self.squirrels; self.numSquirrels; self.squirrelsFlicked;
+  self.nests;
+  self.squirrels;
   self.box;
   self.door;
   self.crowd;
   self.presenter;
 
   self.task;
+  self.nestsFlicked;
+  self.squirrelsFlicked;
 
   self.resetPlacements = function()
   {
@@ -162,37 +97,8 @@ var WheelScene = function(game, stage)
     }
   }
 
-  self.ready = function()
+  self.registerToDrawer = function()
   {
-    self.ticker = new Ticker({});
-    self.flicker = new Flicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
-    self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
-    self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
-    self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
-    self.drawer = new Drawer({source:stage.drawCanv});
-    self.assetter = new Assetter({});
-
-    self.bg = new WH_BG(self);
-    self.box = new WH_Box(self);
-    self.wheel = new WH_Wheel(self);
-    self.door = new WH_Door(self);
-    self.box_bg = new WH_Box_BG(self);
-    self.crowd = new WH_Crowd(self);
-    self.presenter = new WH_Presenter(self);
-    self.happyPeople = new WH_HappyPeople(self);
-
-    self.numSquirrels = 4;
-    self.squirrelsFlicked = 0;
-    self.squirrels = [];
-    for(var i = 0; i < self.numSquirrels; i++)
-      self.squirrels.push(new WH_Squirrel(self));
-
-    self.numNests = 32;
-    self.nestsFlicked = 0;
-    self.nests = [];
-    for(var i = 0; i < self.numNests; i++)
-      self.nests.push(new WH_Nest(self));
-
     self.drawer.register(self.bg);
     self.drawer.register(self.crowd);
     self.drawer.register(self.box_bg);
@@ -204,12 +110,99 @@ var WheelScene = function(game, stage)
     self.drawer.register(self.box);
     self.drawer.register(self.door);
     self.drawer.register(self.presenter);
+  }
 
-    self.resetPlacements();
+  self.registerToInitialDoodles = function()
+  {
+    for(var i = 0; i < self.numSquirrels; i++)
+      self.ticker.register(self.squirrels[i]);
+    for(var i = 0; i < self.numNests; i++)
+      self.ticker.register(self.nests[i]);
+    self.ticker.register(self.door);
+    self.ticker.register(self.wheel);
+    self.ticker.register(self.crowd);
+    self.ticker.register(self.presenter);
+  }
+
+  self.initObjects = function()
+  {
+    self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
+    self.retryButton = self.retryButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.retryGame });
+
+    self.bg = new WH_BG(self);
+    self.box = new WH_Box(self);
+    self.wheel = new WH_Wheel(self);
+    self.door = new WH_Door(self);
+    self.box_bg = new WH_Box_BG(self);
+    self.crowd = new WH_Crowd(self);
+    self.presenter = new WH_Presenter(self);
+    self.happyPeople = new WH_HappyPeople(self);
+
+    self.squirrels = [];
+    for(var i = 0; i < self.numSquirrels; i++)
+      self.squirrels.push(new WH_Squirrel(self));
+
+    self.nests = [];
+    for(var i = 0; i < self.numNests; i++)
+      self.nests.push(new WH_Nest(self));
+  }
+
+  self.resetState = function()
+  {
+    self.squirrelsFlicked = 0;
+    self.nestsFlicked = 0;
     self.task = -1;
-    self.nextTask();
+  }
+
+  self.ready = function()
+  {
+    self.ticker = new Ticker({});
+    self.flicker = new Flicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.presser = new Presser({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
+    self.drawer = new Drawer({source:stage.drawCanv});
+    self.assetter = new Assetter({});
+
+    self.initObjects();
+    self.resetState();
+    self.resetPlacements();
+    self.registerToDrawer();
+
     game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
   };
+
+  self.beginGame = function()
+  {
+    self.viewing = 1;
+    self.clicker.unregister(self.beginButton);
+
+    self.registerToInitialDoodles();
+    self.nextTask();
+  }
+
+  self.retryGame = function()
+  {
+    self.viewing = 1;
+
+    self.clearDoodles();
+    self.resetPlacements();
+    self.resetState();
+    self.resetPlacements();
+    self.registerToDrawer();
+    self.registerToInitialDoodles();
+
+    self.nextTask();
+  }
+
+  self.endGame = function()
+  {
+    self.viewing = 3;
+    game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
+  }
+
+
+
 
   self.tick = function()
   {
@@ -254,7 +247,7 @@ var WheelScene = function(game, stage)
     }
   };
 
-  self.cleanup = function()
+  self.clearDoodles = function()
   {
     self.ticker.clear();
     self.flicker.clear();
@@ -263,7 +256,10 @@ var WheelScene = function(game, stage)
     self.dragger.clear();
     self.drawer.clear();
     self.assetter.clear();
+  }
 
+  self.detachDoodles = function()
+  {
     self.ticker.detach();
     self.flicker.detach();
     self.presser.detach();
@@ -271,6 +267,12 @@ var WheelScene = function(game, stage)
     self.dragger.detach();
     self.drawer.detach();
     self.assetter.detach();
+  }
+
+  self.cleanup = function()
+  {
+    self.clearDoodles();
+    self.detachDoodles();
   };
 
   self.doorFlicked = function()
