@@ -152,7 +152,12 @@ var BarrelScene = function(game, stage)
     self.drawer.flush();
 
     stage.drawCanv.context.font = "30px comic_font";
-    stage.drawCanv.context.fillStyle = "#FF0000";
+    stage.drawCanv.context.fillStyle = "#000000";
+    stage.drawCanv.context.fillText(self.barrelsFound+"/"+self.barrels.length+" barrels placed",50-3,685-3);
+    stage.drawCanv.context.fillText(self.barrelsFound+"/"+self.barrels.length+" barrels placed",50+3,685-3);
+    stage.drawCanv.context.fillText(self.barrelsFound+"/"+self.barrels.length+" barrels placed",50-3,685+3);
+    stage.drawCanv.context.fillText(self.barrelsFound+"/"+self.barrels.length+" barrels placed",50+3,685+3);
+    stage.drawCanv.context.fillStyle = "#FFFFFF";
     stage.drawCanv.context.fillText(self.barrelsFound+"/"+self.barrels.length+" barrels placed",50,685);
 
     if(self.viewing == 0)
