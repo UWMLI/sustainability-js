@@ -44,6 +44,54 @@
 var m; //model
 var g; //game
 
+var gameId = 0;
+var playerId = 0;
+var webPageId = 0;
+var gameType = "";
+
+var params = parseURLParams(document.URL); //use "parseURLParams" from config rather than from arisJS
+gameId     = params.gameId;
+playerId   = params.playerId;
+webPageId  = params.webPageId;
+gameType   = params.gameType;
+//update vars in config
+platform   = params.platform;
+debug      = params.debug;
+using_aris = params.using_aris;
+
+var game_meta =
+[
+  {
+    "name":"window",
+    "item_id":3584
+  },
+  {
+    "name":"bike",
+    "item_id":3587
+  },
+  {
+    "name":"barrel",
+    "item_id":3590
+  },
+  {
+    "name":"bulb",
+    "item_id":3593
+  },
+  {
+    "name":"wheel",
+    "item_id":3596
+  },
+  {
+    "name":"pavement",
+    "item_id":3599
+  },
+  {
+    "name":"sweater",
+    "item_id":3602
+  }
+];
+
+
 //Prepare and load HTML+JS
 var ARIS = {};
 var readyCount = 2;
@@ -54,25 +102,6 @@ window.addEventListener('load', partReady, false);
 //Sync with ARIS for data
 function stackLoaded()
 {
-
-  //Hack ARIS.parseURLParams into my custom stuff because the one supplied by arisJS is crap
-  ARIS.parseURLParams = function(url)
-  {
-    var gameType = "";
-    var vars = window.location.search.substring(1).split("&");
-    for (var i=0;i<vars.length;i++)
-    {
-      var pair = vars[i].split("=");
-      if(pair[0].toLowerCase() == "gameType".toLowerCase()) gameType = pair[1].replace('/','').toLowerCase();
-      if(pair[0].toLowerCase() == "platform".toLowerCase()) platform = pair[1].replace('/','').toUpperCase(); //part of config
-      if(pair[0].toLowerCase() == "debug".toLowerCase()) debug = (pair[1].replace('/','').toLowerCase() == "true"); //part of config
-    }
-
-    return {"gameId":0,"playerId":0,"webPageId":0,"gameType":gameType,"platform":platform,"debug":debug};
-  };
-
-
-
 
   window.scrollTo(0,1);
   m = new Model();
@@ -108,7 +137,7 @@ function stackLoaded()
       container:"stage_container"
     });
 
-    switch(m.gameType)
+    switch(gameType)
     {
       case "bike":     g.setMainScene(BikeScene);     break;
       case "window":   g.setMainScene(WindowScene);   break;
