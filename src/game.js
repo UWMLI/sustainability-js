@@ -113,7 +113,7 @@ var Game = function(init)
             ARIS.setItemCount(game_meta[i].item_id,1);
             ARIS.giveItemCount(victory_count_item_id,1);
           }
-          ARIS.closeMe();
+          setTimeout(ARIS.closeMe,100);
         }
       }
     }
