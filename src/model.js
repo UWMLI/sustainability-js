@@ -7,7 +7,7 @@ var Model = function()
 
   for(var i = 0; i < game_meta.length; i++)
   {
-    self.item_ids[i] = game_meta.item_id;
+    self.item_ids[i] = game_meta[i].item_id;
     self.item_qtys[i] = 0;
   }
 
