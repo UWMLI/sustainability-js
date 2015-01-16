@@ -21,6 +21,7 @@ var WheelScene = function(game, stage)
   self.clicker;
   self.dragger;
   self.drawer;
+  self.particler;
   self.assetter;
 
   self.beginButton;
@@ -112,6 +113,7 @@ var WheelScene = function(game, stage)
     self.drawer.register(self.door);
     self.drawer.register(self.presenter);
     self.drawer.register(self.tprompt);
+    self.drawer.register(self.particler);
   }
 
   self.registerToInitialDoodles = function()
@@ -125,6 +127,7 @@ var WheelScene = function(game, stage)
     self.ticker.register(self.crowd);
     self.ticker.register(self.presenter);
     self.ticker.register(self.tprompt);
+    self.ticker.register(self.particler);
   }
 
   self.initObjects = function()
@@ -166,6 +169,7 @@ var WheelScene = function(game, stage)
     self.clicker = new Clicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
+    self.particler = new Particler({});
     self.assetter = new Assetter({});
 
     self.initObjects();
@@ -257,6 +261,7 @@ var WheelScene = function(game, stage)
     self.dragger.clear();
     self.drawer.clear();
     self.assetter.clear();
+    self.particler.clear();
   }
 
   self.detachDoodles = function()
@@ -268,6 +273,7 @@ var WheelScene = function(game, stage)
     self.dragger.detach();
     self.drawer.detach();
     self.assetter.detach();
+    self.particler.detach();
   }
 
   self.cleanup = function()
@@ -340,6 +346,74 @@ var WheelScene = function(game, stage)
     }
   }
 };
+
+var WH_goodText =
+[
+"cool!",
+"great!",
+"fantastic!",
+"word!",
+"rad!",
+"sweet!",
+"noice!",
+"swell!",
+"the bee's knees!",
+"excellent!",
+"pleasant!",
+"good!",
+"wow!",
+"acceptable!"
+];
+var WH_poorText =
+[
+"bad!",
+"poor!",
+"why?!",
+"no!",
+":(",
+"negative!",
+"sad!",
+"stop!",
+"terrible!",
+"wrong!"
+];
+var WH_Particle = function(x,y,s,good,game)
+{
+  var self = this;
+
+  self.x = x-100;
+  self.ex = self.x+(Math.random()*50)-25;
+  self.y = y;
+  self.ey = self.y-50;
+  self.size = s;
+
+  self.t = 0;
+
+  if(good) self.text = WH_goodText[Math.floor(Math.random()*WH_goodText.length)];
+  else     self.text = WH_poorText[Math.floor(Math.random()*WH_poorText.length)];
+
+  self.tick = function()
+  {
+    self.t += 0.01;
+    self.y = self.y+(self.ey-self.y)/50;
+    self.x = self.x+(self.ex-self.x)/50;
+    return self.t < 1;
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.globalAlpha = 1-(self.t*self.t*self.t);
+    canv.context.font = self.size+"px comic_font";
+    canv.context.fillStyle = "#000000";
+    canv.context.fillText(self.text,self.x,self.y+10+2);
+    canv.context.fillText(self.text,self.x,self.y+10-2);
+    canv.context.fillText(self.text,self.x,self.y+10+2);
+    canv.context.fillText(self.text,self.x,self.y+10-2);
+    canv.context.fillStyle = "#FFFFFF";
+    canv.context.fillText(self.text,self.x,self.y+10);
+    canv.context.globalAlpha = 1.0;
+  }
+}
 
 var WH_Prompt = function(game)
 {
@@ -583,6 +657,7 @@ var WH_Door = function(game)
 
   self.flick = function(vec)
   {
+    game.particler.register(new WH_Particle(self.x+self.w/2,self.y+self.h/2,50,true,self));
     self.flicked = true;
     self.vx = vec.x/10;
     self.vy = vec.y/5;
@@ -660,6 +735,7 @@ var WH_Squirrel = function(game)
 
   self.flick = function(vec)
   {
+    game.particler.register(new WH_Particle(self.x+self.w/2,self.y+self.h/2,50,true,self));
     if(!self.flicked)
     {
       game.drawer.unregister(self);
@@ -746,6 +822,7 @@ var WH_Nest = function(game)
 
   self.press = function(evt)
   {
+    if(Math.floor(Math.random()*3) == 0) game.particler.register(new WH_Particle(self.x+self.w/2,self.y+self.h/2,50,true,self));
     if(!self.flicked)
     {
       game.drawer.unregister(self);
@@ -836,6 +913,7 @@ var WH_Wheel = function(game)
   {
     return Math.sqrt((x*x)+(y*y));
   }
+  var revCooldown = 0;
   self.drag = function(evt)
   {
     self.deltaX = (evt.doX-self.x+(self.w/2))-self.offX;
@@ -853,10 +931,19 @@ var WH_Wheel = function(game)
 
     var a = self.oldT-self.newT;
     if((a > 0 && a < Math.PI) || a < -Math.PI) /*wrong way...*/;
-    else                                       self.rev++; //maybe spit out a particle?
+    else
+    {
+      self.rev++; //maybe spit out a particle?
+      if(revCooldown == 0)
+      {
+        game.particler.register(new WH_Particle(self.x+self.w/2+(Math.random()*50-25),self.y+self.h/2+(Math.random()*50-25),50,true,self));
+        revCooldown = 20;
+      }
+      revCooldown--;
+    }
     self.rot -= a;
 
-    if(self.rev > 50)
+    if(self.rev > 100)
     {
       if(!self.spinning) game.wheelSpinning();
       self.spinning = true;
