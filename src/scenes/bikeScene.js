@@ -39,6 +39,7 @@ var BikeScene = function(game, stage)
   self.dragger;
   self.flicker;
   self.drawer;
+  self.particler;
   self.assetter;
 
   self.panes = [];
@@ -51,6 +52,7 @@ var BikeScene = function(game, stage)
     self.dragger = new Dragger({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.flicker = new Flicker({source:stage.dispCanv.canvas,physical_rect:physical_rect,theoretical_rect:theoretical_rect});
     self.drawer = new Drawer({source:stage.drawCanv});
+    self.particler = new Particler({});
     self.assetter = new Assetter({});
 
     self.currentPane = 0;
@@ -68,6 +70,9 @@ var BikeScene = function(game, stage)
       }
     };
     self.drawer.register(new BG(self.assetter.asset("bike_bg.png")));
+
+    self.drawer.register(self.particler);
+    self.ticker.register(self.particler);
 
     game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
   };
@@ -123,6 +128,7 @@ var BikeScene = function(game, stage)
     self.dragger.clear();
     self.flicker.clear();
     self.drawer.clear();
+    self.particler.clear();
     self.assetter.clear();
 
     self.dbugger.detach();
@@ -131,14 +137,85 @@ var BikeScene = function(game, stage)
     self.dragger.detach();
     self.flicker.detach();
     self.drawer.detach();
+    self.particler.detach();
     self.assetter.detach();
   };
 };
+
+var B_goodText =
+[
+"cool!",
+"great!",
+"fantastic!",
+"word!",
+"rad!",
+"sweet!",
+"noice!",
+"swell!",
+"the bee's knees!",
+"excellent!",
+"pleasant!",
+"good!",
+"wow!",
+"acceptable!"
+];
+var B_poorText =
+[
+"bad!",
+"poor!",
+"why?!",
+"no!",
+":(",
+"negative!",
+"sad!",
+"stop!",
+"terrible!",
+"wrong!"
+];
+var B_Particle = function(x,y,s,good,game)
+{
+  var self = this;
+
+  self.x = x-100;
+  self.ex = self.x+(Math.random()*50)-25;
+  self.y = y;
+  self.ey = self.y-50;
+  self.size = s;
+
+  self.t = 0;
+
+  if(good) self.text = B_goodText[Math.floor(Math.random()*B_goodText.length)];
+  else     self.text = B_poorText[Math.floor(Math.random()*B_poorText.length)];
+
+  self.tick = function()
+  {
+    self.t += 0.01;
+    self.y = self.y+(self.ey-self.y)/50;
+    self.x = self.x+(self.ex-self.x)/50;
+    return self.t < 1;
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.globalAlpha = 1-(self.t*self.t*self.t);
+    canv.context.font = self.size+"px comic_font";
+    canv.context.fillStyle = "#000000";
+    canv.context.fillText(self.text,self.x,self.y+10+2);
+    canv.context.fillText(self.text,self.x,self.y+10-2);
+    canv.context.fillText(self.text,self.x,self.y+10+2);
+    canv.context.fillText(self.text,self.x,self.y+10-2);
+    canv.context.fillStyle = "#FFFFFF";
+    canv.context.fillText(self.text,self.x,self.y+10);
+    canv.context.globalAlpha = 1.0;
+  }
+}
+
 
 
 //mini scenes
 var B_FindHelmetPane = function(scene)
 {
+  var self = this; self.scene = scene;
   var finished = false;
   var won = false;
 
@@ -224,7 +301,7 @@ var B_FindHelmetPane = function(scene)
     {
       canv.context.drawImage(helmet_img,self.x,self.y,self.w,self.h);
     }
-    self.click = function(evt) { pane.helmetTouched() };
+    self.click = function(evt) { pane.helmetTouched(); pane.scene.particler.register(new B_Particle(self.x+self.w/2,self.y+self.h/2,50,true,self)); };
   }
   var Ace = function(pane)
   {
@@ -240,7 +317,7 @@ var B_FindHelmetPane = function(scene)
     }
     self.xvis = 0;
     self.tick = function() {self.xvis--;}
-    self.click = function(evt) { self.xvis = 100; };
+    self.click = function(evt) { self.xvis = 100; pane.scene.particler.register(new B_Particle(self.x+self.w/2,self.y+self.h/2,50,false,self));};
   }
   var Bible = function(pane)
   {
@@ -256,7 +333,7 @@ var B_FindHelmetPane = function(scene)
     }
     self.xvis = 0;
     self.tick = function() {self.xvis--;}
-    self.click = function(evt) { self.xvis = 100; };
+    self.click = function(evt) { self.xvis = 100; pane.scene.particler.register(new B_Particle(self.x+self.w/2,self.y+self.h/2,50,false,self)); };
   }
   var Bowl = function(pane)
   {
@@ -272,7 +349,7 @@ var B_FindHelmetPane = function(scene)
     }
     self.xvis = 0;
     self.tick = function() {self.xvis--;}
-    self.click = function(evt) { self.xvis = 100; };
+    self.click = function(evt) { self.xvis = 100; pane.scene.particler.register(new B_Particle(self.x+self.w/2,self.y+self.h/2,50,false,self)); };
   }
   var Hamster = function(pane)
   {
@@ -288,7 +365,7 @@ var B_FindHelmetPane = function(scene)
     }
     self.xvis = 0;
     self.tick = function() {self.xvis--;}
-    self.click = function(evt) { self.xvis = 100; };
+    self.click = function(evt) { self.xvis = 100;  pane.scene.particler.register(new B_Particle(self.x+self.w/2,self.y+self.h/2,50,false,self));};
   }
   var Pizza = function(pane)
   {
@@ -304,7 +381,7 @@ var B_FindHelmetPane = function(scene)
     }
     self.xvis = 0;
     self.tick = function() {self.xvis--;}
-    self.click = function(evt) { self.xvis = 100; };
+    self.click = function(evt) { self.xvis = 100; pane.scene.particler.register(new B_Particle(self.x+self.w/2,self.y+self.h/2,50,false,self)); };
   }
   var Salt = function(pane)
   {
@@ -320,7 +397,7 @@ var B_FindHelmetPane = function(scene)
     }
     self.xvis = 0;
     self.tick = function() {self.xvis--;}
-    self.click = function(evt) { self.xvis = 100; };
+    self.click = function(evt) { self.xvis = 100; pane.scene.particler.register(new B_Particle(self.x+self.w/2,self.y+self.h/2,50,false,self)); };
   }
   var Mask = function(pane)
   {
@@ -336,7 +413,7 @@ var B_FindHelmetPane = function(scene)
     }
     self.xvis = 0;
     self.tick = function() {self.xvis--;}
-    self.click = function(evt) { self.xvis = 100; };
+    self.click = function(evt) { self.xvis = 100; pane.scene.particler.register(new B_Particle(self.x+self.w/2,self.y+self.h/2,50,false,self)); };
   }
 
 
@@ -400,6 +477,10 @@ var B_FindHelmetPane = function(scene)
     scene.ticker.register(intro);
     scene.drawer.register(outro);
     scene.ticker.register(outro);
+
+    //re-register particler on top
+    scene.drawer.unregister(scene.particler);
+    scene.drawer.register(scene.particler);
   }
   self.tick = function() //return 0 for continue, 1 for lose, 2 for win
   {
@@ -458,6 +539,8 @@ var B_FindHelmetPane = function(scene)
 
 var B_PumpTirePane = function(scene)
 {
+  var self = this;
+  self.scene = scene;
   var finished = false;
   var won = false;
 
@@ -489,7 +572,7 @@ var B_PumpTirePane = function(scene)
       else if(self.intro_count < 100) x = 100+(((self.intro_count-95)/5)*500);
       else return;
 
-      canv.context.drawImage(intro_text_img, x, 100, 500, 150);
+      canv.context.drawImage(intro_text_img, x, 250, 500, 150);
     }
   }
 
@@ -579,6 +662,7 @@ var B_PumpTirePane = function(scene)
       if(pane.mode != 1) return;
       self.touch_offset_y = self.y+(self.h/2)-evt.doY;
     };
+    var dragParticleCooldown = 0;
     self.drag = function(evt)
     {
       if(pane.mode != 1) return;
@@ -597,6 +681,12 @@ var B_PumpTirePane = function(scene)
         self.y = self.handle_up_y;
       }
 
+      if(dragParticleCooldown == 0)
+      {
+        pane.scene.particler.register(new B_Particle(self.x+self.w/2,self.y+self.h/2,50,true,self));
+        dragParticleCooldown = 20;
+      }
+      dragParticleCooldown--;
       self.syncHandleWithDrag();
     };
     self.dragFinish = function()
@@ -634,6 +724,10 @@ var B_PumpTirePane = function(scene)
     scene.drawer.register(intro);
     scene.ticker.register(outro);
     scene.drawer.register(outro);
+
+    //re-register particler on top
+    scene.drawer.unregister(scene.particler);
+    scene.drawer.register(scene.particler);
   }
   self.tick = function() //return 0 for continue, 1 for lose, 2 for win
   {
@@ -676,6 +770,8 @@ var B_PumpTirePane = function(scene)
 
 var B_GrabKeysPane = function(scene)
 {
+  var self = this;
+  self.scene = scene;
   var finished = false;
   var won = false;
 
@@ -695,7 +791,8 @@ var B_GrabKeysPane = function(scene)
     self.tick = function()
     {
       if(pane.mode != 0) return;
-      self.intro_count+=0.5;
+      if(self.intro_count > 5 && self.intro_count < 95) self.intro_count += 0.25;
+      else                                              self.intro_count+=0.5;
       if(self.intro_count > 100) pane.introFinished();
     }
     self.draw = function(canv)
@@ -753,6 +850,7 @@ var B_GrabKeysPane = function(scene)
     self.tapped = false;
     self.grabbed = false;
 
+    var handParticleCooldown = 0;
     self.tick = function()
     {
       if(pane.mode != 1) return;
@@ -765,12 +863,22 @@ var B_GrabKeysPane = function(scene)
         self.grabbed = true;
         pane.handGrabbed();
       }
-      else self.x-=5; //move left
+      else
+      {
+        if(handParticleCooldown == 0)
+        {
+          pane.scene.particler.register(new B_Particle(self.x,self.y+self.h/2,50,false,self));
+          handParticleCooldown = 20;
+        }
+        handParticleCooldown--;
+        self.x-=5; //move left
+      }
     }
     self.click = function()
     {
       if(pane.mode != 1) return;
       self.tapped = true;
+      pane.scene.particler.register(new B_Particle(self.x,self.y+self.h/2,100,true,self));
     }
     self.draw = function(canv) //handle drawing keys here too, because of swapping precidence
     {
@@ -813,6 +921,10 @@ var B_GrabKeysPane = function(scene)
     scene.drawer.register(intro);
     scene.ticker.register(outro);
     scene.drawer.register(outro);
+
+    //re-register particler on top
+    scene.drawer.unregister(scene.particler);
+    scene.drawer.register(scene.particler);
   }
   self.tick = function() //return 0 for continue, 1 for lose, 2 for win
   {
@@ -1002,6 +1114,10 @@ var B_CardChoicePane = function(scene)
     scene.ticker.register(intro);
     scene.drawer.register(outro);
     scene.ticker.register(outro);
+
+    //re-register particler on top
+    scene.drawer.unregister(scene.particler);
+    scene.drawer.register(scene.particler);
   }
   self.tick = function() //return 0 for continue, 1 for lose, 2 for win
   {

@@ -57,7 +57,6 @@ var parseURLParams = function(url)
   for (var i=0;i<vars.length;i++)
   {
     var pair = vars[i].split("=");
-    console.log(pair[0]);
     if(pair[0].toLowerCase() == "gameid")    gameId     = parseInt(pair[1].replace('/',''));
     if(pair[0].toLowerCase() == "playerid")  playerId   = parseInt(pair[1].replace('/',''));
     if(pair[0].toLowerCase() == "webpageid") webPageId  = parseint(pair[1].replace('/',''));
