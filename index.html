@@ -63,8 +63,8 @@ var parseURLParams = function(url)
     if(pair[0].toLowerCase() == "webpageid") webPageId  = parseint(pair[1].replace('/',''));
     if(pair[0].toLowerCase() == "gametype")  gameType   = pair[1].replace('/','').toLowerCase();
     if(pair[0].toLowerCase() == "platform")  platform   = pair[1].replace('/','').toUpperCase();
-    if(pair[0].toLowerCase() == "debug")     debug      = (pair[1].replace('/','').toLowerCase() == "true");
-    if(pair[0].toLowerCase() == "aris")      using_aris = (pair[1].replace('/','').toLowerCase() == "true");
+    if(pair[0].toLowerCase() == "debug")     debug      = (pair[1].replace('/','').toLowerCase() != "false" && pair[1].replace('/','') != "0");
+    if(pair[0].toLowerCase() == "aris")      using_aris = (pair[1].replace('/','').toLowerCase() != "false" && pair[1].replace('/','') != "0");
   }
 };
 var params = parseURLParams(document.URL);
