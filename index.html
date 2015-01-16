@@ -59,35 +59,43 @@ platform   = params.platform;
 debug      = params.debug;
 using_aris = params.using_aris;
 
+var victory_count_item_id = 3611;
 var game_meta =
 [
   {
     "name":"window",
-    "item_id":3584
+    "item_id":3584,
+    "scene":WindowScene
   },
   {
     "name":"bike",
-    "item_id":3587
+    "item_id":3587,
+    "scene":BikeScene
   },
   {
     "name":"barrel",
-    "item_id":3590
+    "item_id":3590,
+    "scene":BarrelScene
   },
   {
     "name":"bulb",
-    "item_id":3593
+    "item_id":3593,
+    "scene":BulbScene
   },
   {
     "name":"wheel",
-    "item_id":3596
+    "item_id":3596,
+    "scene":WheelScene
   },
   {
     "name":"pavement",
-    "item_id":3599
+    "item_id":3599,
+    "scene":PavementScene
   },
   {
     "name":"sweater",
-    "item_id":3602
+    "item_id":3602,
+    "scene":SweaterScene
   }
 ];
 
@@ -102,7 +110,6 @@ window.addEventListener('load', partReady, false);
 //Sync with ARIS for data
 function stackLoaded()
 {
-
   window.scrollTo(0,1);
   m = new Model();
   m.fetchSync(function()
@@ -137,17 +144,18 @@ function stackLoaded()
       container:"stage_container"
     });
 
-    switch(gameType)
+    var foundGame = false;
+    for(var i = 0; i < game_meta.length; i++)
     {
-      case "bike":     g.setMainScene(BikeScene);     break;
-      case "window":   g.setMainScene(WindowScene);   break;
-      case "bulb":     g.setMainScene(BulbScene);     break;
-      case "sweater":  g.setMainScene(SweaterScene);  break;
-      case "barrel":   g.setMainScene(BarrelScene);   break;
-      case "pavement": g.setMainScene(PavementScene); break;
-      case "wheel":    g.setMainScene(WheelScene);    break;
-      default:         g.setMainScene(IntroScene);    break;
+      if(game_meta[i].name == gameType)
+      {
+        g.setMainScene(game_meta[i].scene);
+        foundGame = true;
+      }
     }
+    if(!foundGame)
+      g.setMainScene(IntroScene);
+
     g.begin();
   });
 }

@@ -101,8 +101,21 @@ var Game = function(init)
   {
     if(using_aris && Scene == MainScene) //trying to "finish level"
     {
-      ARIS.setItemCount(3584,1);
-      ARIS.closeMe();
+      for(var i = 0; i < game_meta.length; i++)
+      {
+        if(scenes[currentScene] == game_meta[i].scene)
+        {
+          var qty = 0;
+          for(var j = 0; j < m.item_ids.length; j++)
+            if(m.item_ids[j] == game_meta[i].item_id) qty = m.item_qtys[j];
+          if(qty < 1)
+          {
+            ARIS.setItemCount(game_meta[i].item_id,1);
+            ARIS.giveItemCount(victory_count_item_id,1);
+          }
+          ARIS.closeMe();
+        }
+      }
     }
     else
     {
