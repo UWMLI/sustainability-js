@@ -103,7 +103,7 @@ var Game = function(init)
     {
       for(var i = 0; i < game_meta.length; i++)
       {
-        if(scenes[currentScene] == game_meta[i].scene)
+        if(scenes[currentScene].constructor == game_meta[i].scene) //eewwwwwwwwww
         {
           var qty = 0;
           for(var j = 0; j < m.item_ids.length; j++)
