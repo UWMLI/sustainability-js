@@ -8,37 +8,36 @@
 
 <title>Game</title>
 
-<script type='text/javascript' src='src/config.js?abc=1234'></script>
-<script type='text/javascript' src='src/utils/js_hacks.js?abc=1234'></script>
-<script type='text/javascript' src='src/utils/webgl-utils.js?abc=1234'></script>
-<script type="text/javascript" src="src/canv.js?abc=1234"></script>
-<script type="text/javascript" src="src/stage.js?abc=1234"></script>
-<script type="text/javascript" src="src/game.js?abc=1234"></script>
-<script type="text/javascript" src="src/model.js?abc=1234"></script>
-<script type="text/javascript" src="src/vid.js?abc=1234"></script>
+<script type='text/javascript' src='src/utils/js_hacks.js?abc=2345'></script>
+<script type='text/javascript' src='src/utils/webgl-utils.js?abc=2345'></script>
+<script type="text/javascript" src="src/canv.js?abc=2345"></script>
+<script type="text/javascript" src="src/stage.js?abc=2345"></script>
+<script type="text/javascript" src="src/game.js?abc=2345"></script>
+<script type="text/javascript" src="src/model.js?abc=2345"></script>
+<script type="text/javascript" src="src/vid.js?abc=2345"></script>
 
-<script type="text/javascript" src="src/doqueues/assetter.js?abc=1234"></script>
-<script type="text/javascript" src="src/doqueues/clicker.js?abc=1234"></script>
-<script type="text/javascript" src="src/doqueues/debugger.js?abc=1234"></script>
-<script type="text/javascript" src="src/doqueues/dragger.js?abc=1234"></script>
-<script type="text/javascript" src="src/doqueues/drawer.js?abc=1234"></script>
-<script type="text/javascript" src="src/doqueues/flicker.js?abc=1234"></script>
-<script type="text/javascript" src="src/doqueues/hoverer.js?abc=1234"></script>
-<script type="text/javascript" src="src/doqueues/presser.js?abc=1234"></script>
-<script type="text/javascript" src="src/doqueues/ticker.js?abc=1234"></script>
-<script type="text/javascript" src="src/doqueues/particler.js?abc=1234"></script>
+<script type="text/javascript" src="src/doqueues/assetter.js?abc=2345"></script>
+<script type="text/javascript" src="src/doqueues/clicker.js?abc=2345"></script>
+<script type="text/javascript" src="src/doqueues/debugger.js?abc=2345"></script>
+<script type="text/javascript" src="src/doqueues/dragger.js?abc=2345"></script>
+<script type="text/javascript" src="src/doqueues/drawer.js?abc=2345"></script>
+<script type="text/javascript" src="src/doqueues/flicker.js?abc=2345"></script>
+<script type="text/javascript" src="src/doqueues/hoverer.js?abc=2345"></script>
+<script type="text/javascript" src="src/doqueues/presser.js?abc=2345"></script>
+<script type="text/javascript" src="src/doqueues/ticker.js?abc=2345"></script>
+<script type="text/javascript" src="src/doqueues/particler.js?abc=2345"></script>
 
-<script type="text/javascript" src="src/scenes/nullScene.js?abc=1234"></script>
-<script type="text/javascript" src="src/scenes/loadingScene.js?abc=1234"></script>
-<script type="text/javascript" src="src/scenes/introScene.js?abc=1234"></script>
-<script type="text/javascript" src="src/scenes/mainScene.js?abc=1234"></script>
-<script type="text/javascript" src="src/scenes/sweaterScene.js?abc=1234"></script>
-<script type="text/javascript" src="src/scenes/barrelScene.js?abc=1234"></script>
-<script type="text/javascript" src="src/scenes/wheelScene.js?abc=1234"></script>
-<script type="text/javascript" src="src/scenes/bulbScene.js?abc=1234"></script>
-<script type="text/javascript" src="src/scenes/windowScene.js?abc=1234"></script>
-<script type="text/javascript" src="src/scenes/pavementScene.js?abc=1234"></script>
-<script type="text/javascript" src="src/scenes/bikeScene.js?abc=1234"></script>
+<script type="text/javascript" src="src/scenes/nullScene.js?abc=2345"></script>
+<script type="text/javascript" src="src/scenes/loadingScene.js?abc=2345"></script>
+<script type="text/javascript" src="src/scenes/introScene.js?abc=2345"></script>
+<script type="text/javascript" src="src/scenes/mainScene.js?abc=2345"></script>
+<script type="text/javascript" src="src/scenes/sweaterScene.js?abc=2345"></script>
+<script type="text/javascript" src="src/scenes/barrelScene.js?abc=2345"></script>
+<script type="text/javascript" src="src/scenes/wheelScene.js?abc=2345"></script>
+<script type="text/javascript" src="src/scenes/bulbScene.js?abc=2345"></script>
+<script type="text/javascript" src="src/scenes/windowScene.js?abc=2345"></script>
+<script type="text/javascript" src="src/scenes/pavementScene.js?abc=2345"></script>
+<script type="text/javascript" src="src/scenes/bikeScene.js?abc=2345"></script>
 
 <script type="text/javascript">
 var m; //model
@@ -48,57 +47,30 @@ var gameId = 0;
 var playerId = 0;
 var webPageId = 0;
 var gameType = "";
+var platform = "MOBILE"; //"PC" or "MOBILE"
+var debug = false;
+var using_aris = false;
 
-var params = parseURLParams(document.URL); //use "parseURLParams" from config rather than from arisJS
-gameId     = params.gameId;
-playerId   = params.playerId;
-webPageId  = params.webPageId;
-gameType   = params.gameType;
-//update vars in config
-platform   = params.platform;
-debug      = params.debug;
-using_aris = params.using_aris;
-
-var victory_count_item_id = 3611;
-var game_meta =
-[
+var parseURLParams = function(url)
+{
+  var vars = window.location.search.substring(1).split("&");
+  for (var i=0;i<vars.length;i++)
   {
-    "name":"window",
-    "item_id":3584,
-    "scene":WindowScene
-  },
-  {
-    "name":"bike",
-    "item_id":3587,
-    "scene":BikeScene
-  },
-  {
-    "name":"barrel",
-    "item_id":3590,
-    "scene":BarrelScene
-  },
-  {
-    "name":"bulb",
-    "item_id":3593,
-    "scene":BulbScene
-  },
-  {
-    "name":"wheel",
-    "item_id":3596,
-    "scene":WheelScene
-  },
-  {
-    "name":"pavement",
-    "item_id":3599,
-    "scene":PavementScene
-  },
-  {
-    "name":"sweater",
-    "item_id":3602,
-    "scene":SweaterScene
+    var pair = vars[i].split("=");
+    console.log(pair[0]);
+    if(pair[0].toLowerCase() == "gameid")    gameId     = parseInt(pair[1].replace('/',''));
+    if(pair[0].toLowerCase() == "playerid")  playerId   = parseInt(pair[1].replace('/',''));
+    if(pair[0].toLowerCase() == "webpageid") webPageId  = parseint(pair[1].replace('/',''));
+    if(pair[0].toLowerCase() == "gametype")  gameType   = pair[1].replace('/','').toLowerCase();
+    if(pair[0].toLowerCase() == "platform")  platform   = pair[1].replace('/','').toUpperCase();
+    if(pair[0].toLowerCase() == "debug")     debug      = (pair[1].replace('/','').toLowerCase() == "true");
+    if(pair[0].toLowerCase() == "aris")      using_aris = (pair[1].replace('/','').toLowerCase() == "true");
   }
-];
+};
+var params = parseURLParams(document.URL);
 
+var victory_count_item_id;
+var game_meta;
 
 //Prepare and load HTML+JS
 var ARIS = {};
@@ -110,6 +82,48 @@ window.addEventListener('load', partReady, false);
 //Sync with ARIS for data
 function stackLoaded()
 {
+
+  victory_count_item_id = 3611;
+  game_meta =
+  [
+    {
+      "name":"window",
+      "item_id":3584,
+      "scene":WindowScene
+    },
+    {
+      "name":"bike",
+      "item_id":3587,
+      "scene":BikeScene
+    },
+    {
+      "name":"barrel",
+      "item_id":3590,
+      "scene":BarrelScene
+    },
+    {
+      "name":"bulb",
+      "item_id":3593,
+      "scene":BulbScene
+    },
+    {
+      "name":"wheel",
+      "item_id":3596,
+      "scene":WheelScene
+    },
+    {
+      "name":"pavement",
+      "item_id":3599,
+      "scene":PavementScene
+    },
+    {
+      "name":"sweater",
+      "item_id":3602,
+      "scene":SweaterScene
+    }
+  ];
+
+
   window.scrollTo(0,1);
   m = new Model();
   m.fetchSync(function()
