@@ -100,8 +100,8 @@ var BarrelScene = function(game, stage)
     for(var i = 0; i < 50; i++)
       self.barrels.push(new RB_Barrel(self,{"x":randx(),"y":randy()}));
     */
-    var barxs = [98, 224, 130, 40, -16, 246, 376, 508, 640, 768, 899, 813, 865, 581, 449, 313, 449, 579, 709, 781, 643, 373, 773, 631, 499, 233, 104, 54, 190];
-    var barys = [38,104,254,392,518,516,584,642,706,774,840,544,432,434,368,294,204,272,338,118,52,730,932,862,794,662,600,840,904];
+    var barxs = [ 98,224,130, 40,-16,246,376,508,640,768,899,813,865,581,449,313,449,579,709,781,643,373,631,499,233,104, 54];
+    var barys = [ 38,104,254,392,518,516,584,642,706,774,840,544,432,434,368,294,204,272,338,118, 52,730,862,794,662,600,840];
     for(var i = 0; i < barxs.length; i++)
       self.barrels.push(new RB_Barrel(self,{"x":barxs[i]+30,"y":barys[i]+30}));
 
@@ -390,8 +390,16 @@ var RB_Runoff = function(game)
   self.stream_img = game.assetter.asset("barrel_stream.png");
   self.pool_img   = game.assetter.asset("barrel_pool.png");
   self.fg_img     = game.assetter.asset("barrel_fg.png");
+  var runoffPulse = 0;
   self.draw = function(canv)
   {
+    if(self.stream_w > 0)
+    {
+      runoffPulse+=0.1;
+      canv.context.fillStyle = "rgba(255,255,255,"+((Math.sin(runoffPulse)+1)/2)+")";
+      canv.context.fillRect(0,self.max_pool_y-60,self.pool_w-100,self.pool_h);
+    }
+
     canv.context.drawImage(self.stream_img, 100+(self.stream_max_w/2)-(self.stream_w/2), game.mapBorder.insetY+game.mapBorder.insetH+50+Math.random()*10,self.stream_w,self.stream_h);
     canv.context.drawImage(self.pool_img,   0, self.pool_y,self.pool_w,self.pool_h);
     canv.context.drawImage(self.fg_img,     0, canv.canvas.height-190, canv.canvas.width, 190);
