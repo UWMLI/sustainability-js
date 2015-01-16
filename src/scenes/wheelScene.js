@@ -27,6 +27,7 @@ var WheelScene = function(game, stage)
   self.retryButton;
 
   self.bg;
+  self.tprompt;
   self.box_bg;
   self.wheel;
   self.nests;
@@ -110,6 +111,7 @@ var WheelScene = function(game, stage)
     self.drawer.register(self.box);
     self.drawer.register(self.door);
     self.drawer.register(self.presenter);
+    self.drawer.register(self.tprompt);
   }
 
   self.registerToInitialDoodles = function()
@@ -122,6 +124,7 @@ var WheelScene = function(game, stage)
     self.ticker.register(self.wheel);
     self.ticker.register(self.crowd);
     self.ticker.register(self.presenter);
+    self.ticker.register(self.tprompt);
   }
 
   self.initObjects = function()
@@ -130,6 +133,7 @@ var WheelScene = function(game, stage)
     self.retryButton = self.retryButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.retryGame });
 
     self.bg = new WH_BG(self);
+    self.tprompt = new WH_Prompt(self);
     self.box = new WH_Box(self);
     self.wheel = new WH_Wheel(self);
     self.door = new WH_Door(self);
@@ -200,9 +204,6 @@ var WheelScene = function(game, stage)
     self.viewing = 3;
     game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }
-
-
-
 
   self.tick = function()
   {
@@ -339,6 +340,79 @@ var WheelScene = function(game, stage)
     }
   }
 };
+
+var WH_Prompt = function(game)
+{
+  var self = this;
+  self.x = 100;
+  self.y = 100;
+  self.w = 500;
+  self.h = 500;
+
+  self.t = 0;
+  self.offx;
+  self.offy;
+  self.buff = 3;
+
+  self.draw = function(canv)
+  {
+    if(game.task == 0) //flick door
+    {
+      canv.context.font = "50px comic_font";
+      canv.context.fillStyle = "#000000";
+      self.word = "Remove the Door!";
+      canv.context.fillText(self.word,self.x+self.offx-self.buff,self.y+self.offy-self.buff);
+      canv.context.fillText(self.word,self.x+self.offx+self.buff,self.y+self.offy-self.buff);
+      canv.context.fillText(self.word,self.x+self.offx-self.buff,self.y+self.offy+self.buff);
+      canv.context.fillText(self.word,self.x+self.offx+self.buff,self.y+self.offy+self.buff);
+      canv.context.fillStyle = "#FFFFFF";
+      canv.context.fillText(self.word,self.x+self.offx,self.y+self.offy);
+    }
+    if(game.task == 1) //shoo squirrels
+    {
+      canv.context.font = "50px comic_font";
+      canv.context.fillStyle = "#000000";
+      self.word = "Shoo the Squirrels!";
+      canv.context.fillText(self.word,self.x+self.offx-self.buff-50,self.y+self.offy-self.buff);
+      canv.context.fillText(self.word,self.x+self.offx+self.buff-50,self.y+self.offy-self.buff);
+      canv.context.fillText(self.word,self.x+self.offx-self.buff-50,self.y+self.offy+self.buff);
+      canv.context.fillText(self.word,self.x+self.offx+self.buff-50,self.y+self.offy+self.buff);
+      canv.context.fillStyle = "#FFFFFF";
+      canv.context.fillText(self.word,self.x+self.offx-50,self.y+self.offy);
+    }
+    if(game.task == 2) //clean nests
+    {
+      canv.context.font = "50px comic_font";
+      canv.context.fillStyle = "#000000";
+      self.word = "Clean the Nests!";
+      canv.context.fillText(self.word,self.x+self.offx-self.buff,self.y+self.offy-self.buff);
+      canv.context.fillText(self.word,self.x+self.offx+self.buff,self.y+self.offy-self.buff);
+      canv.context.fillText(self.word,self.x+self.offx-self.buff,self.y+self.offy+self.buff);
+      canv.context.fillText(self.word,self.x+self.offx+self.buff,self.y+self.offy+self.buff);
+      canv.context.fillStyle = "#FFFFFF";
+      canv.context.fillText(self.word,self.x+self.offx,self.y+self.offy);
+    }
+    if(game.task == 3) //spin wheel
+    {
+      canv.context.font = "50px comic_font";
+      canv.context.fillStyle = "#000000";
+      self.word = "Spin the Wheel!";
+      canv.context.fillText(self.word,self.x+self.offx-self.buff,self.y+self.offy-self.buff);
+      canv.context.fillText(self.word,self.x+self.offx+self.buff,self.y+self.offy-self.buff);
+      canv.context.fillText(self.word,self.x+self.offx-self.buff,self.y+self.offy+self.buff);
+      canv.context.fillText(self.word,self.x+self.offx+self.buff,self.y+self.offy+self.buff);
+      canv.context.fillStyle = "#FFFFFF";
+      canv.context.fillText(self.word,self.x+self.offx,self.y+self.offy);
+    }
+  }
+
+  self.tick = function()
+  {
+    self.t+=0.1;
+    self.offx = Math.sin(self.t)*5;
+    self.offy = Math.sin(self.t+Math.PI/2)*5;
+  }
+}
 
 var WH_HappyPeople = function(game)
 {
