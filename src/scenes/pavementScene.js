@@ -3,13 +3,38 @@ var PavementScene = function(game, stage)
   var self = this;
   self.stage = stage;
 
-  //try to inject as much intro stuff as possible here
   self.viewing = 0; //0- intro, 1- gameplay, 2- outro
 
   self.intro_vid_src = "assets/sample.webm";
   self.intro_vid_stamps = [];
   self.outro_vid_src = "assets/sample.webm";
   self.outro_vid_stamps = [];
+
+  var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
+  var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
+  self.dbugger;
+  self.ticker;
+  self.dragger;
+  self.clicker;
+  self.drawer;
+  self.particler;
+  self.assetter;
+
+  self.rain;
+  self.cleanBG;
+  self.dirtyBG;
+  self.finger;
+
+  self.percent = 0;
+  self.pstage = 0;
+
+  self.resetState = function()
+  {
+    self.cleanBG.setStage(0);
+    self.dirtyBG.setStage(0);
+    self.percent = 0;
+    self.pstage = 0;
+  }
 
   self.beginGame = function()
   {
@@ -33,22 +58,6 @@ var PavementScene = function(game, stage)
 
   self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
   //end intro stuff
-
-
-  var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
-  var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
-  self.dbugger;
-  self.ticker;
-  self.dragger;
-  self.clicker;
-  self.drawer;
-  self.particler;
-  self.assetter;
-
-  self.rain;
-  self.cleanBG;
-  self.dirtyBG;
-  self.finger;
 
   self.ready = function()
   {
@@ -99,7 +108,7 @@ var PavementScene = function(game, stage)
     self.drawer.flush();
     self.stage.drawCanv.context.font = "60px comic_font";
     self.stage.drawCanv.context.fillStyle = "#000000";
-    self.stage.drawCanv.context.fillText(Math.round(percent*10000)/100+"%",0,self.stage.drawCanv.canvas.height-100);
+    self.stage.drawCanv.context.fillText(Math.round(self.percent*10000)/100+"%",0,self.stage.drawCanv.canvas.height-100);
 
     if(self.viewing == 0)
     {
@@ -136,12 +145,10 @@ var PavementScene = function(game, stage)
     self.assetter.detach();
   };
 
-  var percent = 0;
-  self.pstage = 0;
   self.percentFilled = function(p)
   {
     if(p > 1) { p = 1; }
-    if(percent != 1 && p == 1)
+    if(self.percent != 1 && p == 1)
     {
       self.pstage++;
       if(self.pstage == 3) setTimeout(self.endGame,1000);
@@ -151,7 +158,7 @@ var PavementScene = function(game, stage)
         self.dirtyBG.setStage(self.pstage);
       }
     }
-    percent = p;
+    self.percent = p;
   }
 };
 
