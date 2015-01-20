@@ -17,8 +17,11 @@ var PavementScene = function(game, stage)
     self.clicker.unregister(self.beginButton);
 
     // register all gameplay stuff
+    self.dirtyBG.setStage(0);
     self.dragger.register(self.dirtyBG);
     self.ticker.register(self.dirtyBG);
+    self.dragger.register(self.finger);
+    self.ticker.register(self.finger);
     // end register
   }
 
@@ -45,6 +48,7 @@ var PavementScene = function(game, stage)
   self.rain;
   self.cleanBG;
   self.dirtyBG;
+  self.finger;
 
   self.ready = function()
   {
@@ -60,9 +64,11 @@ var PavementScene = function(game, stage)
     self.cleanBG = new PV_Background(self);
     self.dirtyBG = new PV_ScratchableBackground(self);
     self.dirtyBG.setStage(0);
+    self.finger = new PV_FingerTracker(self);
 
     self.drawer.register(self.cleanBG);
     self.drawer.register(self.dirtyBG);
+    self.drawer.register(self.finger);
     self.drawer.register(self.particler);
     self.ticker.register(self.particler);
 
@@ -148,6 +154,68 @@ var PavementScene = function(game, stage)
     percent = p;
   }
 };
+
+var PV_FingerTracker = function(game)
+{
+  var self = this;
+
+  self.x = 0;
+  self.y = 0;
+  self.w = game.stage.drawCanv.canvas.width;
+  self.h = game.stage.drawCanv.canvas.height;
+
+  self.ptx = 0;
+  self.pty = 0;
+  self.pressed = false;
+
+  self.jack_0_img = game.assetter.asset("pavement_jack_0.png"),
+  self.jack_1_img = game.assetter.asset("pavement_jack_1.png"),
+  self.shovel_img = game.assetter.asset("pavement_shovel.png"),
+  self.imgw = 200;
+  self.imgh = 400;
+
+  self.dragStart = function(evt)
+  {
+    self.pressed = true;
+    self.ptx = evt.doX;
+    self.pty = evt.doY;
+  };
+  self.drag = function(evt)
+  {
+    self.ptx = evt.doX;
+    self.pty = evt.doY;
+  };
+  self.dragFinish = function()
+  {
+    self.pressed = false;
+    self.ptx = 0;
+    self.pty = 0;
+  };
+
+  self.t = 0;
+  self.tick = function()
+  {
+    self.t++;
+  }
+
+  self.draw = function(canv)
+  {
+    if(self.pressed)
+    {
+      if(game.pstage == 0)
+      {
+        if(Math.round(self.t/2)%2 == 0)
+          canv.context.drawImage(self.jack_0_img,self.ptx-self.imgw/2,self.pty-self.imgh,self.imgw,self.imgh);
+        else
+          canv.context.drawImage(self.jack_1_img,self.ptx-self.imgw/2,self.pty-self.imgh,self.imgw,self.imgh);
+      }
+      else if(game.pstage == 1)
+      {
+        canv.context.drawImage(self.shovel_img,self.ptx-(1.5*self.imgw),self.pty-self.imgh,self.imgw*2,self.imgh);
+      }
+    }
+  }
+}
 
 var PV_Rain = function(game)
 {
