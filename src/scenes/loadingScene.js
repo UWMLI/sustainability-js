@@ -147,6 +147,14 @@ var LoadingScene = function(game, stage)
       img_srcs.push("assets/pavement_jack_0.png");
       img_srcs.push("assets/pavement_jack_1.png");
       img_srcs.push("assets/pavement_shovel.png");
+      img_srcs.push("assets/pavement_fish_0.png");
+      img_srcs.push("assets/pavement_fish_1.png");
+      img_srcs.push("assets/pavement_fish_2.png");
+      img_srcs.push("assets/pavement_dfish_0.png");
+      img_srcs.push("assets/pavement_dfish_1.png");
+      img_srcs.push("assets/pavement_dfish_2.png");
+      img_srcs.push("assets/pavement_sludge.png");
+      img_srcs.push("assets/pavement_algae.png");
     }
     if(gameType == "barrel" || gameType == "")
     {

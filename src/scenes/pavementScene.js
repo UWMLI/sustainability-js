@@ -24,6 +24,7 @@ var PavementScene = function(game, stage)
   self.cleanBG;
   self.dirtyBG;
   self.finger;
+  self.fisher;
 
   self.percent = 0;
   self.pstage = 0;
@@ -47,6 +48,7 @@ var PavementScene = function(game, stage)
     self.ticker.register(self.dirtyBG);
     self.dragger.register(self.finger);
     self.ticker.register(self.finger);
+    self.ticker.register(self.fisher);
     // end register
   }
 
@@ -74,10 +76,12 @@ var PavementScene = function(game, stage)
     self.dirtyBG = new PV_ScratchableBackground(self);
     self.dirtyBG.setStage(0);
     self.finger = new PV_FingerTracker(self);
+    self.fisher = new PV_FishKiller(self);
 
     self.drawer.register(self.cleanBG);
     self.drawer.register(self.dirtyBG);
     self.drawer.register(self.finger);
+    self.drawer.register(self.fisher);
     self.drawer.register(self.particler);
     self.ticker.register(self.particler);
 
@@ -162,6 +166,73 @@ var PavementScene = function(game, stage)
   }
 };
 
+var PV_FishKiller = function(game)
+{
+  var self = this;
+
+  self.h = 340;
+  self.w = game.stage.drawCanv.canvas.width;
+  self.x = 0;
+  self.y = game.stage.drawCanv.canvas.height-self.h;
+
+  self.t = 0;
+
+  self.algae_img = game.assetter.asset("pavement_algae.png");
+  self.sludge_img = game.assetter.asset("pavement_sludge.png");
+
+  self.fish =
+  [
+    {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir":-1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_0.png"),"dimg":game.assetter.asset("pavement_dfish_0.png")},
+    {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir": 1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_1.png"),"dimg":game.assetter.asset("pavement_dfish_1.png")},
+    {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir":-1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_2.png"),"dimg":game.assetter.asset("pavement_dfish_2.png")},
+    {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir": 1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_1.png"),"dimg":game.assetter.asset("pavement_dfish_1.png")},
+    {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir":-1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_2.png"),"dimg":game.assetter.asset("pavement_dfish_2.png")},
+    {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir": 1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_1.png"),"dimg":game.assetter.asset("pavement_dfish_1.png")},
+    {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir":-1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_0.png"),"dimg":game.assetter.asset("pavement_dfish_0.png")},
+    {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir": 1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_1.png"),"dimg":game.assetter.asset("pavement_dfish_1.png")},
+    {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir":-1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_2.png"),"dimg":game.assetter.asset("pavement_dfish_2.png")},
+    {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir":-1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_2.png"),"dimg":game.assetter.asset("pavement_dfish_2.png")},
+    {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir": 1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_1.png"),"dimg":game.assetter.asset("pavement_dfish_1.png")},
+    {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir":-1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_2.png"),"dimg":game.assetter.asset("pavement_dfish_2.png")}
+  ]
+  //set y's in loop rather than hardcoding bs
+  for(var i = 0; i < self.fish.length; i++)
+    self.fish[i].y = ((self.h/5)*2-10)+((self.h-((self.h/5)*2-10))/self.fish.length+1)*i;
+
+  self.tick = function()
+  {
+    self.t += 0.01;
+    for(var i = 0; i < self.fish.length; i++)
+    {
+      if(self.fish[i].alive)
+      {
+        self.fish[i].x += self.fish[i].dir;
+        if(self.fish[i].x < 0-self.fish[i].w) self.fish[i].x = self.w;
+        if(self.fish[i].x > self.w)           self.fish[i].x = 0-self.fish[i].w;
+
+        if(Math.random()*1000 < 1) self.fish[i].alive = false;
+      }
+      else
+      {
+        self.fish[i].y = self.fish[i].y + (((self.h/5)*2-10)-self.fish[i].y)/100;
+      }
+    }
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.drawImage(self.algae_img,self.x-20,self.y-30,self.w+40,70);
+    //canv.context.drawImage(self.sludge_img,self.x,self.y,self.w,self.h);
+    for(var i = 0; i < self.fish.length; i++)
+    {
+      if(self.fish[i].alive)
+        canv.context.drawImage(self.fish[i].aimg,self.x+self.fish[i].x,self.y+self.fish[i].y+Math.sin(self.t+self.fish[i].wav)*10,self.fish[i].w,self.fish[i].h);
+      else
+        canv.context.drawImage(self.fish[i].dimg,self.x+self.fish[i].x,self.y+self.fish[i].y+Math.sin(self.t+self.fish[i].wav)*10,self.fish[i].w,self.fish[i].h);
+    }
+  }
+}
+
 var PV_FingerTracker = function(game)
 {
   var self = this;
@@ -211,10 +282,12 @@ var PV_FingerTracker = function(game)
     {
       if(game.pstage == 0)
       {
+        var offx = Math.random()*6-3;
+        var offy = Math.random()*6-3;
         if(Math.round(self.t/2)%2 == 0)
-          canv.context.drawImage(self.jack_0_img,self.ptx-self.imgw/2,self.pty-self.imgh,self.imgw,self.imgh);
+          canv.context.drawImage(self.jack_0_img,self.ptx-self.imgw/2+offx,self.pty-self.imgh+offy,self.imgw,self.imgh);
         else
-          canv.context.drawImage(self.jack_1_img,self.ptx-self.imgw/2,self.pty-self.imgh,self.imgw,self.imgh);
+          canv.context.drawImage(self.jack_1_img,self.ptx-self.imgw/2+offx,self.pty-self.imgh+offy,self.imgw,self.imgh);
       }
       else if(game.pstage == 1)
       {
