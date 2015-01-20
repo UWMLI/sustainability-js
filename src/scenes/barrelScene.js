@@ -112,10 +112,10 @@ var BarrelScene = function(game, stage)
 
     self.drawer.register(self.particler);
     self.ticker.register(self.particler);
-
     self.drawer.register(self.mapBorder);
 
     self.drawer.register(self.runoff);
+
     self.drawer.register(self.mapPipe);
 
     game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
@@ -405,13 +405,27 @@ var RB_Runoff = function(game)
       canv.context.fillRect(0,self.max_pool_y-60,self.pool_w-100,self.pool_h);
     }
 
-    canv.context.drawImage(self.stream_img, 100+(self.stream_max_w/2)-(self.stream_w/2), game.mapBorder.insetY+game.mapBorder.insetH+50+Math.random()*10,self.stream_w,self.stream_h);
+    //clipping
+    canv.context.save();
+    canv.context.beginPath();
+    canv.context.moveTo(                0, game.mapBorder.insetY+game.mapBorder.insetH+50);
+    canv.context.lineTo(canv.canvas.width, game.mapBorder.insetY+game.mapBorder.insetH+50);
+    canv.context.lineTo(canv.canvas.width, canv.canvas.height                            );
+    canv.context.lineTo(                0, canv.canvas.height                            );
+    canv.context.closePath();
+    canv.context.clip();
+    canv.context.drawImage(self.stream_img, 100+(self.stream_max_w/2)-(self.stream_w/2), game.mapBorder.insetY+game.mapBorder.insetH+50+self.t%self.stream_h-self.stream_h,self.stream_w,self.stream_h);
+    canv.context.drawImage(self.stream_img, 100+(self.stream_max_w/2)-(self.stream_w/2), game.mapBorder.insetY+game.mapBorder.insetH+50+self.t%self.stream_h,              self.stream_w,self.stream_h);
+    canv.context.restore();
+
     canv.context.drawImage(self.pool_img,   0, self.pool_y,self.pool_w,self.pool_h);
     canv.context.drawImage(self.fg_img,     0, canv.canvas.height-190, canv.canvas.width, 190);
   }
 
+  self.t = 0;
   self.tick = function()
   {
+    self.t+=10;
     self.stream_w = ((game.barrels.length-game.barrelsFound)/game.barrels.length)*self.stream_max_w;
     self.pool_y = self.max_pool_y-((self.max_pool_y-self.min_pool_y)*(game.totalRunoff/game.maxRunoff));
   }
