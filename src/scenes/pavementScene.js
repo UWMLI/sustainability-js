@@ -248,7 +248,7 @@ var PV_FishKiller = function(game)
     self.t = 0;
     for(var i = 0; i < self.fish.length; i++)
     {
-      self.fish[i].y = ((self.h/5)*2-10)+((self.h-((self.h/5)*2-10))/self.fish.length+1)*i;
+      self.fish[i].y = ((self.h/5)*2-10)+((self.h-((self.h/5)*2-10))/self.fish.length+4)*i;
       self.fish[i].alive = true;
     }
   }
@@ -258,7 +258,7 @@ var PV_FishKiller = function(game)
     self.t += 0.01;
     for(var i = 0; i < self.fish.length; i++)
     {
-      if((self.t/3)/self.fish.length > i/self.fish.length)
+      if(((self.t/3)/self.fish.length-0.1) > i/self.fish.length)
         self.fish[i].alive = false;
 
       if(self.fish[i].alive)
@@ -278,8 +278,12 @@ var PV_FishKiller = function(game)
 
   self.draw = function(canv)
   {
+    var a = (self.t/3)/self.fish.length
+    canv.context.globalAlpha = a;
+    canv.context.drawImage(self.sludge_img,self.x,self.y,self.w,self.h*1.5);
+    canv.context.globalAlpha = 1.0;
     canv.context.drawImage(self.algae_img,self.x-20,self.y-30,self.w+40,70);
-    //canv.context.drawImage(self.sludge_img,self.x,self.y,self.w,self.h);
+
     for(var i = 0; i < self.fish.length; i++)
     {
       if(self.fish[i].alive)
