@@ -395,6 +395,7 @@ var RB_Runoff = function(game)
   self.stream_img = game.assetter.asset("barrel_stream.png");
   self.pool_img   = game.assetter.asset("barrel_pool.png");
   self.fg_img     = game.assetter.asset("barrel_fg.png");
+  self.monster_img   = game.assetter.asset("barrel_monster.png");
   var runoffPulse = 0;
   self.draw = function(canv)
   {
@@ -418,8 +419,9 @@ var RB_Runoff = function(game)
     canv.context.drawImage(self.stream_img, 100+(self.stream_max_w/2)-(self.stream_w/2), game.mapBorder.insetY+game.mapBorder.insetH+50+self.t%self.stream_h,              self.stream_w,self.stream_h);
     canv.context.restore();
 
-    canv.context.drawImage(self.pool_img,   0, self.pool_y,self.pool_w,self.pool_h);
-    canv.context.drawImage(self.fg_img,     0, canv.canvas.height-190, canv.canvas.width, 190);
+    canv.context.drawImage(self.pool_img,      0,    self.pool_y, self.pool_w, self.pool_h);
+    canv.context.drawImage(self.monster_img, 200, self.pool_y-20,         300,         75);
+    canv.context.drawImage(self.fg_img, 0, canv.canvas.height-190, canv.canvas.width, 190);
   }
 
   self.t = 0;
