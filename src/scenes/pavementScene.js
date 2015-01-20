@@ -248,7 +248,7 @@ var PV_FishKiller = function(game)
     self.t = 0;
     for(var i = 0; i < self.fish.length; i++)
     {
-      self.fish[i].y = ((self.h/5)*2-10)+((self.h-((self.h/5)*2-10))/self.fish.length+4)*i;
+      self.fish[i].y = ((self.h/5)*2-10)+((self.h-((self.h/5)*2-10))/(self.fish.length+4))*i;
       self.fish[i].alive = true;
     }
   }
