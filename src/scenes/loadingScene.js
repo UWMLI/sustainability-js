@@ -140,8 +140,13 @@ var LoadingScene = function(game, stage)
     }
     if(gameType == "pavement" || gameType == "")
     {
-      img_srcs.push("assets/pavement_bad.png");
-      img_srcs.push("assets/pavement_good.png");
+      img_srcs.push("assets/pavement_bg_0.png");
+      img_srcs.push("assets/pavement_bg_1.png");
+      img_srcs.push("assets/pavement_bg_2.png");
+      img_srcs.push("assets/pavement_bg_3.png");
+      img_srcs.push("assets/pavement_jack_0.png");
+      img_srcs.push("assets/pavement_jack_1.png");
+      img_srcs.push("assets/pavement_shovel.png");
     }
     if(gameType == "barrel" || gameType == "")
     {

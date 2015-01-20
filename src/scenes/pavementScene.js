@@ -59,6 +59,7 @@ var PavementScene = function(game, stage)
     self.rain = [];
     self.cleanBG = new PV_Background(self);
     self.dirtyBG = new PV_ScratchableBackground(self);
+    self.dirtyBG.setStage(0);
 
     self.drawer.register(self.cleanBG);
     self.drawer.register(self.dirtyBG);
@@ -130,10 +131,20 @@ var PavementScene = function(game, stage)
   };
 
   var percent = 0;
+  self.pstage = 0;
   self.percentFilled = function(p)
   {
     if(p > 1) { p = 1; }
-    if(percent != 1 && p == 1) setTimeout(self.endGame,1000);
+    if(percent != 1 && p == 1)
+    {
+      self.pstage++;
+      if(self.pstage == 3) setTimeout(self.endGame,1000);
+      else
+      {
+        self.cleanBG.setStage(self.pstage);
+        self.dirtyBG.setStage(self.pstage);
+      }
+    }
     percent = p;
   }
 };
@@ -236,29 +247,47 @@ var PV_ScratchableBackground = function(game)
 
   self.bottom_buffer = 340; //pixels not worth using in drawable canv
 
-  self.canv = new Canv({width:self.w,height:self.h-self.bottom_buffer});
-  self.img = game.assetter.asset("pavement_bad.png");
-  self.canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
-  self.canv.context.globalCompositeOperation = "destination-out";
-  self.canv.context.fillStyle = "#000000";
-  self.canv.context.strokeStyle = "#000000";
-  self.canv.context.lineWidth = 50;
-
+  self.canv;
   var qRatio = 0.05;
   self.qw = Math.round(self.w*qRatio);
   self.qh = Math.round((self.h-self.bottom_buffer)*qRatio);
-  self.countcanv = new Canv({width:self.qw,height:self.qh});
-  self.countcanv.context.fillStyle = "#000000";
-  self.countcanv.context.fillRect(0,0,self.qw,self.qh);
-  self.countcanv.context.fillStyle = "#FFFFFF";
-  self.countcanv.context.strokeStyle = "#FFFFFF";
-  self.countcanv.context.lineWidth = 50*qRatio;
 
   self.lastPtX = 0;
   self.lastPtY = 0;
 
   self.filled = 0;
   self.ticks = 0;
+
+  self.stage = 0;
+  self.imgs =
+  [
+    game.assetter.asset("pavement_bg_0.png"),
+    game.assetter.asset("pavement_bg_1.png"),
+    game.assetter.asset("pavement_bg_2.png")
+  ];
+
+  self.setStage = function(s)
+  {
+    self.stage = s;
+
+    self.canv = new Canv({width:self.w,height:self.h-self.bottom_buffer});
+    self.canv.context.drawImage(self.imgs[self.stage],self.x,self.y,self.w,self.h);
+    self.canv.context.globalCompositeOperation = "destination-out";
+    self.canv.context.fillStyle = "#000000";
+    self.canv.context.strokeStyle = "#000000";
+    self.canv.context.lineWidth = 50;
+
+    self.countcanv = new Canv({width:self.qw,height:self.qh});
+    self.countcanv.context.fillStyle = "#000000";
+    self.countcanv.context.fillRect(0,0,self.qw,self.qh);
+    self.countcanv.context.fillStyle = "#FFFFFF";
+    self.countcanv.context.strokeStyle = "#FFFFFF";
+    self.countcanv.context.lineWidth = 50*qRatio;
+
+    self.filled = 0;
+    self.ticks = 0;
+  }
+
   //spread out tally over multiple ticks
   self.tick = function()
   {
@@ -269,9 +298,9 @@ var PV_ScratchableBackground = function(game)
     self.ticks++;
     if(self.ticks % self.qh == 0)
     {
-      //790 = road filled
+      //~1000 = road filled
       //1056 = actually filled
-      game.percentFilled(self.filled/790);
+      game.percentFilled(self.filled/1000);
       self.ticks = 0;
       self.filled = 0;
     }
@@ -347,11 +376,22 @@ var PV_Background = function(game)
   self.w = game.stage.drawCanv.canvas.width;
   self.h = game.stage.drawCanv.canvas.height;
 
-  self.img = game.assetter.asset("pavement_good.png");
+  self.stage = 0;
+  self.imgs =
+  [
+    game.assetter.asset("pavement_bg_1.png"),
+    game.assetter.asset("pavement_bg_2.png"),
+    game.assetter.asset("pavement_bg_3.png")
+  ];
+
+  self.setStage = function(s)
+  {
+    self.stage = s;
+  }
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
+    canv.context.drawImage(self.imgs[self.stage],self.x,self.y,self.w,self.h);
   }
 }
 
