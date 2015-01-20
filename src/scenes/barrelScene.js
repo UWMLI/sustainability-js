@@ -6,7 +6,7 @@ var BarrelScene = function(game, stage)
   //try to inject as much intro stuff as possible here
   self.viewing = 0; //0- intro, 1- gameplay, 2- outro
 
-  self.intro_vid_src = "assets/sample.webm";
+  self.intro_vid_src = "assets/barrel_intro.mp4";
   self.intro_vid_stamps = [];
   self.outro_vid_src = "assets/sample.webm";
   self.outro_vid_stamps = [];
