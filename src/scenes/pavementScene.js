@@ -20,6 +20,9 @@ var PavementScene = function(game, stage)
   self.particler;
   self.assetter;
 
+  self.beginButton;
+  self.retryButton;
+
   self.rain;
   self.cleanBG;
   self.dirtyBG;
@@ -29,12 +32,46 @@ var PavementScene = function(game, stage)
   self.percent = 0;
   self.pstage = 0;
 
+  self.initObjects = function()
+  {
+    self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
+    self.retryButton = self.retryButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.retryGame });
+
+    self.rain = [];
+    self.cleanBG = new PV_Background(self);
+    self.dirtyBG = new PV_ScratchableBackground(self);
+    self.dirtyBG.setStage(0);
+    self.finger = new PV_FingerTracker(self);
+    self.fisher = new PV_FishKiller(self);
+    self.fisher.reset();
+  }
+
+  self.registerToDrawer = function()
+  {
+    self.drawer.register(self.cleanBG);
+    self.drawer.register(self.dirtyBG);
+    self.drawer.register(self.fisher);
+    self.drawer.register(self.finger);
+    self.drawer.register(self.particler);
+  }
+
+  self.registerToInitialDoodles = function()
+  {
+    self.dragger.register(self.dirtyBG);
+    self.ticker.register(self.dirtyBG);
+    self.dragger.register(self.finger);
+    self.ticker.register(self.finger);
+    self.ticker.register(self.fisher);
+    self.ticker.register(self.particler);
+  }
+
   self.resetState = function()
   {
-    self.cleanBG.setStage(0);
-    self.dirtyBG.setStage(0);
     self.percent = 0;
     self.pstage = 0;
+    self.cleanBG.setStage(self.pstage);
+    self.dirtyBG.setStage(self.pstage);
+    self.fisher.reset();
   }
 
   self.beginGame = function()
@@ -42,24 +79,23 @@ var PavementScene = function(game, stage)
     self.viewing = 1;
     self.clicker.unregister(self.beginButton);
 
-    // register all gameplay stuff
-    self.dirtyBG.setStage(0);
-    self.dragger.register(self.dirtyBG);
-    self.ticker.register(self.dirtyBG);
-    self.dragger.register(self.finger);
-    self.ticker.register(self.finger);
-    self.ticker.register(self.fisher);
-    // end register
+    self.registerToInitialDoodles();
+    self.resetState();
+  }
+
+  self.retryGame = function()
+  {
+    self.viewing = 1;
+    self.clicker.unregister(self.retryButton);
+
+    self.resetState();
   }
 
   self.endGame = function()
   {
-    self.viewing = 2;
+    self.viewing = 3;
     game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }
-
-  self.beginButton = self.beginButton = new Clickable( { "x":0, "y":0, "w":stage.drawCanv.canvas.width, "h":stage.drawCanv.canvas.height, "click":self.beginGame });
-  //end intro stuff
 
   self.ready = function()
   {
@@ -71,19 +107,9 @@ var PavementScene = function(game, stage)
     self.particler = new Particler({});
     self.assetter = new Assetter({});
 
-    self.rain = [];
-    self.cleanBG = new PV_Background(self);
-    self.dirtyBG = new PV_ScratchableBackground(self);
-    self.dirtyBG.setStage(0);
-    self.finger = new PV_FingerTracker(self);
-    self.fisher = new PV_FishKiller(self);
-
-    self.drawer.register(self.cleanBG);
-    self.drawer.register(self.dirtyBG);
-    self.drawer.register(self.finger);
-    self.drawer.register(self.fisher);
-    self.drawer.register(self.particler);
-    self.ticker.register(self.particler);
+    self.initObjects();
+    self.resetState();
+    self.registerToDrawer();
 
     game.playVid(self.intro_vid_src, self.intro_vid_stamps, function(){self.clicker.register(self.beginButton)});
   };
@@ -115,6 +141,20 @@ var PavementScene = function(game, stage)
     self.stage.drawCanv.context.fillText(Math.round(self.percent*10000)/100+"%",0,self.stage.drawCanv.canvas.height-100);
 
     if(self.viewing == 0)
+    {
+      self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
+      self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
+      self.stage.drawCanv.context.fillStyle = "#FFFFFF";
+      self.stage.drawCanv.context.font = "30px comic_font";
+      self.stage.drawCanv.context.fillText("Swap traditional pavement    ",50,300);
+      self.stage.drawCanv.context.fillText("with porous pavement to      ",50,340);
+      self.stage.drawCanv.context.fillText("reduce runoff and prevent    ",50,380);
+      self.stage.drawCanv.context.fillText("algae from killing the fish! ",50,420);
+      self.stage.drawCanv.context.fillText("                             ",50,480);
+      self.stage.drawCanv.context.fillText("                             ",50,540);
+      self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
+    }
+    if(self.viewing == 2)
     {
       self.stage.drawCanv.context.fillStyle = "rgba(0,0,0,0.8)";
       self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
@@ -164,6 +204,13 @@ var PavementScene = function(game, stage)
     }
     self.percent = p;
   }
+
+  self.allFishDead = function()
+  {
+    self.viewing = 2;
+    self.clicker.unregister(self.retryButton);
+    self.clicker.register(self.retryButton);
+  }
 };
 
 var PV_FishKiller = function(game)
@@ -195,28 +242,38 @@ var PV_FishKiller = function(game)
     {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir": 1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_1.png"),"dimg":game.assetter.asset("pavement_dfish_1.png")},
     {"x":Math.random()*self.w,"y":0,"w":100,"h":50,"dir":-1,"wav":Math.random()*Math.PI,"alive":true,"aimg":game.assetter.asset("pavement_fish_2.png"),"dimg":game.assetter.asset("pavement_dfish_2.png")}
   ]
-  //set y's in loop rather than hardcoding bs
-  for(var i = 0; i < self.fish.length; i++)
-    self.fish[i].y = ((self.h/5)*2-10)+((self.h-((self.h/5)*2-10))/self.fish.length+1)*i;
+
+  self.reset = function()
+  {
+    self.t = 0;
+    for(var i = 0; i < self.fish.length; i++)
+    {
+      self.fish[i].y = ((self.h/5)*2-10)+((self.h-((self.h/5)*2-10))/self.fish.length+1)*i;
+      self.fish[i].alive = true;
+    }
+  }
 
   self.tick = function()
   {
     self.t += 0.01;
     for(var i = 0; i < self.fish.length; i++)
     {
+      if((self.t/3)/self.fish.length > i/self.fish.length)
+        self.fish[i].alive = false;
+
       if(self.fish[i].alive)
       {
         self.fish[i].x += self.fish[i].dir;
         if(self.fish[i].x < 0-self.fish[i].w) self.fish[i].x = self.w;
         if(self.fish[i].x > self.w)           self.fish[i].x = 0-self.fish[i].w;
-
-        if(Math.random()*1000 < 1) self.fish[i].alive = false;
       }
       else
       {
         self.fish[i].y = self.fish[i].y + (((self.h/5)*2-10)-self.fish[i].y)/100;
       }
     }
+
+    if(!self.fish[self.fish.length-1].alive) game.allFishDead();
   }
 
   self.draw = function(canv)
