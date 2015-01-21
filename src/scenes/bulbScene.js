@@ -205,9 +205,9 @@ var BulbScene = function(game, stage)
 
     var savingsx = 200;
     var savingsy = 100;
-    self.savedinc+=13;
+    self.savedinc+=3;
     if(self.savedinc > self.saved)  self.savedinc = self.saved;
-    else if(self.savedinc%6 == 0) self.particler.register(new BU_PriceParticle(savingsx+150+Math.random()*70,savingsy+Math.random()*20,"$",30,"#00AA00",0));
+    else if(self.savedinc%5 == 0) self.particler.register(new BU_PriceParticle(savingsx+150+Math.random()*70,savingsy+Math.random()*20,"$",30,"#00AA00",0));
 
     //self.stage.drawCanv.context.strokeStyle = "#000000";
     //self.stage.drawCanv.context.lineWidth = 2;
@@ -228,9 +228,9 @@ var BulbScene = function(game, stage)
       self.stage.drawCanv.context.fillText("Swap in LED lights before the",50,300);
       self.stage.drawCanv.context.fillText("maintenance workers put in   ",50,340);
       self.stage.drawCanv.context.fillText("more incandescents.          ",50,380);
-      self.stage.drawCanv.context.fillText("Each LED will save $500 over ",50,440);
+      self.stage.drawCanv.context.fillText("Each LED will save $150 over ",50,440);
       self.stage.drawCanv.context.fillText("its lifetime.                ",50,480);
-      self.stage.drawCanv.context.fillText("Save $7500 to win!           ",50,540);
+      self.stage.drawCanv.context.fillText("Save $2000 to win!           ",50,540);
       self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
     }
   };
@@ -315,8 +315,8 @@ var BulbScene = function(game, stage)
   self.purchaseBulb = function(bulb)
   {
     self.ispent += BU_c.cost[bulb.type];
-    if(bulb.type == BU_c.BULB_LED_ON) self.saved += 500;
-    if(!won && self.saved >= 7500) { won = true; setTimeout(self.endGame,1000);}
+    if(bulb.type == BU_c.BULB_LED_ON) self.saved += 150;
+    if(!won && self.saved >= 2000) { won = true; setTimeout(self.endGame,1000);}
     self.numbulbs++;
     //self.particler.register(new BU_PriceParticle(bulb.x+(bulb.w/2),bulb.y+(bulb.h/4),"$"+BU_c.cost[bulb.type],30,"#00AA00",0));
   }
