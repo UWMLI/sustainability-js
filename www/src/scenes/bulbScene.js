@@ -126,9 +126,12 @@ var BulbScene = function(game, stage)
 
     self.selector = new BU_Selector(self);
 
+    /*
+    //graphs not used
     self.iSpendGraph         = new BU_Graph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#00FF00",self);
     self.theySpendGraph      = new BU_Graph(50,150,stage.drawCanv.canvas.width-100,stage.drawCanv.canvas.width-100,"#FF0000",self);
     self.spendGraphMarkings  = new SpendGraphMarkings(self);
+    */
 
     self.drawer.register(self.house);
     for(var i = 0; i < self.bulbs.length; i++)
@@ -169,11 +172,14 @@ var BulbScene = function(game, stage)
 
       if(self.player.state == 0 && self.selector.lastNode) self.player.goalNode = self.selector.lastNode;
 
+/*
+//graphs not used
       self.iSpendGraph.register(self.ispent);
       self.theySpendGraph.register(self.theyspent);
 
       if(self.theySpendGraph.high > self.iSpendGraph.high) self.iSpendGraph.high = self.theySpendGraph.high;
       else                                                 self.theySpendGraph.high = self.iSpendGraph.high;
+*/
     }
   };
 
