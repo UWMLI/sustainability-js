@@ -8,7 +8,7 @@ var SweaterScene = function(game, stage)
 
   self.intro_vid_src = "assets/sweater_intro.mp4";
   self.intro_vid_stamps = [];
-  self.outro_vid_src = "assets/sample.webm";
+  self.outro_vid_src = "assets/sweater_win.mp4";
   self.outro_vid_stamps = [];
 
   self.beginGame = function()
@@ -137,7 +137,7 @@ var SweaterScene = function(game, stage)
       //self.clicker.unregister(self.retryButton);
       self.clicker.register(self.retryButton);
     }
-    else if(!won && self.enemiesMade > 10)
+    else if(!won && self.enemiesMade > 20)
     {
       won = true;
       setTimeout(self.endGame,1000);

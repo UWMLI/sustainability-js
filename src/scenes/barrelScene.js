@@ -8,7 +8,7 @@ var BarrelScene = function(game, stage)
 
   self.intro_vid_src = "assets/barrel_intro.mp4";
   self.intro_vid_stamps = [];
-  self.outro_vid_src = "assets/sample.webm";
+  self.outro_vid_src = "assets/barrel_win.mp4";
   self.outro_vid_stamps = [];
 
   self.beginGame = function()

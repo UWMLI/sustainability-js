@@ -7,7 +7,7 @@ var PavementScene = function(game, stage)
 
   self.intro_vid_src = "assets/pavement_intro.mp4";
   self.intro_vid_stamps = [];
-  self.outro_vid_src = "assets/sample.webm";
+  self.outro_vid_src = "assets/pavement_win.mp4";
   self.outro_vid_stamps = [];
 
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};

@@ -7,7 +7,7 @@ var WheelScene = function(game, stage)
 
   self.intro_vid_src = "assets/wheel_intro.mp4";
   self.intro_vid_stamps = [];
-  self.outro_vid_src = "assets/sample.webm";
+  self.outro_vid_src = "assets/wheel_win.mp4";
   self.outro_vid_stamps = [];
 
   self.numSquirrels = 4;
