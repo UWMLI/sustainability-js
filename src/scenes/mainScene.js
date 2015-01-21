@@ -33,14 +33,17 @@ var MainScene = function(game, stage)
     self.particler = new Particler({});
     self.assetter = new Assetter({});
 
-    self.map         = new MA_Map(self);                             self.drawer.register(self.map);         self.dragger.register(self.map)
-    self.bikeBtn     = new MA_Button( 20, 20,200,100,"Bike",self);     self.drawer.register(self.bikeBtn);     self.clicker.register(self.bikeBtn);
-    self.windowBtn   = new MA_Button( 60,300,200,100,"Window",self);   self.drawer.register(self.windowBtn);   self.clicker.register(self.windowBtn);
-    self.bulbBtn     = new MA_Button(200,700,200,100,"Bulb",self);     self.drawer.register(self.bulbBtn);     self.clicker.register(self.bulbBtn);
-    self.sweaterBtn  = new MA_Button(700,140,200,100,"Sweater",self);  self.drawer.register(self.sweaterBtn);  self.clicker.register(self.sweaterBtn);
-    self.barrelBtn   = new MA_Button(100,180,200,100,"Barrel",self);   self.drawer.register(self.barrelBtn);   self.clicker.register(self.barrelBtn);
-    self.pavementBtn = new MA_Button(450,620,200,100,"Pavement",self); self.drawer.register(self.pavementBtn); self.clicker.register(self.pavementBtn);
-    self.wheelBtn    = new MA_Button(500,260,200,100,"Wheel",self);    self.drawer.register(self.wheelBtn);    self.clicker.register(self.wheelBtn);
+  ;
+    self.map         = new MA_Map(self);                                                                  self.drawer.register(self.map);         self.dragger.register(self.map)
+    var hw = 50;
+    var hh = 50;
+    self.bikeBtn     = new MA_Button(self.map.w*(3/4)-hw,self.map.h*(3/4)-hh,100,100,self.assetter.asset("overworld_bike.png"),self);     self.drawer.register(self.bikeBtn);     self.clicker.register(self.bikeBtn);
+    self.windowBtn   = new MA_Button(self.map.w*(1/4)-hw,self.map.h*(3/8)-hh,100,100,self.assetter.asset("overworld_window.png"),self);   self.drawer.register(self.windowBtn);   self.clicker.register(self.windowBtn);
+    self.bulbBtn     = new MA_Button(self.map.w*(3/8)-hw,self.map.h*(3/4)-hh,100,100,self.assetter.asset("overworld_bulb.png"),self);     self.drawer.register(self.bulbBtn);     self.clicker.register(self.bulbBtn);
+    self.sweaterBtn  = new MA_Button(self.map.w*(1/8)-hw,self.map.h*(1/8)-hh,100,100,self.assetter.asset("overworld_sweater.png"),self);  self.drawer.register(self.sweaterBtn);  self.clicker.register(self.sweaterBtn);
+    self.barrelBtn   = new MA_Button(self.map.w*(1/8)-hw,self.map.h*(3/4)-hh,100,100,self.assetter.asset("overworld_barrel.png"),self);   self.drawer.register(self.barrelBtn);   self.clicker.register(self.barrelBtn);
+    self.pavementBtn = new MA_Button(self.map.w*(7/8)-hw,self.map.h*(5/8)-hh,100,100,self.assetter.asset("overworld_pavement.png"),self); self.drawer.register(self.pavementBtn); self.clicker.register(self.pavementBtn);
+    self.wheelBtn    = new MA_Button(self.map.w*(3/8)-hw,self.map.h*(5/8)-hh,100,100,self.assetter.asset("overworld_wheel.png"),self);    self.drawer.register(self.wheelBtn);    self.clicker.register(self.wheelBtn);
   };
 
   self.tick = function()
@@ -97,8 +100,10 @@ var MA_Map = function(game)
   self.deltaY = 0;
   self.x = 0;
   self.y = 0;
-  self.w = game.stage.drawCanv.canvas.width*4;
-  self.h = game.stage.drawCanv.canvas.height*2;
+  self.w = game.stage.drawCanv.canvas.width*3;
+  self.h = game.stage.drawCanv.canvas.height*1.5;
+
+  self.img = game.assetter.asset("overworld_map.png")
 
   var boundx = 0;
   var boundy = 0;
@@ -141,33 +146,22 @@ var MA_Map = function(game)
   };
   self.draw = function(canv)
   {
-    canv.context.strokeStyle = "#000000";
-    canv.context.lineWidth = 1;
-    var dens = 200;
-    for(var i = 0; i < dens; i+=2)
-      canv.context.strokeRect(self.x+(self.w/dens)*i, self.y, self.w/dens, self.h);
-    for(var i = 0; i < dens; i+=2)
-      canv.context.strokeRect(self.x, self.y+(self.h/dens)*i, self.w, self.h/dens);
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   }
 }
 
-var MA_Button = function(x,y,w,h,text,game)
+var MA_Button = function(x,y,w,h,img,game)
 {
   var self = this;
   self.x = x;
   self.y = y;
   self.w = w;
   self.h = h;
-  self.text = text;
+  self.img = img;
 
   self.draw = function(canv)
   {
-    canv.context.lineWidth = 2;
-    canv.context.strokeStyle = "#000000";
-    canv.context.strokeRect(self.x, self.y, self.w, self.h);
-    canv.context.fillStyle = "#000000";
-    canv.context.font = "30px comic_font";
-    canv.context.fillText(self.text,self.x,self.y+self.h);
+    canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
   }
   self.click = function()
   {

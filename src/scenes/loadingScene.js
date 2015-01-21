@@ -170,6 +170,18 @@ var LoadingScene = function(game, stage)
       img_srcs.push("assets/barrel_marker.png");
       img_srcs.push("assets/barrel_barrel.png");
     }
+    if(gameType == "")
+    {
+      img_srcs.push("assets/overworld_map.png");
+      img_srcs.push("assets/overworld_barrel.png");
+      img_srcs.push("assets/overworld_bike.png");
+      img_srcs.push("assets/overworld_wheel.png");
+      img_srcs.push("assets/overworld_bulb.png");
+      img_srcs.push("assets/overworld_pavement.png");
+      img_srcs.push("assets/overworld_toilet.png");
+      img_srcs.push("assets/overworld_window.png");
+      img_srcs.push("assets/overworld_sweater.png");
+    }
     //misc
     img_srcs.push("assets/null.png");
     img_srcs.push("assets/man.png");
