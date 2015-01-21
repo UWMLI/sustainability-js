@@ -138,7 +138,7 @@ var PavementScene = function(game, stage)
     self.drawer.flush();
     self.stage.drawCanv.context.font = "60px comic_font";
     self.stage.drawCanv.context.fillStyle = "#000000";
-    self.stage.drawCanv.context.fillText(Math.round(self.percent*10000)/100+"%",0,self.stage.drawCanv.canvas.height-100);
+    //self.stage.drawCanv.context.fillText(Math.round(self.percent*10000)/100+"%",0,self.stage.drawCanv.canvas.height-100);
 
     if(self.viewing == 0)
     {
@@ -509,7 +509,7 @@ var PV_ScratchableBackground = function(game)
     {
       //~1000 = road filled
       //1056 = actually filled
-      game.percentFilled(self.filled/1000);
+      game.percentFilled(self.filled/900);
       self.ticks = 0;
       self.filled = 0;
     }
