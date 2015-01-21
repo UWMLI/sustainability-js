@@ -65,18 +65,15 @@ var IntroScene = function(game, stage)
 var IN_startButton = function(game)
 {
   var self = this;
-  self.x = 20;
-  self.y = 20;
-  self.w = 200;
-  self.h = 20;
+  self.x = 0;
+  self.y = 0;
+  self.w = game.stage.drawCanv.canvas.width;
+  self.h = game.stage.drawCanv.canvas.height;
 
   self.draw = function(canv)
   {
-    canv.context.strokeStyle = "#000000";
-    canv.context.strokeRect(self.x, self.y, self.w, self.h);
-    canv.context.fillStyle = "#000000";
     canv.context.font = "30px comic_font";
-    canv.context.fillText("START",self.x,self.y+self.h);
+    canv.context.fillText("START",self.x+self.w/2,self.y+self.h/2);
   }
   self.click = function()
   {
