@@ -73,6 +73,7 @@ var IN_startButton = function(game)
   self.draw = function(canv)
   {
     canv.context.font = "30px comic_font";
+    canv.context.fillStyle = "#000000";
     canv.context.fillText("START",self.x+self.w/2,self.y+self.h/2);
   }
   self.click = function()

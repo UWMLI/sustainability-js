@@ -255,7 +255,7 @@ var PV_FishKiller = function(game)
 
   self.tick = function()
   {
-    self.t += 0.01;
+    self.t += 0.02;
     for(var i = 0; i < self.fish.length; i++)
     {
       if(((self.t/3)/self.fish.length-0.1) > i/self.fish.length)
@@ -475,6 +475,8 @@ var PV_ScratchableBackground = function(game)
     game.assetter.asset("pavement_bg_2.png")
   ];
 
+  var brushsize = 100;
+
   self.setStage = function(s)
   {
     self.stage = s;
@@ -484,14 +486,14 @@ var PV_ScratchableBackground = function(game)
     self.canv.context.globalCompositeOperation = "destination-out";
     self.canv.context.fillStyle = "#000000";
     self.canv.context.strokeStyle = "#000000";
-    self.canv.context.lineWidth = 50;
+    self.canv.context.lineWidth = brushsize;
 
     self.countcanv = new Canv({width:self.qw,height:self.qh});
     self.countcanv.context.fillStyle = "#000000";
     self.countcanv.context.fillRect(0,0,self.qw,self.qh);
     self.countcanv.context.fillStyle = "#FFFFFF";
     self.countcanv.context.strokeStyle = "#FFFFFF";
-    self.countcanv.context.lineWidth = 50*qRatio;
+    self.countcanv.context.lineWidth = brushsize*qRatio;
 
     self.filled = 0;
     self.ticks = 0;
@@ -522,11 +524,11 @@ var PV_ScratchableBackground = function(game)
     //just draw circle
     ////canv
     self.canv.context.beginPath();
-    self.canv.context.arc(evt.doX,evt.doY,25,0,Math.PI*2,true);
+    self.canv.context.arc(evt.doX,evt.doY,brushsize/2,0,Math.PI*2,true);
     self.canv.context.fill();
     ////countcanv
     self.countcanv.context.beginPath();
-    self.countcanv.context.arc(evt.doX*qRatio,evt.doY*qRatio,25*qRatio,0,Math.PI*2,true);
+    self.countcanv.context.arc(evt.doX*qRatio,evt.doY*qRatio,brushsize/2*qRatio,0,Math.PI*2,true);
     self.countcanv.context.fill();
 
     self.lastPtX = evt.doX;
@@ -557,11 +559,11 @@ var PV_ScratchableBackground = function(game)
     //draw circle (for short frames)
     ////canv
     self.canv.context.beginPath();
-    self.canv.context.arc(evt.doX,evt.doY,25,0,Math.PI*2,true);
+    self.canv.context.arc(evt.doX,evt.doY,brushsize/2,0,Math.PI*2,true);
     self.canv.context.fill();
     ////countcanv
     self.countcanv.context.beginPath();
-    self.countcanv.context.arc(evt.doX*qRatio,evt.doY*qRatio,25*qRatio,0,Math.PI*2,true);
+    self.countcanv.context.arc(evt.doX*qRatio,evt.doY*qRatio,brushsize/2*qRatio,0,Math.PI*2,true);
     self.countcanv.context.fill();
 
     self.lastPtX = evt.doX;
