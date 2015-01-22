@@ -401,7 +401,7 @@ var RB_Runoff = function(game)
   {
     if(self.stream_w > 0)
     {
-      runoffPulse+=0.1;
+      runoffPulse+=0.2;
       canv.context.fillStyle = "rgba(255,255,255,"+((Math.sin(runoffPulse)+1)/2)+")";
       canv.context.fillRect(0,self.max_pool_y-60,self.pool_w-100,self.pool_h);
     }
@@ -427,7 +427,7 @@ var RB_Runoff = function(game)
   self.t = 0;
   self.tick = function()
   {
-    self.t+=10;
+    self.t+=20;
     self.stream_w = ((game.barrels.length-game.barrelsFound)/game.barrels.length)*self.stream_max_w;
     self.pool_y = self.max_pool_y-((self.max_pool_y-self.min_pool_y)*(game.totalRunoff/game.maxRunoff));
   }

@@ -10,12 +10,14 @@ var Vid = function(container, source, stamps, callback)
   self.video = document.createElement('video');
   self.video.style.width = container.style.width;
   self.video.style.height = container.style.height;
+  self.video.controls = false;
+  self.video.loop = false;
+  //self.video.playsinline = true;
+  self.video.setAttribute("webkit-playsinline","webkit-playsinline"); //ugh
   var dom_src = document.createElement('source');
   dom_src.src = self.source;
   dom_src.type = "video/"+self.source.substring(self.source.indexOf('.')+1); //oh god so error prone
   self.video.appendChild(dom_src);
-  self.video.controls = false;
-  self.video.loop = false;
 
   self.onended = function()
   {
