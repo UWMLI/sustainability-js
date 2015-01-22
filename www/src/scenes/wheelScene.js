@@ -59,17 +59,17 @@ var WheelScene = function(game, stage)
     var b = self.door.y+self.door.h;
 
     //squirrels
-    self.squirrels[0].x = l+50;
-    self.squirrels[0].y = t;
+    self.squirrels[0].x = l+25;
+    self.squirrels[0].y = t-25;
 
-    self.squirrels[1].x = r-self.squirrels[1].w-50;
-    self.squirrels[1].y = t;
+    self.squirrels[1].x = r-self.squirrels[1].w-25;
+    self.squirrels[1].y = t-25;
 
-    self.squirrels[2].x = r-self.squirrels[2].w-50;
-    self.squirrels[2].y = b-self.squirrels[2].h-20;
+    self.squirrels[2].x = r-self.squirrels[2].w-25;
+    self.squirrels[2].y = b-self.squirrels[2].h;
 
-    self.squirrels[3].x = l+50;
-    self.squirrels[3].y = b-self.squirrels[3].h-20;
+    self.squirrels[3].x = l+25;
+    self.squirrels[3].y = b-self.squirrels[3].h;
 
     //nests
     var templateNests = [];
@@ -696,9 +696,9 @@ var WH_Squirrel = function(game)
 
   self.x = game.box.x+20;
   self.y = game.box.y+20;
-  self.w = 60;
-  self.h = 100;
-  self.r = self.w/4;
+  self.w = 120;
+  self.h = 120;
+  self.r = self.w/8;
 
   self.offYt = Math.random()*2*Math.PI;
   self.offY = 0;
@@ -713,7 +713,7 @@ var WH_Squirrel = function(game)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x+self.offX,self.y+self.offY,self.w,self.h);
+    canv.context.drawImage(self.img,self.x+self.w/4+self.offX,self.y+self.offY,self.w/2,self.h);
   }
 
   self.tick = function()
@@ -758,9 +758,9 @@ var WH_Squirrel = function(game)
 
     self.x = game.box.x+20;
     self.y = game.box.y+20;
-    self.w = 60;
-    self.h = 100;
-    self.r = self.w/4;
+    self.w = 120;
+    self.h = 120;
+    self.r = self.w/8;
 
     self.offYt = Math.random()*2*Math.PI;
     self.offY = 0;
@@ -930,8 +930,10 @@ var WH_Wheel = function(game)
     self.newT = ((-Math.atan2(x,y))+(Math.PI/2)+(2*Math.PI))%(2*Math.PI); //why terrible coordinate spaces...
 
     var a = self.oldT-self.newT;
-    if((a > 0 && a < Math.PI) || a < -Math.PI) /*wrong way...*/;
-    else
+
+    //if((a > 0 && a < Math.PI) || a < -Math.PI) /*wrong way...*/;
+    //else {}
+
     {
       self.rev++; //maybe spit out a particle?
       if(revCooldown == 0)
