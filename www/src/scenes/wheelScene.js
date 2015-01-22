@@ -311,6 +311,7 @@ var WheelScene = function(game, stage)
     if(!self.wheel.spinning)
     {
       self.viewing = 2;
+      self.clicker.unregister(self.retryButton);
       self.clicker.register(self.retryButton);
     }
   }

@@ -255,7 +255,7 @@ var PV_FishKiller = function(game)
 
   self.tick = function()
   {
-    self.t += 0.02;
+    self.t += 0.05;
     for(var i = 0; i < self.fish.length; i++)
     {
       if(((self.t/3)/self.fish.length-0.1) > i/self.fish.length)

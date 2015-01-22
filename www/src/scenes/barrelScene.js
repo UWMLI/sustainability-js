@@ -82,7 +82,7 @@ var BarrelScene = function(game, stage)
 
     self.barrelsFound = 0;
     self.totalRunoff = 0;
-    self.maxRunoff = 20000;
+    self.maxRunoff = 600;
 
     self.mapBorder = new RB_MapBorder(self);
     self.mapPipe   = new RB_MapPipe(self);
@@ -134,12 +134,12 @@ var BarrelScene = function(game, stage)
         self.drawer.register(self.rain[self.rain.length-1]);
       }
     }
-    self.totalRunoff += ((self.barrels.length-self.barrelsFound)/self.barrels.length)*15;
+    self.totalRunoff += (self.barrels.length-self.barrelsFound)/self.barrels.length;
     if(self.totalRunoff > self.maxRunoff)
     {
       self.totalRunoff = self.maxRunoff;
       self.viewing = 2;
-      //self.clicker.unregister(self.retryButton);
+      self.clicker.unregister(self.retryButton);
       self.clicker.register(self.retryButton);
     }
     self.clicker.flush();

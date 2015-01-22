@@ -134,7 +134,7 @@ var SweaterScene = function(game, stage)
     if(self.thermostat.temp > 69)
     {
       self.viewing = 2;
-      //self.clicker.unregister(self.retryButton);
+      self.clicker.unregister(self.retryButton);
       self.clicker.register(self.retryButton);
     }
     else if(!won && self.enemiesMade > 20)

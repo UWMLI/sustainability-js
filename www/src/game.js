@@ -146,6 +146,7 @@ var Game = function(init)
   self.vidTouched = function()
   {
     if(vid) vid.play();
+    if(debug) vid.next();
   }
   if(platform == "PC")          document.getElementById("vid_div").addEventListener('mousedown', self.vidTouched, false);
   else if(platform == "MOBILE") document.getElementById("vid_div").addEventListener('touchstart', self.vidTouched, false);
