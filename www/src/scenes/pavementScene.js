@@ -146,9 +146,9 @@ var PavementScene = function(game, stage)
       self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
       self.stage.drawCanv.context.fillStyle = "#FFFFFF";
       self.stage.drawCanv.context.font = "30px comic_font";
-      self.stage.drawCanv.context.fillText("Swap traditional pavement    ",50,300);
-      self.stage.drawCanv.context.fillText("with porous pavement to      ",50,340);
-      self.stage.drawCanv.context.fillText("reduce runoff and prevent    ",50,380);
+      self.stage.drawCanv.context.fillText("Swipe to swap traditional    ",50,300);
+      self.stage.drawCanv.context.fillText("pavement with porous pavement.",50,340);
+      self.stage.drawCanv.context.fillText("Reduce runoff and prevent    ",50,380);
       self.stage.drawCanv.context.fillText("algae from killing the fish! ",50,420);
       self.stage.drawCanv.context.fillText("                             ",50,480);
       self.stage.drawCanv.context.fillText("                             ",50,540);
@@ -160,12 +160,12 @@ var PavementScene = function(game, stage)
       self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
       self.stage.drawCanv.context.fillStyle = "#FFFFFF";
       self.stage.drawCanv.context.font = "30px comic_font";
-      self.stage.drawCanv.context.fillText("Swap traditional pavement    ",50,300);
-      self.stage.drawCanv.context.fillText("with porous pavement to      ",50,340);
-      self.stage.drawCanv.context.fillText("reduce runoff and prevent    ",50,380);
-      self.stage.drawCanv.context.fillText("algae from killing the fish! ",50,420);
-      self.stage.drawCanv.context.fillText("                             ",50,480);
-      self.stage.drawCanv.context.fillText("                             ",50,540);
+      self.stage.drawCanv.context.fillText("All the fish died!           ",50,300);
+      self.stage.drawCanv.context.fillText("                             ",50,340);
+      self.stage.drawCanv.context.fillText("Swipe to swap traditional    ",50,400);
+      self.stage.drawCanv.context.fillText("pavement with porous pavement.",50,440);
+      self.stage.drawCanv.context.fillText("Reduce runoff and prevent    ",50,480);
+      self.stage.drawCanv.context.fillText("algae from killing the fish! ",50,520);
       self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
     }
   };

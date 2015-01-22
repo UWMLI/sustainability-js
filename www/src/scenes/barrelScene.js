@@ -166,12 +166,8 @@ var BarrelScene = function(game, stage)
       self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
       self.stage.drawCanv.context.fillStyle = "#FFFFFF";
       self.stage.drawCanv.context.font = "30px comic_font";
-      self.stage.drawCanv.context.fillText("Install barrels before the   ",50,300);
-      self.stage.drawCanv.context.fillText("holding tank overflows!      ",50,340);
-      self.stage.drawCanv.context.fillText("                             ",50,380);
-      self.stage.drawCanv.context.fillText("                             ",50,440);
-      self.stage.drawCanv.context.fillText("                             ",50,480);
-      self.stage.drawCanv.context.fillText("                             ",50,540);
+      self.stage.drawCanv.context.fillText("Tap to install barrels before",50,300);
+      self.stage.drawCanv.context.fillText("the holding tank overflows!  ",50,340);
       self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
     }
 
@@ -181,12 +177,11 @@ var BarrelScene = function(game, stage)
       self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
       self.stage.drawCanv.context.fillStyle = "#FFFFFF";
       self.stage.drawCanv.context.font = "30px comic_font";
-      self.stage.drawCanv.context.fillText("Install barrels before the   ",50,300);
-      self.stage.drawCanv.context.fillText("holding tank overflows!      ",50,340);
-      self.stage.drawCanv.context.fillText("                             ",50,380);
-      self.stage.drawCanv.context.fillText("                             ",50,440);
-      self.stage.drawCanv.context.fillText("                             ",50,480);
-      self.stage.drawCanv.context.fillText("                             ",50,540);
+      self.stage.drawCanv.context.fillText("The holding tank overflowed  ",50,300);
+      self.stage.drawCanv.context.fillText("and the algae monster        ",50,340);
+      self.stage.drawCanv.context.fillText("escaped!                     ",50,380);
+      self.stage.drawCanv.context.fillText("Tap to install barrels before",50,440);
+      self.stage.drawCanv.context.fillText("the holding tank overflows!  ",50,480);
       self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
     }
   };

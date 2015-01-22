@@ -167,12 +167,14 @@ var SweaterScene = function(game, stage)
       self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
       self.stage.drawCanv.context.fillStyle = "#FFFFFF";
       self.stage.drawCanv.context.font = "30px comic_font";
-      self.stage.drawCanv.context.fillText("Prevent the cold students    ",50,300);
-      self.stage.drawCanv.context.fillText("from turning up the          ",50,340);
-      self.stage.drawCanv.context.fillText("thermostat!                  ",50,380);
-      self.stage.drawCanv.context.fillText("Give them sweaters instead!  ",50,440);
-      self.stage.drawCanv.context.fillText("Keep the thermostat below    ",50,500);
-      self.stage.drawCanv.context.fillText("69 degrees!                  ",50,540);
+      self.stage.drawCanv.context.fillText("The thermostat was raised    ",50,300);
+      self.stage.drawCanv.context.fillText("too high!                    ",50,340);
+      self.stage.drawCanv.context.fillText("Prevent the cold students    ",50,400);
+      self.stage.drawCanv.context.fillText("from turning up the          ",50,440);
+      self.stage.drawCanv.context.fillText("thermostat!                  ",50,480);
+      self.stage.drawCanv.context.fillText("Give them sweaters instead!  ",50,540);
+      self.stage.drawCanv.context.fillText("Keep the thermostat below    ",50,600);
+      self.stage.drawCanv.context.fillText("69 degrees!                  ",50,640);
       self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
     }
   };

@@ -242,11 +242,11 @@ var WheelScene = function(game, stage)
       self.stage.drawCanv.context.fillRect(0,0,self.stage.drawCanv.canvas.width,self.stage.drawCanv.canvas.height);
       self.stage.drawCanv.context.fillStyle = "#FFFFFF";
       self.stage.drawCanv.context.font = "30px comic_font";
-      self.stage.drawCanv.context.fillText("Fix the heat wheel to save   ",50,300);
-      self.stage.drawCanv.context.fillText("the demo!                    ",50,340);
-      self.stage.drawCanv.context.fillText("                             ",50,380);
-      self.stage.drawCanv.context.fillText("                             ",50,440);
-      self.stage.drawCanv.context.fillText("                             ",50,480);
+      self.stage.drawCanv.context.fillText("The board of regents got away",50,300);
+      self.stage.drawCanv.context.fillText("before they could see the    ",50,340);
+      self.stage.drawCanv.context.fillText("heat wheel!                  ",50,380);
+      self.stage.drawCanv.context.fillText("Fix the wheat wheel to save  ",50,440);
+      self.stage.drawCanv.context.fillText("the demo!                    ",50,480);
       self.stage.drawCanv.context.fillText("                             ",50,540);
       self.stage.drawCanv.context.fillText("(Touch Anywhere to Begin)",self.stage.drawCanv.canvas.width-480,self.stage.drawCanv.canvas.height-30);
     }
