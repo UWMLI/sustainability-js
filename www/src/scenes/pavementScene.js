@@ -207,9 +207,11 @@ var PavementScene = function(game, stage)
 
   self.allFishDead = function()
   {
-    self.viewing = 2;
-    self.clicker.unregister(self.retryButton);
-    self.clicker.register(self.retryButton);
+    if(self.viewing != 2)
+    {
+      self.viewing = 2;
+      setTimeout(function(){self.clicker.register(self.retryButton);}, 1000);
+    }
   }
 };
 

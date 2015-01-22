@@ -134,13 +134,13 @@ var BarrelScene = function(game, stage)
         self.drawer.register(self.rain[self.rain.length-1]);
       }
     }
-    self.totalRunoff += (self.barrels.length-self.barrelsFound)/self.barrels.length;
-    if(self.totalRunoff > self.maxRunoff)
+    if(self.totalRunoff < self.maxRunoff)
+      self.totalRunoff += (self.barrels.length-self.barrelsFound)/self.barrels.length;
+    else if(self.totalRunoff >= self.maxRunoff && self.viewing != 2)
     {
       self.totalRunoff = self.maxRunoff;
       self.viewing = 2;
-      self.clicker.unregister(self.retryButton);
-      self.clicker.register(self.retryButton);
+      setTimeout(function(){ self.clicker.register(self.retryButton); },1000);
     }
     self.clicker.flush();
     self.dragger.flush();

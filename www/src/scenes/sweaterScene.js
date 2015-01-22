@@ -131,13 +131,12 @@ var SweaterScene = function(game, stage)
     self.presser.flush();
     self.ticker.flush();
 
-    if(self.thermostat.temp > 69)
+    if(self.thermostat.temp > 69 && self.viewing != 2)
     {
       self.viewing = 2;
-      self.clicker.unregister(self.retryButton);
-      self.clicker.register(self.retryButton);
+      setTimeout(function(){self.clicker.register(self.retryButton);},1000);
     }
-    else if(!won && self.enemiesMade > 20)
+    else if(!won && self.enemiesMade > 20 && self.viewing != 2)
     {
       won = true;
       setTimeout(self.endGame,1000);

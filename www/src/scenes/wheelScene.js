@@ -308,11 +308,10 @@ var WheelScene = function(game, stage)
 
   self.crowdLeft = function()
   {
-    if(!self.wheel.spinning)
+    if(!self.wheel.spinning && self.viewing != 2)
     {
       self.viewing = 2;
-      self.clicker.unregister(self.retryButton);
-      self.clicker.register(self.retryButton);
+      setTimeout(function(){self.clicker.register(self.retryButton);},1000);
     }
   }
 
