@@ -3,6 +3,9 @@ var IntroScene = function(game, stage)
   var self = this;
   self.stage = stage;
 
+  self.outro_vid_src = "assets/game_intro.mp4";
+  self.outro_vid_stamps = [];
+
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.dbugger;
@@ -58,7 +61,8 @@ var IntroScene = function(game, stage)
 
   self.startClicked = function()
   {
-    game.setScene(MainScene);
+    self.clicker.unregister(self);
+    game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }
 };
 
