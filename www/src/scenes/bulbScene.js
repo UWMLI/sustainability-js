@@ -21,7 +21,7 @@ var BU_Constants = //global for ease of access
   lifespan:  [0,0,  1200,0,50000,0], //hours
 
   electricity_cost:0.00000003, //$/j
-  hours_per_tick:0.5, //hours... duh
+  hours_per_tick:1, //hours... duh
 };
 var BU_c = BU_Constants; //for terseness
 
@@ -160,37 +160,34 @@ var BulbScene = function(game, stage)
 
   self.tick = function()
   {
-    for(var z = 0; z < 2; z++)
+    self.hours += BU_c.hours_per_tick;
+
+    //rates
+    //control 0.123   $/h @ infnty w/ 4 janitors
+    //recoup  (0.123) $/h @ 13653h w/ 3 jan, 1 player
+    //halve   (0.06)  $/h @ 26398h w/ 3 jan, 1 player
+    //lowest  (0.05)  $/h @ 37000h w/ 3 jan, 1 player
+    self.theyspent += 0.123*BU_c.hours_per_tick; //$0.11 experimentally determined to be rate of spending w/ 2 janitors, no player
+
+    self.clicker.flush();
+    self.presser.flush();
+    self.ticker.flush();
+    for(var i = 0; i < self.janitors.length; i++)
     {
-      self.hours += BU_c.hours_per_tick;
+      if(self.janitors[i].state != 2)
+        self.janitors[i].goalNode = self.bestGoalFromNode(self.nodeNearestDude(self.janitors[i]));
+    }
 
-      //rates
-      //control 0.123   $/h @ infnty w/ 4 janitors
-      //recoup  (0.123) $/h @ 13653h w/ 3 jan, 1 player
-      //halve   (0.06)  $/h @ 26398h w/ 3 jan, 1 player
-      //lowest  (0.05)  $/h @ 37000h w/ 3 jan, 1 player
-      self.theyspent += 0.123*BU_c.hours_per_tick; //$0.11 experimentally determined to be rate of spending w/ 2 janitors, no player
-
-      self.clicker.flush();
-      self.presser.flush();
-      self.ticker.flush();
-      for(var i = 0; i < self.janitors.length; i++)
-      {
-        if(self.janitors[i].state != 2)
-          self.janitors[i].goalNode = self.bestGoalFromNode(self.nodeNearestDude(self.janitors[i]));
-      }
-
-      if(self.player.state == 0 && self.selector.lastNode) self.player.goalNode = self.selector.lastNode;
+    if(self.player.state == 0 && self.selector.lastNode) self.player.goalNode = self.selector.lastNode;
 
 /*
 //graphs not used
-      self.iSpendGraph.register(self.ispent);
-      self.theySpendGraph.register(self.theyspent);
+    self.iSpendGraph.register(self.ispent);
+    self.theySpendGraph.register(self.theyspent);
 
-      if(self.theySpendGraph.high > self.iSpendGraph.high) self.iSpendGraph.high = self.theySpendGraph.high;
-      else                                                 self.theySpendGraph.high = self.iSpendGraph.high;
+    if(self.theySpendGraph.high > self.iSpendGraph.high) self.iSpendGraph.high = self.theySpendGraph.high;
+    else                                                 self.theySpendGraph.high = self.iSpendGraph.high;
 */
-    }
   };
 
   self.trunc = function(v,t)
@@ -223,7 +220,7 @@ var BulbScene = function(game, stage)
     var savingsy = 100;
     self.savedinc+=3;
     if(self.savedinc > self.saved)  self.savedinc = self.saved;
-    else if(self.savedinc%5 == 0) self.particler.register(new BU_PriceParticle(savingsx+150+Math.random()*70,savingsy+Math.random()*20,"$",30,"#00AA00",0));
+    else if(self.savedinc%10 == 0) self.particler.register(new BU_PriceParticle(savingsx+150+Math.random()*70,savingsy+Math.random()*20,"$",30,"#00AA00",0));
 
     //self.stage.drawCanv.context.strokeStyle = "#000000";
     //self.stage.drawCanv.context.lineWidth = 2;
@@ -454,7 +451,9 @@ var BU_Dude = function(game, floor, bulb)
   self.maxChangeTimer = 200;
   self.animTimer = Math.round(Math.random()*100);
 
-  var epsillon = 1; //<- ridiculous
+  var walkspeed = 3;
+
+  var epsillon = walkspeed; //<- ridiculous
   self.eq = function(a,b) { return Math.abs(a-b) < epsillon; }
   self.less = function(a,b) { return a < (b-epsillon); }
   self.great = function(a,b) { return a > (b+epsillon); }
@@ -462,20 +461,20 @@ var BU_Dude = function(game, floor, bulb)
   self.lastwalked;
   self.tick = function()
   {
-    self.animTimer = (self.animTimer+1)%100;
+    self.animTimer = (self.animTimer+3)%100;
     if(self.state == 0 || self.state == 1) //should move to goal
     {
       if(self.floor != self.goalNode.n_y) //not on goal floor
       {
-        if(self.less(self.x+(self.w/2), game.node(game.house.bulbsPerFloor,self.floor).x)) { self.x++; self.lastwalked = 1; } //left of elevator
+        if(self.less(self.x+(self.w/2), game.node(game.house.bulbsPerFloor,self.floor).x)) { self.x+=walkspeed; self.lastwalked = 1; } //left of elevator
         else { self.floor = self.goalNode.n_y; self.y = self.goalNode.y; } //at elevator
         self.state = 1;
       }
       else //on goal floor
       {
         self.state = 1;
-             if(self.less( self.x+(self.w/2), self.goalNode.x)) { self.x++; self.lastwalked = 1; } //left of goal
-        else if(self.great(self.x+(self.w/2), self.goalNode.x)) { self.x--; self.lastwalked = -1; } //right of goal
+             if(self.less( self.x+(self.w/2), self.goalNode.x)) { self.x+=walkspeed; self.lastwalked = 1; } //left of goal
+        else if(self.great(self.x+(self.w/2), self.goalNode.x)) { self.x-=walkspeed; self.lastwalked = -1; } //right of goal
         else //at goal
         {
           self.state = 0;
@@ -483,7 +482,7 @@ var BU_Dude = function(game, floor, bulb)
           if(b && (b.type == BU_c.BULB_LED_OUT || b.type == BU_c.BULB_INCANDESCENT_OUT || b.type == BU_c.BULB_NONE))
           {
             self.state = 2;
-            self.changeTimer = 200;
+            self.changeTimer = 100;
             b.setType(BU_c.BULB_CHANGING);
           }
         }
@@ -491,7 +490,7 @@ var BU_Dude = function(game, floor, bulb)
     }
     else
     {
-      self.changeTimer--;
+      self.changeTimer-=1;
       if(self.changeTimer <= 0)
       {
         game.bulbAt(self.goalNode).setType(bulb);
@@ -628,7 +627,7 @@ var BU_PriceParticle = function(x,y,text,size,color,delay)
   self.c = color;
   self.tick = function()
   {
-    self.t += 0.005;
+    self.t += 0.01;
     if(self.t > 0) self.y = self.y+(self.ey-self.y)/50;
     return self.t < 1;
   }
