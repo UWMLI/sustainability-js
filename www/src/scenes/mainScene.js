@@ -7,6 +7,8 @@ var MainScene = function(game, stage)
   self.outro_vid_src = "assets/game_win.mp4";
   self.outro_vid_stamps = [];
 
+  self.audio_src = "assets/game_music.mp3";
+
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.dbugger;
@@ -16,6 +18,8 @@ var MainScene = function(game, stage)
   self.drawer;
   self.particler;
   self.assetter;
+
+  self.audio;
 
   self.map;
 
@@ -37,6 +41,9 @@ var MainScene = function(game, stage)
     self.particler = new Particler({});
     self.assetter = new Assetter({});
 
+    self.audio = new Aud(self.audio_src);
+    self.audio.load();
+
     self.map         = new MA_Map(self);                                                                  self.drawer.register(self.map);         self.dragger.register(self.map)
     var hw = 50;
     var hh = 50;
@@ -54,8 +61,10 @@ var MainScene = function(game, stage)
     if(play && !MainSceneOutroPlayed)
     {
       MainSceneOutroPlayed = true;
-      setTimeout(function() { game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){});},1000);
+      setTimeout(function() { game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){self.audio.play();});},1000);
     }
+    else
+      self.audio.play();
   };
 
   self.tick = function()
@@ -91,6 +100,7 @@ var MainScene = function(game, stage)
 
   self.buttonClicked = function(btn)
   {
+    self.audio.stop();
     if(btn == self.bikeBtn)     game.setScene(BikeScene);
     if(btn == self.windowBtn)   game.setScene(WindowScene);
     if(btn == self.bulbBtn)     game.setScene(BulbScene);
