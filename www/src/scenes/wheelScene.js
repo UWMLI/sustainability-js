@@ -10,6 +10,8 @@ var WheelScene = function(game, stage)
   self.outro_vid_src = "assets/wheel_win.mp4";
   self.outro_vid_stamps = [];
 
+  self.audio_src = "assets/game_music.mp3";
+
   self.numSquirrels = 4;
   self.numNests = 32;
 
@@ -23,6 +25,8 @@ var WheelScene = function(game, stage)
   self.drawer;
   self.particler;
   self.assetter;
+
+  self.audio;
 
   self.beginButton;
   self.retryButton;
@@ -172,6 +176,9 @@ var WheelScene = function(game, stage)
     self.particler = new Particler({});
     self.assetter = new Assetter({});
 
+    self.audio = new Aud(self.audio_src);
+    self.audio.load();
+
     self.initObjects();
     self.resetState();
     self.resetPlacements();
@@ -182,6 +189,7 @@ var WheelScene = function(game, stage)
 
   self.beginGame = function()
   {
+    self.audio.play();
     self.viewing = 1;
     self.clicker.unregister(self.beginButton);
 
@@ -205,6 +213,8 @@ var WheelScene = function(game, stage)
 
   self.endGame = function()
   {
+    self.audio.stop();
+
     self.viewing = 3;
     game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }

@@ -11,8 +11,12 @@ var WindowScene = function(game, stage)
   self.outro_vid_src = "assets/window_win.mp4";
   self.outro_vid_stamps = [];
 
+  self.audio_src = "assets/game_music.mp3";
+
   self.beginGame = function()
   {
+    self.audio.play();
+
     self.viewing = 1;
     self.clicker.unregister(self.beginButton);
 
@@ -27,6 +31,8 @@ var WindowScene = function(game, stage)
 
   self.endGame = function()
   {
+    self.audio.stop();
+
     self.viewing = 2;
     game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }
@@ -43,6 +49,8 @@ var WindowScene = function(game, stage)
   self.drawer;
   self.assetter;
   self.particler;
+
+  self.audio;
 
   self.sky;
   self.reticle;
@@ -64,6 +72,9 @@ var WindowScene = function(game, stage)
     self.drawer = new Drawer({source:stage.drawCanv});
     self.assetter = new Assetter({});
     self.particler = new Particler({});
+
+    self.audio = new Aud(self.audio_src);
+    self.audio.load();
 
     self.sky = new WI_Sky(self);
     self.reticle = new WI_Reticle(self);

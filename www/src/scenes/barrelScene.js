@@ -41,6 +41,7 @@ var BarrelScene = function(game, stage)
   self.endGame = function()
   {
     self.audio.stop();
+
     self.viewing = 3;
     game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }
@@ -86,6 +87,7 @@ var BarrelScene = function(game, stage)
 
     self.audio = new Aud(self.audio_src);
     self.audio.load();
+
     //self.clicker.register(new RB_PlaceLogger(self));
 
     self.barrelsFound = 0;

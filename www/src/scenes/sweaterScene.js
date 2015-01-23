@@ -11,8 +11,12 @@ var SweaterScene = function(game, stage)
   self.outro_vid_src = "assets/sweater_win.mp4";
   self.outro_vid_stamps = [];
 
+  self.audio_src = "assets/game_music.mp3";
+
   self.beginGame = function()
   {
+    self.audio.play();
+
     self.viewing = 1;
     self.clicker.unregister(self.beginButton);
 
@@ -41,6 +45,8 @@ var SweaterScene = function(game, stage)
 
   self.endGame = function()
   {
+    self.audio.stop();
+
     self.viewing = 3;
     game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }
@@ -57,6 +63,8 @@ var SweaterScene = function(game, stage)
   self.drawer;
   self.particler;
   self.assetter;
+
+  self.audio;
 
   self.house;
   self.player;
@@ -81,6 +89,9 @@ var SweaterScene = function(game, stage)
     self.drawer = new Drawer({source:stage.drawCanv});
     self.particler = new Particler({});
     self.assetter = new Assetter({});
+
+    self.audio = new Aud(self.audio_src);
+    self.audio.load();
 
     self.house = new SW_House(self);
     self.player = new SW_Player(self);

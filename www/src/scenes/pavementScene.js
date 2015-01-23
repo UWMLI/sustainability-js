@@ -10,6 +10,8 @@ var PavementScene = function(game, stage)
   self.outro_vid_src = "assets/pavement_win.mp4";
   self.outro_vid_stamps = [];
 
+  self.audio_src = "assets/game_music.mp3";
+
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.dbugger;
@@ -19,6 +21,8 @@ var PavementScene = function(game, stage)
   self.drawer;
   self.particler;
   self.assetter;
+
+  self.audio;
 
   self.beginButton;
   self.retryButton;
@@ -76,6 +80,8 @@ var PavementScene = function(game, stage)
 
   self.beginGame = function()
   {
+    self.audio.play();
+
     self.viewing = 1;
     self.clicker.unregister(self.beginButton);
 
@@ -93,6 +99,8 @@ var PavementScene = function(game, stage)
 
   self.endGame = function()
   {
+    self.audio.stop();
+
     self.viewing = 3;
     game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }
@@ -106,6 +114,9 @@ var PavementScene = function(game, stage)
     self.drawer = new Drawer({source:stage.drawCanv});
     self.particler = new Particler({});
     self.assetter = new Assetter({});
+
+    self.audio = new Aud(self.audio_src);
+    self.audio.load();
 
     self.initObjects();
     self.resetState();

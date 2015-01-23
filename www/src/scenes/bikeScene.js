@@ -11,8 +11,11 @@ var BikeScene = function(game, stage)
   self.outro_vid_src = "assets/bike_win.mp4";
   self.outro_vid_stamps = [];
 
+  self.audio_src = "assets/game_music.mp3";
+
   self.beginGame = function()
   {
+    self.audio.play();
     self.viewing = 1;
     self.clicker.unregister(self.beginButton);
 
@@ -23,6 +26,7 @@ var BikeScene = function(game, stage)
 
   self.endGame = function()
   {
+    self.audio.stop();
     self.viewing = 2;
     game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }
@@ -42,6 +46,8 @@ var BikeScene = function(game, stage)
   self.particler;
   self.assetter;
 
+  self.audio;
+
   self.panes = [];
 
   self.ready = function()
@@ -54,6 +60,9 @@ var BikeScene = function(game, stage)
     self.drawer = new Drawer({source:stage.drawCanv});
     self.particler = new Particler({});
     self.assetter = new Assetter({});
+
+    self.audio = new Aud(self.audio_src);
+    self.audio.load();
 
     self.currentPane = 0;
     self.panes.push(new B_FindHelmetPane(self));
