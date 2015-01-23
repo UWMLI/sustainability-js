@@ -99,30 +99,33 @@ var Game = function(init)
 
   self.setScene = function(Scene)
   {
-    if(using_aris && Scene == MainScene) //trying to "finish level"
+    if(Scene == MainScene) //trying to "finish level"
     {
       for(var i = 0; i < game_meta.length; i++)
       {
         if(scenes[currentScene].constructor == game_meta[i].scene) //eewwwwwwwwww
         {
-          var qty = 0;
-          for(var j = 0; j < m.item_ids.length; j++)
-            if(m.item_ids[j] == game_meta[i].item_id) qty = m.item_qtys[j];
-          if(qty < 1)
+          game_meta[i].complete = 1;
+          if(using_aris)
           {
-            ARIS.setItemCount(game_meta[i].item_id,1);
-            ARIS.giveItemCount(victory_count_item_id,1);
+            var qty = 0;
+            for(var j = 0; j < m.item_ids.length; j++)
+              if(m.item_ids[j] == game_meta[i].item_id) qty = m.item_qtys[j];
+            if(qty < 1)
+            {
+              ARIS.setItemCount(game_meta[i].item_id,1);
+              ARIS.giveItemCount(victory_count_item_id,1);
+            }
+            setTimeout(ARIS.closeMe,10);
+            return;
           }
-          setTimeout(ARIS.closeMe,100);
         }
       }
     }
-    else
-    {
-      scenes[currentScene].cleanup();
-      scenes[currentScene] = new Scene(self, stage);
-      scenes[currentScene].ready();
-    }
+
+    scenes[currentScene].cleanup();
+    scenes[currentScene] = new Scene(self, stage);
+    scenes[currentScene].ready();
   }
 
   var vidCallback;
