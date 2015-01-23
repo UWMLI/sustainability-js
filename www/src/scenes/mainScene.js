@@ -181,6 +181,7 @@ var MA_Button = function(x,y,w,h,name,game)
   self.h = h;
   self.name = name;
   self.img = game.assetter.asset("overworld_"+self.name+".png")
+  self.c_img = game.assetter.asset("overworld_check.png")
 
   self.meta;
   for(var i = 0; i < game_meta.length; i++)
@@ -193,7 +194,7 @@ var MA_Button = function(x,y,w,h,name,game)
   {
     canv.context.drawImage(self.img,self.x,self.y,self.w,self.h);
     if(self.meta.complete)
-      canv.context.fillRect(self.x,self.y,self.w,self.h);
+      canv.context.drawImage(self.c_img,self.x-20,self.y-20,self.w+40,self.h+40);
   }
   self.click = function()
   {
