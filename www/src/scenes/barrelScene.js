@@ -11,8 +11,11 @@ var BarrelScene = function(game, stage)
   self.outro_vid_src = "assets/barrel_win.mp4";
   self.outro_vid_stamps = [];
 
+  self.audio_src = "assets/game_music.mp3";
+
   self.beginGame = function()
   {
+    self.audio.play();
     self.viewing = 1;
     self.clicker.unregister(self.beginButton);
 
@@ -37,6 +40,7 @@ var BarrelScene = function(game, stage)
 
   self.endGame = function()
   {
+    self.audio.stop();
     self.viewing = 3;
     game.playVid(self.outro_vid_src, self.outro_vid_stamps, function(){game.setScene(MainScene);});
   }
@@ -55,6 +59,8 @@ var BarrelScene = function(game, stage)
   self.drawer;
   self.particler;
   self.assetter;
+
+  self.audio;
 
   self.mapBorder;
   self.mapPipe;
@@ -78,11 +84,14 @@ var BarrelScene = function(game, stage)
     self.particler = new Particler({});
     self.assetter = new Assetter({});
 
+    self.audio = new Aud(self.audio_src);
+    self.audio.load();
     //self.clicker.register(new RB_PlaceLogger(self));
 
     self.barrelsFound = 0;
     self.totalRunoff = 0;
     self.maxRunoff = 300;
+    if(platform == "PC") self.maxRunoff *= 2;
 
     self.mapBorder = new RB_MapBorder(self);
     self.mapPipe   = new RB_MapPipe(self);
