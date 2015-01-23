@@ -71,7 +71,6 @@ var BulbScene = function(game, stage)
 
   //end intro stuff
 
-
   var physical_rect    = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height};
   var theoretical_rect = {x:0,y:0,w:stage.drawCanv.canvas.width,h:stage.drawCanv.canvas.height};
   self.ticker;
@@ -83,6 +82,8 @@ var BulbScene = function(game, stage)
 
   self.audio;
 
+  self.arcgraphs;
+
   self.house;
   self.nodes;
   self.player;
@@ -91,9 +92,9 @@ var BulbScene = function(game, stage)
 
   self.selector;
 
-  self.theySpendGraph;
-  self.iSpendGraph;
-  self.spendGraphMarkings;
+  //self.theySpendGraph;
+  //self.iSpendGraph;
+  //self.spendGraphMarkings;
 
   self.hours = 0;
   self.numbulbs = 0;
@@ -111,6 +112,29 @@ var BulbScene = function(game, stage)
 
     self.audio = new Aud(self.audio_src);
     self.audio.load();
+
+    self.arcgraphs = [];
+    var l = 100;
+    for(var i = 0; i < l; i++)
+    {
+      var w = 50;
+      var h = 50;
+      var c = new Canv({width:w,height:h});
+
+      c.context.strokeStyle = "#00FFFF"
+      c.context.lineWidth = 5;
+      c.context.beginPath();
+      c.context.arc(
+      w/2,
+      h/2,
+      (w/2)-5,
+      3*Math.PI/2,
+      (3*(Math.PI/2)+(i/l)*(2*Math.PI))%(2*Math.PI)+0.01,
+      true);
+      c.context.stroke();
+
+      self.arcgraphs[i] = c;
+    }
 
     self.house = new BU_House(self);
     self.nodes = [];
@@ -599,6 +623,19 @@ var BU_Bulb = function(game,node)
 
     if(self.hours_left > 0)
     {
+//DRAW GRAPH HERE!
+      var i = Math.floor(((BU_c.lifespan[self.type]-self.hours_left)/BU_c.lifespan[self.type])*game.arcgraphs.length);
+      canv.context.drawImage(
+        game.arcgraphs[i].canvas,
+        0,
+        0,
+        game.arcgraphs[i].canvas.width,
+        game.arcgraphs[i].canvas.height,
+        self.x+12,
+        self.y+10,
+        game.arcgraphs[i].canvas.width,
+        game.arcgraphs[i].canvas.height);
+/*
       canv.context.strokeStyle = "#00FFFF"
       canv.context.lineWidth = 5;
       canv.context.beginPath();
@@ -610,6 +647,7 @@ var BU_Bulb = function(game,node)
       (3*(Math.PI/2)+((BU_c.lifespan[self.type]-self.hours_left)/BU_c.lifespan[self.type])*(2*Math.PI))%(2*Math.PI),
       true);
       canv.context.stroke();
+*/
     }
   }
 }
