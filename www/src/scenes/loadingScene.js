@@ -172,6 +172,7 @@ var LoadingScene = function(game, stage)
     }
     if(gameType == "")
     {
+      img_srcs.push("assets/title_logo.png");
       img_srcs.push("assets/overworld_map.png");
       img_srcs.push("assets/overworld_check.png");
       img_srcs.push("assets/overworld_barrel.png");

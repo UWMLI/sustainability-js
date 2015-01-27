@@ -73,12 +73,16 @@ var IN_startButton = function(game)
   self.y = 0;
   self.w = game.stage.drawCanv.canvas.width;
   self.h = game.stage.drawCanv.canvas.height;
+  self.img = game.assetter.asset("title_logo.png")
 
   self.draw = function(canv)
   {
-    canv.context.font = "30px comic_font";
     canv.context.fillStyle = "#000000";
-    canv.context.fillText("START",self.x+self.w/2,self.y+self.h/2);
+    canv.context.fillRect(self.x,self.y,self.w,self.h);
+    canv.context.drawImage(self.img,self.x,self.y+(self.h/2)-200,self.w,400);
+    canv.context.font = "30px comic_font";
+    canv.context.fillStyle = "#FFFFFF";
+    canv.context.fillText("(Touch Anywhere to Begin)",self.x+160,self.y+self.h-30);
   }
   self.click = function()
   {

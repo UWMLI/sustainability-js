@@ -16,7 +16,7 @@ var Vid = function(container, source, stamps, callback)
   self.video.setAttribute("webkit-playsinline","webkit-playsinline"); //ugh
   var dom_src = document.createElement('source');
   dom_src.src = self.source;
-  dom_src.type = "video/"+self.source.substring(self.source.indexOf('.')+1); //oh god so error prone
+  //dom_src.type = "video/"+self.source.substring(self.source.indexOf('.')+1); //oh god so error prone
   self.video.appendChild(dom_src);
 
   self.onended = function()
