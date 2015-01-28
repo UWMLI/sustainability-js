@@ -145,7 +145,7 @@ var BarrelScene = function(game, stage)
         self.drawer.register(self.rain[self.rain.length-1]);
       }
     }
-    if(self.totalRunoff < self.maxRunoff)
+    if(self.viewing == 1 && self.totalRunoff < self.maxRunoff)
       self.totalRunoff += (self.barrels.length-self.barrelsFound)/self.barrels.length;
     else if(self.totalRunoff >= self.maxRunoff && self.viewing != 2)
     {
