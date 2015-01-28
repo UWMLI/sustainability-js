@@ -92,8 +92,8 @@ var BarrelScene = function(game, stage)
 
     self.barrelsFound = 0;
     self.totalRunoff = 0;
-    self.maxRunoff = 300;
-    if(platform == "PC") self.maxRunoff *= 2;
+    self.maxRunoff = 400;
+    if(platform == "PC") self.maxRunoff *= 1.5;
 
     self.mapBorder = new RB_MapBorder(self);
     self.mapPipe   = new RB_MapPipe(self);

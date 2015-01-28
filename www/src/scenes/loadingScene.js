@@ -18,16 +18,8 @@ var LoadingScene = function(game, stage)
     imagesloaded++;
   };
 
-  self.ready = function()
+  var registerSrcs = function()
   {
-    pad = 20;
-    barw = (canv.canvas.width-(2*pad));
-    progress = 0;
-    canv.context.fillStyle = "#000000";
-    canv.context.fillText(".",0,0);// funky way to encourage any custom font to load
-
-    //put strings in 'img_srcs' as separate array to get "static" count
-
     if(gameType == "window" || gameType == "")
     {
       img_srcs.push("assets/win_building.png");
@@ -187,6 +179,17 @@ var LoadingScene = function(game, stage)
     //misc
     img_srcs.push("assets/null.png");
     img_srcs.push("assets/man.png");
+  }
+
+  self.ready = function()
+  {
+    pad = 20;
+    barw = (canv.canvas.width-(2*pad));
+    progress = 0;
+    canv.context.fillStyle = "#000000";
+    canv.context.fillText(".",0,0);// funky way to encourage any custom font to load
+
+    registerSrcs();
     for(var i = 0; i < img_srcs.length; i++)
     {
       images[i] = new Image();
@@ -196,10 +199,38 @@ var LoadingScene = function(game, stage)
     imageLoaded(); //call once to prevent 0/0 != 100% bug
   };
 
+  self.retry = function()
+  {
+    for(var i = 0; i < images.length; i++)
+      images[i].onload = function(){};
+    imagesLoaded = 0;
+
+    images = [];
+    img_srcs = [];
+    progress = 0;
+
+    registerSrcs();
+    for(var i = 0; i < img_srcs.length; i++)
+    {
+      images[i] = new Image();
+      images[i].onload = imageLoaded; 
+      images[i].src = img_srcs[i];
+    }
+    imageLoaded(); //call once to prevent 0/0 != 100% bug
+  }
+
+  var ticksTilRetry = 1000;
+  var ticksSinceRetry = 0;
   self.tick = function()
   {
     if(progress <= imagesloaded/(img_srcs.length+1)) progress += 0.01;
     if(progress >= 1.0) game.nextScene();
+    if(ticksSinceRetry >= ticksTilRetry)
+    {
+      ticksSinceRetry = 0;
+      self.retry();
+    }
+    ticksSinceRetry++;
   };
 
   self.draw = function()
