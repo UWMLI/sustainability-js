@@ -88,6 +88,12 @@ var Game = function(init)
     //self.drawer.flush();
     //DEBUG CODE
     stage.draw(); //blits from offscreen canvas to on screen one
+
+    if(vid && vid.video)
+    {
+      if(vid.video.currentTime >= vid.video.duration-0.25)
+        vid.stop();
+    }
   };
 
   self.nextScene = function()

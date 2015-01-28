@@ -54,6 +54,5 @@ var Vid = function(container, source, stamps, callback)
     else
       self.video.currentTime = self.stamps[i];
   }
-
-
 }
+
