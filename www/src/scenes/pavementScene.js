@@ -206,7 +206,7 @@ var PavementScene = function(game, stage)
     if(self.percent != 1 && p == 1)
     {
       self.pstage++;
-      if(self.pstage == 3) setTimeout(self.endGame,1000);
+      if(self.pstage == 3) setTimeout(function(){if(self.viewing == 1) self.endGame(); },1000);
       else
       {
         self.cleanBG.setStage(self.pstage);
