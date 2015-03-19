@@ -9,4 +9,7 @@
     </author>
     <content src="index.html" />
     <access origin="*" />
+    <preference name="orientation" value="portrait" />
+    <preference name="AllowInlineMediaPlayback" value="true"/>
+    <preference name="MediaPlaybackRequiresUserAction" value="false"/>
 </widget>

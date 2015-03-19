@@ -7,6 +7,13 @@ var Vid = function(container, source, stamps, callback)
   self.stamps    = stamps;
   self.callback  = callback;
 
+  function getPhoneGapPath() {
+    var path = window.location.pathname;
+    path = path.substr( path, path.length - 10 );
+    return 'file://' + path;
+  };
+
+/*
   self.video = document.createElement('video');
   self.video.style.width = container.style.width;
   self.video.style.height = container.style.height;
@@ -18,41 +25,46 @@ var Vid = function(container, source, stamps, callback)
   dom_src.src = self.source;
   //dom_src.type = "video/"+self.source.substring(self.source.indexOf('.')+1); //oh god so error prone
   self.video.appendChild(dom_src);
+  */
 
   self.onended = function()
   {
-    self.container.removeChild(self.video);
+    //self.container.removeChild(self.video);
 
-    self.video = undefined;
+    //self.video = undefined;
+    VideoPlayer.close();
     self.callback();
   }
-  self.video.onended = self.onended;
+  //self.video.onended = self.onended;
 
   self.load = function()
   {
-    self.video.load();
+    //self.video.load();
   }
 
   self.play = function()
   {
-    self.container.appendChild(self.video);
-    self.video.play();
+    VideoPlayer.play(getPhoneGapPath()+source, {}, self.onended, function(){});
+    //self.container.appendChild(self.video);
+    //self.video.play();
   }
 
   self.stop = function()
   {
-    self.video.pause();
+    //self.video.pause();
     self.onended();
   }
 
   self.next = function()
   {
+  /*
     var i = 0;
     while(i < self.stamps.length && self.video.currentTime >= self.stamps[i])
       i++;
     if(i == self.stamps.length) self.stop();
     else
       self.video.currentTime = self.stamps[i];
+  */
   }
 }
 
