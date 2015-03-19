@@ -1,9 +1,25 @@
+var all_vids = [];
+var vid_listener_init = false;
+var stopAllVids = function()
+{
+  for(var i = 0; i < all_vids.length; i++)
+    all_vids[i].stop();
+  all_vids = [];
+}
+var initVidListener = function()
+{
+  if(vid_listener_init) return;
+  vid_listener_init = true;
+  document.addEventListener("pause", stopAllVids, false);
+}
 var Vid = function(container, source, stamps, callback)
 {
-  //var PLAT="IOS";
-  var PLAT="ANDROID";
+  var PLAT="IOS";
+  //var PLAT="ANDROID";
 
   var self = this;
+  initVidListener();
+  all_vids.push(self);
 
   self.container = container;
   self.source    = source;
@@ -30,6 +46,8 @@ var Vid = function(container, source, stamps, callback)
 
       self.video = undefined;
       self.callback();
+      var index = all_vids.indexOf(self);
+      if(index != -1) all_vids.splice(index,1);
     }
     self.video.onended = self.onended;
 
@@ -73,6 +91,8 @@ var Vid = function(container, source, stamps, callback)
     {
       VideoPlayer.close();
       self.callback();
+      var index = all_vids.indexOf(self);
+      if(index != -1) all_vids.splice(index,1);
     }
 
     self.load = function()
