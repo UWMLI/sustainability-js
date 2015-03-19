@@ -1,40 +1,64 @@
 var Aud = function(source)
 {
+  //var PLAT="IOS";
+  var PLAT="ANDROID";
+
   var self = this;
   self.stopped = false;
 
-  function getPhoneGapPath() {
-    var path = window.location.pathname;
-    path = path.substr( path, path.length - 10 );
-    return 'file://' + path;
-  };
+  if(PLAT == "IOS")
+  {
+    self.audio = new Audio(source);
+    self.audio.controls = false;
+    self.audio.loop = true;
 
-  self.audio = new Media(getPhoneGapPath()+source,null,null,
-    function(status)
+    self.load = function()
     {
-      if(!self.stopped && status == Media.MEDIA_STOPPED)
-        self.audio.play();
+      self.audio.load();
     }
-  );
 
-  //self.audio = new Audio(source);
-  //self.audio.controls = false;
-  //self.audio.loop = true;
+    self.play = function()
+    {
+      self.audio.play();
+    }
 
-  self.load = function()
-  {
-    //self.audio.load();
+    self.stop = function()
+    {
+      self.stopped = true;
+      self.audio.pause();
+    }
   }
 
-  self.play = function()
+  if(PLAT == "ANDROID")
   {
-    self.audio.play();
-  }
+    function getPhoneGapPath() {
+      var path = window.location.pathname;
+      path = path.substr( path, path.length - 10 );
+      return 'file://' + path;
+    };
 
-  self.stop = function()
-  {
-    self.stopped = true;
-    self.audio.pause();
-    self.audio.release();
+    self.audio = new Media(getPhoneGapPath()+source,null,null,
+      function(status)
+      {
+        if(!self.stopped && status == Media.MEDIA_STOPPED)
+          self.audio.play();
+      }
+    );
+
+    self.load = function()
+    {
+    }
+
+    self.play = function()
+    {
+      self.audio.play();
+    }
+
+    self.stop = function()
+    {
+      self.stopped = true;
+      self.audio.pause();
+      self.audio.release();
+    }
   }
 }
