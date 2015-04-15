@@ -110,7 +110,6 @@ var SweaterScene = function(game, stage)
 
     self.drawer.register(self.house);
 
-
     function getClickFuncForFloor(i)
     {
       return function() { self.player.setFloor(i); }
@@ -255,7 +254,8 @@ var SW_Player = function(game)
 
   self.img_grab  = game.assetter.asset("thermo_you_grab.png");
   self.img_throw = game.assetter.asset("thermo_you_throw.png");
-  self.img = self.img_grab;
+  self.imgs = [self.img_grab,self.img_throw];
+  self.cur_img = 0;
 
   self.charge = 100;
 
@@ -266,19 +266,19 @@ var SW_Player = function(game)
     {
       game.sweaterFactory.produce();
       self.charge = 0;
-      self.img = self.img_throw;
+      self.cur_img = 1;
     }
   }
 
   self.tick = function()
   {
-    self.charge += 4;
-    if(self.charge > 100) { self.charge = 100; self.img = self.img_grab; }
+    if(self.charge <  100) { self.charge += 4; }
+    if(self.charge >= 100) { self.charge = 100; self.cur_img = 0; }
   }
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x,game.house.ybForFloor(self.floor)-self.h,self.w,self.h);
+    canv.context.drawImage(self.imgs[self.cur_img],self.x,game.house.ybForFloor(self.floor)-self.h,self.w,self.h);
     //canv.context.fillStyle = "#00FF00";
     //canv.context.fillRect(self.x,game.house.yForFloor(self.floor)+self.h-((self.charge/100)*self.h),20,(self.charge/100)*self.h);
   }
@@ -456,30 +456,61 @@ var SW_Enemy = function(game, floor)
 var SW_SweaterFactory = function(game)
 {
   var self = this;
+  self.sweaterpool = [];
+  self.active = 0;
 
   self.produce = function()
   {
     game.sweaterProduced(game.player.floor);
-    var s = new SW_Sweater(game,game.player.floor);
-    game.sweaters.push(s);
-    game.ticker.register(s);
-    game.drawer.register(s);
+    var s;
+    if(self.sweaterpool.length == self.active)
+    {
+      s = new SW_Sweater(game,self);
+      self.sweaterpool.push(s);
+    }
+    else
+    {
+      s = self.sweaterpool[self.active];
+    }
+    s.init(game.player.floor);
+    self.active++;
+  }
+
+  self.sweaterKilled = function(s)
+  {
+    var i = self.sweaterpool.indexOf(s);
+    self.sweaterpool[i] = self.sweaterpool[self.active-1];
+    self.sweaterpool[self.active-1] = s;
+    self.active--;
   }
 }
 
-var SW_Sweater = function(game, floor)
+var SW_Sweater = function(game, factory)
 {
   var self = this;
 
-  self.floor = floor;
+  self.factory = factory;
+
+  self.floor = 0;
   self.w = 100;
   self.h = 100;
   self.x = 90;
-  self.y = game.house.ybForFloor(floor)-self.h;
+  self.y = game.house.ybForFloor(0)-self.h;
 
   self.speed = 8;
 
   self.img = game.assetter.asset("thermo_sweat.png");
+
+  self.init = function(floor)
+  {
+    self.floor = floor;
+    self.x = 90;
+    self.y = game.house.ybForFloor(floor)-self.h;
+
+    game.sweaters.push(self);
+    game.ticker.register(self);
+    game.drawer.register(self);
+  }
 
   self.tick = function()
   {
@@ -509,6 +540,7 @@ var SW_Sweater = function(game, floor)
     game.sweaters.splice(game.sweaters.indexOf(self),1);
     game.ticker.unregister(self);
     game.drawer.unregister(self);
+    factory.sweaterKilled(self);
   }
 }
 

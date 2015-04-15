@@ -569,11 +569,20 @@ var BU_Bulb = function(game,node)
   self.x = self.node.x-(self.w/2);
   self.y = self.node.y;
 
-  self.img = game.assetter.asset("bulb_bulb.png");
-  self.glow_img = game.assetter.asset("bulb_glow_blue.png");
-
   self.type = BU_c.BULB_NONE;
   self.hours_left = BU_c.lifespan[self.type];
+
+  self.imgs = [
+    game.assetter.asset("bulb_bulb.png"),
+  ];
+  self.cur_img = 0;
+
+  self.glow_imgs = [
+    game.assetter.asset("null.png"),
+    game.assetter.asset("bulb_glow_yellow.png"),
+    game.assetter.asset("bulb_glow_blue.png")
+  ];
+  self.cur_glow_img = 0;
 
   self.setType = function(type)
   {
@@ -581,12 +590,12 @@ var BU_Bulb = function(game,node)
     self.hours_left = BU_c.lifespan[self.type];
     switch(type)
     {
-      case BU_c.BULB_NONE:             self.img = game.assetter.asset("bulb_bulb.png"); self.glow_img = game.assetter.asset("null.png");             break;
-      case BU_c.BULB_CHANGING:         self.img = game.assetter.asset("bulb_bulb.png"); self.glow_img = game.assetter.asset("null.png");             break;
-      case BU_c.BULB_INCANDESCENT_ON:  self.img = game.assetter.asset("bulb_bulb.png"); self.glow_img = game.assetter.asset("bulb_glow_yellow.png"); break;
-      case BU_c.BULB_INCANDESCENT_OUT: self.img = game.assetter.asset("bulb_bulb.png"); self.glow_img = game.assetter.asset("null.png");             break;
-      case BU_c.BULB_LED_ON:           self.img = game.assetter.asset("bulb_bulb.png"); self.glow_img = game.assetter.asset("bulb_glow_blue.png");   break;
-      case BU_c.BULB_LED_OUT:          self.img = game.assetter.asset("bulb_bulb.png"); self.glow_img = game.assetter.asset("null.png");             break;
+      case BU_c.BULB_NONE:             self.cur_img = 0; self.cur_glow_img = 0; break;
+      case BU_c.BULB_CHANGING:         self.cur_img = 0; self.cur_glow_img = 0; break;
+      case BU_c.BULB_INCANDESCENT_ON:  self.cur_img = 0; self.cur_glow_img = 1; break;
+      case BU_c.BULB_INCANDESCENT_OUT: self.cur_img = 0; self.cur_glow_img = 0; break;
+      case BU_c.BULB_LED_ON:           self.cur_img = 0; self.cur_glow_img = 2; break;
+      case BU_c.BULB_LED_OUT:          self.cur_img = 0; self.cur_glow_img = 0; break;
     }
     game.bulbChanged(self);
   }
@@ -618,8 +627,8 @@ var BU_Bulb = function(game,node)
 
   self.draw = function(canv)
   {
-    canv.context.drawImage(self.img,self.x+self.w/3,self.y,self.w/3,self.h/4);
-    if(self.hours_left > 20 || Math.random() < 0.95) canv.context.drawImage(self.glow_img,self.x-self.w/2,self.y-(self.h/8),self.w*2,self.h);
+    canv.context.drawImage(self.imgs[self.cur_img],self.x+self.w/3,self.y,self.w/3,self.h/4);
+    if(self.hours_left > 20 || Math.random() < 0.95) canv.context.drawImage(self.glow_imgs[self.cur_glow_img],self.x-self.w/2,self.y-(self.h/8),self.w*2,self.h);
 
     if(self.hours_left > 0)
     {
